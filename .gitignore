@@ -13,4 +13,11 @@ Cargo.lock
 # Added by cargo
 
 /target
+<<<<<<< HEAD
 .env
+=======
+<<<<<<< HEAD
+=======
+.env
+>>>>>>> 579dc89 (feat: initialize app)
+>>>>>>> 3ba1a04 (feat: initialize app)
