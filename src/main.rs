@@ -3,7 +3,7 @@ use axum::Router;
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use std::env;
-use std::net::SocketAddr;
+use std::net::{Ipv4Addr, SocketAddr};
 use tower::ServiceBuilder;
 use tower_http::{
     add_extension::AddExtensionLayer,
@@ -45,7 +45,7 @@ async fn main() -> anyhow::Result<()> {
             .layer(TraceLayer::new_for_http()),
     );
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
+    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
     println!("listening on http://{}", addr);
 
     axum::Server::bind(&addr)
