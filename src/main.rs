@@ -1,17 +1,27 @@
+use anyhow::Ok;
 use axum::Router;
 use dotenvy::dotenv;
+use sqlx::PgPool;
 use std::env;
 use std::net::SocketAddr;
 use tower::ServiceBuilder;
-use tower_http::cors::{Any, CorsLayer};
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    add_extension::AddExtensionLayer,
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
 use tracing::info;
 
 use budgetto::app::apis::ApiRoutes;
 use budgetto::core::{config::AppConfig, database::ConnectionManager};
 
+#[derive(Clone)]
+struct ApiContext {
+    db: PgPool,
+}
+
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     dotenv().ok();
     let config = AppConfig::new();
     let api_routes = ApiRoutes::new();
@@ -25,14 +35,15 @@ async fn main() {
     // enable console logging
     tracing_subscriber::fmt::init();
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");
-    let pg_pool = ConnectionManager::new_pool(&config.database_url, config.run_migrations)
+    let db = ConnectionManager::new_pool(&config.database_url, config.run_migrations)
         .await
         .expect("could not initialize the database connection pool");
 
-    let app = Router::new()
-        .nest("/api", api_routes)
-        .layer(cors)
-        .layer(ServiceBuilder::new().layer(TraceLayer::new_for_http()));
+    let app = Router::new().nest("/api", api_routes).layer(cors).layer(
+        ServiceBuilder::new()
+            .layer(AddExtensionLayer::new(ApiContext { db }))
+            .layer(TraceLayer::new_for_http()),
+    );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     println!("listening on http://{}", addr);
@@ -41,4 +52,6 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
+
+    Ok(())
 }
