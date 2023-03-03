@@ -1,6 +1,5 @@
-use axum::{http::StatusCode, response::IntoResponse, routing::get, Json, Router};
+use axum::Router;
 use dotenvy::dotenv;
-use serde::Serialize;
 use std::env;
 use std::net::SocketAddr;
 use tower::ServiceBuilder;
@@ -8,18 +7,14 @@ use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
-use budgetto::core::config::AppConfig;
-use budgetto::core::database::ConnectionManager;
-
-#[derive(Serialize)]
-struct Hello {
-    msg: String,
-}
+use budgetto::app::apis::ApiRoutes;
+use budgetto::core::{config::AppConfig, database::ConnectionManager};
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
     let config = AppConfig::new();
+    let api_routes = ApiRoutes::new();
     let cors = CorsLayer::new().allow_origin(Any);
 
     // Setup logging & RUST_LOG from args
@@ -34,8 +29,6 @@ async fn main() {
         .await
         .expect("could not initialize the database connection pool");
 
-    let api_routes = Router::new().route("/", get(root));
-
     let app = Router::new()
         .nest("/api", api_routes)
         .layer(cors)
@@ -48,11 +41,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
-}
-
-async fn root() -> impl IntoResponse {
-    let hello = Hello {
-        msg: String::from("☁️☁️🚀☁️ "),
-    };
-    (StatusCode::OK, Json(hello))
 }
