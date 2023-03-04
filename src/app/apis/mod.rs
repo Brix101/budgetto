@@ -27,7 +27,7 @@ impl ApiRoutes {
             .merge(AuthRouter::new())
             .merge(BudgetRouter::new())
             .merge(LedgerRouter::new())
-            .merge(UsersRouter::new())
+            .merge(UsersRouter::new(service_register))
     }
 
     async fn hello() -> impl IntoResponse {

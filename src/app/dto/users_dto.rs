@@ -12,6 +12,36 @@ pub struct ResponseUserDto {
     pub token: String,
 }
 
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct UserAuthenicationResponse {
+    pub user: ResponseUserDto,
+}
+
+impl UserAuthenicationResponse {
+    pub fn new(
+        id: i64,
+        name: String,
+        email: String,
+        // unfortunately, while our implementation returns thes optional fields as empty strings,
+        // the realworld demo API enables nullable serializing by default, so we have to wrap these
+        // strings as `Option` option values for now
+        bio: Option<String>,
+        image: Option<String>,
+        token: String,
+    ) -> Self {
+        UserAuthenicationResponse {
+            user: ResponseUserDto {
+                id,
+                name,
+                email,
+                bio,
+                image,
+                token,
+            },
+        }
+    }
+}
+
 #[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct UserProfileDto {
     pub name: String,

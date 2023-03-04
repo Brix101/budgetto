@@ -1,7 +1,7 @@
+use anyhow::{Context, Ok};
 use axum::{response::Redirect, routing::get, Router};
 use budgetto::app::services::ServiceRegister;
 use dotenvy::dotenv;
-use sqlx::PgPool;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::Arc;
 use tower::ServiceBuilder;
@@ -15,7 +15,7 @@ use budgetto::app::apis::ApiRoutes;
 use budgetto::core::{config::AppConfig, database::ConnectionManager};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     dotenv().ok();
     let config = Arc::new(AppConfig::new());
     let cors = CorsLayer::new().allow_origin(Any);
@@ -43,5 +43,7 @@ async fn main() {
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
-        .unwrap();
+        .context("could not initialize application")?;
+
+    Ok(())
 }
