@@ -8,7 +8,7 @@ pub type ConnectionPool = Pool<Postgres>;
 pub struct ConnectionManager;
 
 impl ConnectionManager {
-    pub async fn new_pool(
+    pub async fn new(
         connection_string: &str,
         run_migrations: bool,
     ) -> anyhow::Result<ConnectionPool> {
