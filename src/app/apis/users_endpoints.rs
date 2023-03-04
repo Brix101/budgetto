@@ -22,8 +22,8 @@ impl UsersRouter {
     pub async fn create_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
     ) -> CustomResult<Json<UserAuthenicationResponse>> {
-        let name = Some(String::from("Brix"));
-        let email = Some(String::from("brixterporras@gmail.com"));
+        let name = Some(String::from("Brix 2 Outlook"));
+        let email = Some(String::from("brixterporras@outlook.com"));
         let password = Some(String::from("password"));
 
         let created_user = users_service
