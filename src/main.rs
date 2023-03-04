@@ -24,6 +24,7 @@ async fn main() {
     let api_routes = ApiRoutes::new();
     let cors = CorsLayer::new().allow_origin(Any);
 
+    println!("{:?}", config.run_migrations);
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");
     let db = ConnectionManager::new(&config.database_url, config.run_migrations)
         .await

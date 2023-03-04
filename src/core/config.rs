@@ -14,7 +14,7 @@ impl AppConfig {
         AppConfig {
             database_url: env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
             port: env::var("PORT")
-                .unwrap_or("8080".to_owned())
+                .unwrap_or("8000".to_owned())
                 .parse()
                 .unwrap(),
             run_migrations: env::var("RUN_MIGRATIONS")
