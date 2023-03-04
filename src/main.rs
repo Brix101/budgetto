@@ -1,5 +1,5 @@
 use anyhow::Ok;
-use axum::Router;
+use axum::{response::Redirect, routing::get, Router};
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use std::env;
@@ -39,11 +39,15 @@ async fn main() -> anyhow::Result<()> {
         .await
         .expect("could not initialize the database connection pool");
 
-    let app = Router::new().nest("/api", api_routes).layer(cors).layer(
-        ServiceBuilder::new()
-            .layer(AddExtensionLayer::new(ApiContext { db }))
-            .layer(TraceLayer::new_for_http()),
-    );
+    let app = Router::new()
+        .route("/", get(|| async { Redirect::permanent("/api") }))
+        .nest("/api", api_routes)
+        .layer(cors)
+        .layer(
+            ServiceBuilder::new()
+                .layer(AddExtensionLayer::new(ApiContext { db }))
+                .layer(TraceLayer::new_for_http()),
+        );
 
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
     println!("listening on http://{}", addr);
