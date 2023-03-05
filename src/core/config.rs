@@ -7,6 +7,8 @@ pub struct AppConfig {
     pub port: u16,
     pub run_migrations: bool,
     pub rust_log: String,
+    pub token_secret: String,
+    pub argon_salt: String,
 }
 
 impl AppConfig {
@@ -21,7 +23,9 @@ impl AppConfig {
                 .unwrap_or("false".to_owned())
                 .parse::<bool>()
                 .unwrap(),
-            rust_log: env::var("RUST_LOG").expect("DATABASE_URL must be set"),
+            rust_log: env::var("RUST_LOG").expect("RUST_LOG must be set"),
+            token_secret: env::var("TOKEN_SECRET").expect("TOKEN_SECRET must be set"),
+            argon_salt: env::var("ARGON_SALT").expect("ARGON_SALT must be set"),
         }
     }
 }

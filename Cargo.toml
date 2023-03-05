@@ -12,7 +12,12 @@ axum = {version="0.6.9", features=["tower-log"]}
 clap = { version = "4.1.8", features = ["derive"] }
 dotenv = "0.15.0"
 dotenvy = "0.15.6"
+http = "0.2.9"
+http-body = "0.4.5"
+hyper = "0.14.24"
+jsonwebtoken = "8.2.0"
 log = "0.4.17"
+metrics-exporter-prometheus = "0.11.0"
 mockall = "0.11.3"
 rust-argon2 = "1.0.0"
 serde = {version="1.0.152", features=["derive"]}

@@ -11,6 +11,8 @@ use budget_endpoints::BudgetRouter;
 use ledger_endpoints::LedgerRouter;
 use users_endpoints::UsersRouter;
 
+use super::services::ServiceRegister;
+
 pub struct ApiRoutes;
 
 #[derive(Serialize)]
@@ -19,13 +21,13 @@ struct Hello {
 }
 
 impl ApiRoutes {
-    pub fn new() -> Router {
+    pub fn new(service_register: ServiceRegister) -> Router {
         Router::new()
             .route("/", get(ApiRoutes::hello))
             .merge(AuthRouter::new())
             .merge(BudgetRouter::new())
             .merge(LedgerRouter::new())
-            .merge(UsersRouter::new())
+            .merge(UsersRouter::new(service_register))
     }
 
     async fn hello() -> impl IntoResponse {
