@@ -22,6 +22,7 @@ pub mod users_service;
 #[derive(Clone)]
 pub struct ServiceRegister {
     pub users_service: DynUsersService,
+    pub token_service: DynTokenService,
 }
 
 impl ServiceRegister {
@@ -39,6 +40,9 @@ impl ServiceRegister {
             token_service.clone(),
         )) as DynUsersService;
 
-        ServiceRegister { users_service }
+        ServiceRegister {
+            users_service,
+            token_service,
+        }
     }
 }
