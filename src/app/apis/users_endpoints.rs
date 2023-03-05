@@ -1,7 +1,9 @@
+use axum::extract::Json;
 use axum::routing::{delete, get, post, put};
-use axum::{http::StatusCode, response::IntoResponse, Extension, Json, Router};
+use axum::{http::StatusCode, response::IntoResponse, Extension, Router};
+use tracing::info;
 
-use crate::app::dto::users_dto::{RegisterUserDto, UserAuthenicationResponse};
+use crate::app::dto::users_dto::{RegisterUserRequest, UserAuthenicationResponse};
 use crate::app::services::users_service::DynUsersService;
 use crate::app::services::ServiceRegister;
 use crate::core::errors::CustomResult;
@@ -21,18 +23,23 @@ impl UsersRouter {
 
     pub async fn create_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
+        Json(request): Json<RegisterUserRequest>,
     ) -> CustomResult<Json<UserAuthenicationResponse>> {
-        let name = Some(String::from("Brix 2 Outlook"));
-        let email = Some(String::from("brixterporras@outlook.com"));
-        let password = Some(String::from("password"));
+        info!(
+            "recieved request to create user {:?}/{:?}",
+            request.user.email.as_ref().unwrap(),
+            request.user.name.as_ref().unwrap()
+        );
+        println!(
+            "recieved request to create user {:?}/{:?}",
+            request.user.email.as_ref().unwrap(),
+            request.user.name.as_ref().unwrap()
+        );
+        // let name = Some(String::from("John Doe"));
+        // let email = Some(String::from("johndoe@example.com"));
+        // let password = Some(String::from("password"));
 
-        let created_user = users_service
-            .register_user(RegisterUserDto {
-                name,
-                email,
-                password,
-            })
-            .await?;
+        let created_user = users_service.register_user(request.user).await?;
 
         Ok(Json(UserAuthenicationResponse { user: created_user }))
     }
