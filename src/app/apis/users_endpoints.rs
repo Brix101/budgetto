@@ -10,6 +10,7 @@ use crate::app::services::users_service::DynUsersService;
 use crate::app::services::ServiceRegister;
 use crate::core::errors::CustomResult;
 use crate::core::extractors::required_authentication_extractor::RequiredAuthentication;
+use crate::core::extractors::validation_extractor::ValidationExtractor;
 
 pub struct UsersRouter;
 
@@ -26,7 +27,7 @@ impl UsersRouter {
 
     pub async fn register_user_endpoint(
         Extension(users_service): Extension<DynUsersService>,
-        Json(request): Json<RegisterUserRequest>,
+        ValidationExtractor(request): ValidationExtractor<RegisterUserRequest>,
     ) -> CustomResult<Json<UserAuthenicationResponse>> {
         info!(
             "recieved request to create user {:?}/{:?}",
