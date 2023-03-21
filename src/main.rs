@@ -1,12 +1,9 @@
 use std::sync::Arc;
 
-use anyhow::Context;
 use clap::Parser;
 use dotenvy::dotenv;
-use rust_rest::{
-    config::AppConfig, controllers::ApplicationController, services::ServiceRegister,
-    utils::connection_pool::ConnectionManager,
-};
+
+use budgetto_api::{config::AppConfig, database::ConnectionManager};
 use tracing::info;
 
 #[tokio::main]
@@ -15,16 +12,8 @@ async fn main() -> anyhow::Result<()> {
     let config = Arc::new(AppConfig::parse());
 
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");
-    let pool = ConnectionManager::new_pool(&config.database_url, config.run_migrations)
+    ConnectionManager::new_pool(&config.database_url, config.run_migrations)
         .await
         .expect("could not initialize the database connection pool");
-
-    let service_register = ServiceRegister::new(pool, config.clone());
-
-    info!("migrations successfully ran, initializing axum server...");
-    ApplicationController::serve(config.port, &config.cors_origin, service_register)
-        .await
-        .context("could not initialize application routes")?;
-
     Ok(())
 }
