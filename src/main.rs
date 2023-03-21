@@ -13,12 +13,13 @@ async fn main() -> anyhow::Result<()> {
     let config = Arc::new(AppConfig::parse());
 
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");
-    let pool = Database::connect(&config.database_url, config.run_migrations)
+    let db = Database::connect(&config.database_url, config.run_migrations)
         .await
         .expect("could not initialize the database connection pool");
 
-    ApplicationServer::serve(config.port, &config.cors_origin, pool)
+    ApplicationServer::serve(config, db)
         .await
         .context("could not initialize application routes")?;
+
     Ok(())
 }

@@ -1,7 +1,13 @@
 mod api;
+pub mod dtos;
+pub mod error;
+pub mod middlewares;
+pub mod services;
+pub mod utils;
 
 use std::future::ready;
 use std::net::{Ipv4Addr, SocketAddr};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use anyhow::Context;
@@ -19,7 +25,9 @@ use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::debug;
 
+use crate::config::AppConfig;
 use crate::database::Database;
+use crate::server::services::Services;
 
 lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
@@ -30,7 +38,7 @@ lazy_static! {
 pub struct ApplicationServer;
 
 impl ApplicationServer {
-    pub async fn serve(port: u16, cors_origin: &str, db: Database) -> anyhow::Result<()> {
+    pub async fn serve(config: Arc<AppConfig>, db: Database) -> anyhow::Result<()> {
         let recorder_handle = PrometheusBuilder::new()
             .set_buckets_for_metric(
                 Matcher::Full(String::from("http_requests_duration_seconds")),
@@ -43,6 +51,9 @@ impl ApplicationServer {
         // enable console logging
         tracing_subscriber::fmt::init();
 
+        let services = Services::new(db, config.clone());
+
+        let cors_origin = &config.cors_origin;
         let router = Router::new()
             .nest("/api", api::app())
             .route("/", get(api::health))
@@ -58,9 +69,10 @@ impl ApplicationServer {
                     .allow_origin(cors_origin.parse::<HeaderValue>().unwrap())
                     .allow_methods([Method::GET]),
             )
-            .layer(Extension(db))
+            .layer(Extension(services))
             .route_layer(middleware::from_fn(Self::track_metrics));
 
+        let port = config.port;
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
 
         debug!("routes initialized, listening on port {}", port);
