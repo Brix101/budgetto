@@ -4,7 +4,7 @@ use tracing::info;
 
 use crate::{
     config::AppConfig,
-    database::{session::DynSessionsRepository, user::DynUsersRepository, Database},
+    database::Database,
     server::{
         services::{session_services::SessionsService, user_services::UsersService},
         utils::{
@@ -23,9 +23,9 @@ pub mod user_services;
 
 #[derive(Clone)]
 pub struct Services {
-    pub users_service: DynUsersService,
+    pub users: DynUsersService,
     pub jwt_util: DynJwtUtil,
-    pub sessions_service: DynSessionsService,
+    pub sessions: DynSessionsService,
 }
 
 impl Services {
@@ -35,25 +35,22 @@ impl Services {
         let jwt_util = Arc::new(JwtTokenUtil::new(config)) as DynJwtUtil;
 
         info!("utility services initialized, building feature services...");
-        let users_repository = Arc::new(db.clone()) as DynUsersRepository;
-        let session_repository = Arc::new(db.clone()) as DynSessionsRepository;
+        let repository = Arc::new(db);
 
-        let sessions_service = Arc::new(SessionsService::new(
-            session_repository.clone(),
-            jwt_util.clone(),
-        )) as DynSessionsService;
+        let sessions_service = Arc::new(SessionsService::new(repository.clone(), jwt_util.clone()))
+            as DynSessionsService;
 
         let users_service = Arc::new(UsersService::new(
-            users_repository.clone(),
+            repository.clone(),
             security_service,
             jwt_util.clone(),
             sessions_service.clone(),
         )) as DynUsersService;
 
         Self {
-            users_service,
+            users: users_service,
             jwt_util,
-            sessions_service,
+            sessions: sessions_service,
         }
     }
 }
