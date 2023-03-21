@@ -1,0 +1,82 @@
+use axum::extract::Json;
+use axum::routing::{get, post, put};
+use axum::{Extension, Router};
+use axum_extra::extract::cookie::{Cookie, CookieJar};
+use tracing::info;
+
+use crate::server::dtos::user_dto::{
+    SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
+};
+use crate::server::error::AppResult;
+use crate::server::middlewares::request_validation_middleware::ValidatedRequest;
+use crate::server::middlewares::required_authentication_middleware::RequiredAuthentication;
+use crate::server::services::Services;
+
+pub struct UsersRouter;
+
+impl UsersRouter {
+    pub fn app() -> Router {
+        Router::new()
+            .route("/signup", post(UsersRouter::signup_user_endpoint))
+            .route("/signin", post(UsersRouter::signin_user_endpoint))
+            .route("/user", get(UsersRouter::get_current_user_endpoint))
+            .route("/user", put(UsersRouter::update_user_endpoint))
+    }
+
+    pub async fn signup_user_endpoint(
+        Extension(services): Extension<Services>,
+        ValidatedRequest(request): ValidatedRequest<SignUpUserDto>,
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
+        info!(
+            "recieved request to create user {:?}/{:?}",
+            request.email.as_ref().unwrap(),
+            request.name.as_ref().unwrap()
+        );
+
+        let created_user = services.users_service.signup_user(request).await?;
+
+        Ok(Json(UserAuthenicationResponse { user: created_user }))
+    }
+    pub async fn signin_user_endpoint(
+        jar: CookieJar,
+        Extension(services): Extension<Services>,
+        ValidatedRequest(request): ValidatedRequest<SignInUserDto>,
+    ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
+        info!(
+            "recieved request to login user {:?}",
+            request.email.as_ref().unwrap()
+        );
+
+        let (user, refresh_token) = services.users_service.signin_user(request).await?;
+
+        let cookie = jar.add(Cookie::new("refresh_token", refresh_token.to_string()));
+
+        Ok((cookie, Json(UserAuthenicationResponse { user })))
+    }
+
+    pub async fn get_current_user_endpoint(
+        Extension(services): Extension<Services>,
+        RequiredAuthentication(user_id): RequiredAuthentication,
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
+        info!("recieved request to retrieve current user");
+
+        let current_user = services.users_service.get_current_user(user_id).await?;
+
+        Ok(Json(UserAuthenicationResponse { user: current_user }))
+    }
+
+    pub async fn update_user_endpoint(
+        Extension(services): Extension<Services>,
+        RequiredAuthentication(user_id): RequiredAuthentication,
+        Json(request): Json<UpdateUserDto>,
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
+        info!("recieved request to update user {:?}", user_id);
+
+        let updated_user = services
+            .users_service
+            .updated_user(user_id, request)
+            .await?;
+
+        Ok(Json(UserAuthenicationResponse { user: updated_user }))
+    }
+}
