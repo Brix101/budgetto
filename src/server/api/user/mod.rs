@@ -17,10 +17,10 @@ pub struct UsersRouter;
 impl UsersRouter {
     pub fn app() -> Router {
         Router::new()
-            .route("/signup", post(UsersRouter::signup_user_endpoint))
-            .route("/signin", post(UsersRouter::signin_user_endpoint))
-            .route("/user", get(UsersRouter::get_current_user_endpoint))
-            .route("/user", put(UsersRouter::update_user_endpoint))
+            .route("/signup", post(Self::signup_user_endpoint))
+            .route("/signin", post(Self::signin_user_endpoint))
+            .route("/user", get(Self::get_current_user_endpoint))
+            .route("/user", put(Self::update_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(
@@ -33,7 +33,7 @@ impl UsersRouter {
             request.name.as_ref().unwrap()
         );
 
-        let created_user = services.users_service.signup_user(request).await?;
+        let created_user = services.users.signup_user(request).await?;
 
         Ok(Json(UserAuthenicationResponse { user: created_user }))
     }
@@ -47,7 +47,7 @@ impl UsersRouter {
             request.email.as_ref().unwrap()
         );
 
-        let (user, refresh_token) = services.users_service.signin_user(request).await?;
+        let (user, refresh_token) = services.users.signin_user(request).await?;
 
         let cookie = jar.add(Cookie::new("refresh_token", refresh_token.to_string()));
 
@@ -60,7 +60,7 @@ impl UsersRouter {
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to retrieve current user");
 
-        let current_user = services.users_service.get_current_user(user_id).await?;
+        let current_user = services.users.get_current_user(user_id).await?;
 
         Ok(Json(UserAuthenicationResponse { user: current_user }))
     }
@@ -72,10 +72,7 @@ impl UsersRouter {
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user_id);
 
-        let updated_user = services
-            .users_service
-            .updated_user(user_id, request)
-            .await?;
+        let updated_user = services.users.updated_user(user_id, request).await?;
 
         Ok(Json(UserAuthenicationResponse { user: updated_user }))
     }
