@@ -5,13 +5,14 @@ use tracing::info;
 
 pub type ConnectionPool = Pool<Postgres>;
 
-pub struct ConnectionManager;
+/// Postgres database
+#[derive(Debug, Clone)]
+pub struct Database {
+    pub pool: ConnectionPool,
+}
 
-impl ConnectionManager {
-    pub async fn new_pool(
-        connection_string: &str,
-        run_migrations: bool,
-    ) -> anyhow::Result<ConnectionPool> {
+impl Database {
+    pub async fn connect(connection_string: &str, run_migrations: bool) -> anyhow::Result<Self> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(connection_string)
@@ -26,6 +27,6 @@ impl ConnectionManager {
                 .context("error while running database migrations")?;
         }
 
-        Ok(pool)
+        Ok(Self { pool })
     }
 }
