@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::time::SystemTime;
 
 use async_trait::async_trait;
 use sqlx::types::time::OffsetDateTime;
@@ -43,20 +42,4 @@ pub struct User {
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
     pub deleted_at: Option<OffsetDateTime>,
-}
-
-impl Default for User {
-    fn default() -> Self {
-        User {
-            id: 1,
-            bio: String::from("stub bio"),
-            created_at: OffsetDateTime::from(SystemTime::now()),
-            updated_at: OffsetDateTime::from(SystemTime::now()),
-            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
-            name: String::from("John doe"),
-            email: String::from("johndoe@example.com"),
-            password: String::from("hashed password"),
-            image: String::from("stub image"),
-        }
-    }
 }

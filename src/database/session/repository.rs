@@ -1,4 +1,4 @@
-use std::{sync::Arc, time::SystemTime};
+use std::sync::Arc;
 
 use async_trait::async_trait;
 // use mockall::automock;
@@ -27,15 +27,4 @@ pub struct Session {
     pub user_id: i64,
     pub exp: OffsetDateTime,
     pub user_agent: String,
-}
-
-impl Default for Session {
-    fn default() -> Self {
-        Session {
-            id: 1,
-            user_id: 1,
-            exp: OffsetDateTime::from(SystemTime::now()),
-            user_agent: String::from("stub user_agent"),
-        }
-    }
 }
