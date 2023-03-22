@@ -1,0 +1,151 @@
+use std::sync::Arc;
+use tracing::info;
+
+use async_trait::async_trait;
+
+use crate::{
+    database::budget::repository::{Budget, DynBudgetsRepository},
+    server::{
+        dtos::budget_dto::{CreateBudgetDto, ResponseBudgetDto, UpdateBudgetDto},
+        error::{AppError, AppResult},
+    },
+};
+
+pub type DynBudgetsService = Arc<dyn BudgetsServiceTrait + Send + Sync>;
+
+#[async_trait]
+pub trait BudgetsServiceTrait {
+    async fn create_budget(
+        &self,
+        user_id: i64,
+        request: CreateBudgetDto,
+    ) -> AppResult<ResponseBudgetDto>;
+
+    async fn get_budget_by_id(&self, id: i64) -> AppResult<ResponseBudgetDto>;
+
+    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>>;
+
+    async fn updated_budget(
+        &self,
+        id: i64,
+        user_id: i64,
+        request: UpdateBudgetDto,
+    ) -> AppResult<ResponseBudgetDto>;
+
+    async fn delete_budget(&self, user_id: i64, id: i64) -> AppResult<()>;
+}
+
+#[derive(Clone)]
+pub struct BudgetsService {
+    repository: DynBudgetsRepository,
+}
+
+impl BudgetsService {
+    pub fn new(repository: DynBudgetsRepository) -> Self {
+        Self { repository }
+    }
+}
+
+#[async_trait]
+impl BudgetsServiceTrait for BudgetsService {
+    async fn create_budget(
+        &self,
+        user_id: i64,
+        request: CreateBudgetDto,
+    ) -> AppResult<ResponseBudgetDto> {
+        let name = request.name.unwrap();
+        let amount = request.amount.unwrap();
+        let description = request.description;
+
+        let created_budget = self
+            .repository
+            .create_budget(user_id, name, amount, description)
+            .await?;
+
+        info!("user created budget successfully");
+
+        Ok(created_budget.into_dto())
+    }
+
+    async fn get_budget_by_id(&self, id: i64) -> AppResult<ResponseBudgetDto> {
+        info!("searching for existing budget {:?}", id);
+        let existing_budget = self.repository.get_budget_by_id(id).await?;
+
+        if existing_budget.is_none() {
+            return Err(AppError::NotFound(String::from("Budget does not exist")));
+        }
+
+        let budget = existing_budget.unwrap();
+
+        Ok(budget.into_dto())
+    }
+
+    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>> {
+        let budgets = self.repository.get_budgets(user_id).await?;
+
+        self.map_to_budgets(budgets).await
+    }
+
+    async fn updated_budget(
+        &self,
+        id: i64,
+        user_id: i64,
+        request: UpdateBudgetDto,
+    ) -> AppResult<ResponseBudgetDto> {
+        let budget_to_update = self.repository.get_budget_by_id(id).await?;
+
+        if let Some(existing_budget) = budget_to_update {
+            // verify the user IDs match on the request and the budget
+            if existing_budget.user_id != user_id {
+                return Err(AppError::Unauthorized);
+            }
+
+            let updated_name = request.name.unwrap_or(existing_budget.name);
+            let updated_amount = request.amount.unwrap_or(existing_budget.amount);
+            let updated_description =
+                Some(request.description.unwrap_or(existing_budget.description));
+
+            let updated_budget = self
+                .repository
+                .update_budget(id, updated_name, updated_amount, updated_description)
+                .await?;
+
+            return Ok(updated_budget.into_dto());
+        }
+
+        Err(AppError::NotFound(String::from("budget was not found")))
+    }
+
+    async fn delete_budget(&self, user_id: i64, id: i64) -> AppResult<()> {
+        let budget = self.repository.get_budget_by_id(id).await?;
+
+        if let Some(existing_budget) = budget {
+            // verify the user IDs match on the request and the budget
+            if existing_budget.user_id != user_id {
+                return Err(AppError::Unauthorized);
+            }
+
+            self.repository.delete_budget(existing_budget.id).await?;
+
+            return Ok(());
+        }
+
+        Err(AppError::NotFound(String::from("budget was not found")))
+    }
+}
+
+impl BudgetsService {
+    async fn map_to_budgets(&self, budgets: Vec<Budget>) -> AppResult<Vec<ResponseBudgetDto>> {
+        info!("found {} budgets", budgets.len());
+
+        let mut mapped_budgets: Vec<ResponseBudgetDto> = Vec::new();
+
+        if !budgets.is_empty() {
+            for budget in budgets {
+                mapped_budgets.push(budget.into_dto());
+            }
+        }
+
+        Ok(mapped_budgets)
+    }
+}

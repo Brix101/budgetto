@@ -6,7 +6,10 @@ use crate::{
     config::AppConfig,
     database::Database,
     server::{
-        services::{session_services::SessionsService, user_services::UsersService},
+        services::{
+            budget_services::BudgetsService, session_services::SessionsService,
+            user_services::UsersService,
+        },
         utils::{
             argon_utils::{ArgonSecurityUtil, DynArgonUtil},
             jwt_utils::JwtTokenUtil,
@@ -14,18 +17,23 @@ use crate::{
     },
 };
 
-use self::{session_services::DynSessionsService, user_services::DynUsersService};
+use self::{
+    budget_services::DynBudgetsService, session_services::DynSessionsService,
+    user_services::DynUsersService,
+};
 
 use super::utils::jwt_utils::DynJwtUtil;
 
-pub mod session_services;
-pub mod user_services;
+mod budget_services;
+mod session_services;
+mod user_services;
 
 #[derive(Clone)]
 pub struct Services {
+    pub jwt_util: DynJwtUtil,
     pub users: DynUsersService,
     pub sessions: DynSessionsService,
-    pub jwt_util: DynJwtUtil,
+    pub budgets: DynBudgetsService,
 }
 
 impl Services {
@@ -37,20 +45,23 @@ impl Services {
         info!("utility services initialized, building feature services...");
         let repository = Arc::new(db);
 
-        let sessions_service = Arc::new(SessionsService::new(repository.clone(), jwt_util.clone()))
+        let sessions = Arc::new(SessionsService::new(repository.clone(), jwt_util.clone()))
             as DynSessionsService;
 
-        let users_service = Arc::new(UsersService::new(
+        let users = Arc::new(UsersService::new(
             repository.clone(),
             security_service,
             jwt_util.clone(),
-            sessions_service.clone(),
+            sessions.clone(),
         )) as DynUsersService;
 
+        let budgets = Arc::new(BudgetsService::new(repository.clone())) as DynBudgetsService;
+
         Self {
-            users: users_service,
-            sessions: sessions_service,
             jwt_util,
+            users,
+            sessions,
+            budgets,
         }
     }
 }

@@ -17,7 +17,7 @@ pub trait BudgetsRepository {
         description: Option<String>,
     ) -> anyhow::Result<Budget>;
 
-    async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Budget>;
+    async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Option<Budget>>;
 
     async fn get_budgets(&self, user_id: i64) -> anyhow::Result<Vec<Budget>>;
 

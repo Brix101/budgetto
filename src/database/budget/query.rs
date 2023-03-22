@@ -32,7 +32,7 @@ impl BudgetsRepository for Database {
         .context("an unexpected error occured while creating the budget")
     }
 
-    async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Budget> {
+    async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Option<Budget>> {
         query_as!(
             Budget,
             r#"
@@ -42,7 +42,7 @@ impl BudgetsRepository for Database {
             "#,
             id,
         )
-        .fetch_one(&self.pool)
+        .fetch_optional(&self.pool)
         .await
         .context("budget was not found")
     }
