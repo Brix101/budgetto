@@ -12,7 +12,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context;
 use axum::extract::MatchedPath;
-use axum::http::{HeaderValue, Method, Request};
+use axum::http::{HeaderValue, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -22,7 +22,7 @@ use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
 use tower::ServiceBuilder;
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{cors::Any, cors::CorsLayer, trace::TraceLayer};
 use tracing::debug;
 
 use crate::config::AppConfig;
@@ -49,13 +49,21 @@ impl ApplicationServer {
             .context("could not install metrics recorder")?;
 
         // enable console logging
+        // TODO need to update this logger
         tracing_subscriber::fmt::init();
 
+        // initialized app services
         let services = Services::new(db, config.clone());
 
         let cors_origin = &config.cors_origin;
+
+        let cors = CorsLayer::new()
+            .allow_origin(cors_origin.parse::<HeaderValue>().unwrap())
+            .allow_methods(Any)
+            .allow_headers(Any);
+
         let router = Router::new()
-            .nest("/api", api::app())
+            .nest("/api/v1", api::app())
             .route("/", get(api::health))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(
@@ -64,13 +72,11 @@ impl ApplicationServer {
                     .layer(HandleErrorLayer::new(Self::handle_timeout_error))
                     .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
             )
-            .layer(
-                CorsLayer::new()
-                    .allow_origin(cors_origin.parse::<HeaderValue>().unwrap())
-                    .allow_methods([Method::GET]),
-            )
+            .layer(cors)
             .layer(Extension(services))
             .route_layer(middleware::from_fn(Self::track_metrics));
+
+        let router = router.fallback(Self::handle_404);
 
         let port = config.port;
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
@@ -140,5 +146,15 @@ impl ApplicationServer {
             .await
             .expect("expect tokio signal ctrl-c");
         println!("signal shutdown");
+    }
+
+    async fn handle_404() -> impl IntoResponse {
+        (
+            StatusCode::NOT_FOUND,
+            axum::response::Json(serde_json::json!({
+            "errors":{
+            "message": vec!(String::from("The requested resource does not exist on this server!")),}
+            })),
+        )
     }
 }
