@@ -7,8 +7,7 @@ use crate::server::dtos::budget_dto::{
     CreateBudgetDto, GetBudgetRequestDto, ResponseBudgetDto, UpdateBudgetDto,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::request_validation_middleware::ValidatedRequest;
-use crate::server::middlewares::required_authentication_middleware::RequiredAuthentication;
+use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
 use crate::server::services::Services;
 
 pub struct BudgetRouter;
@@ -30,7 +29,9 @@ impl BudgetRouter {
         info!("received request to get current user budgets");
 
         if let Some(id) = query_params.budget_id {
+            // return this function if the query params has value
             let budget = services.budgets.get_budget_by_id(id, user_id).await?;
+
             return Ok(Json(vec![budget]));
         }
 
@@ -45,14 +46,11 @@ impl BudgetRouter {
         ValidatedRequest(request): ValidatedRequest<CreateBudgetDto>,
     ) -> AppResult<Json<ResponseBudgetDto>> {
         info!("received request to create budget");
+
         let new_budget = services.budgets.create_budget(user_id, request).await?;
 
         Ok(Json(new_budget))
     }
-
-    // pub async fn get_budget() -> AppResult<Json<ResponseBudgetDto>> {
-    //     todo!()
-    // }
 
     pub async fn update_budget(
         Path(id): Path<i64>,

@@ -8,8 +8,7 @@ use crate::server::dtos::user_dto::{
     SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::request_validation_middleware::ValidatedRequest;
-use crate::server::middlewares::required_authentication_middleware::RequiredAuthentication;
+use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
 use crate::server::services::Services;
 
 pub struct UsersRouter;

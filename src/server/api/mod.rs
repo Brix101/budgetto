@@ -1,10 +1,10 @@
 mod budget_api;
-mod user;
+mod user_api;
 
 use axum::routing::*;
 
-use self::user::UsersRouter;
 use budget_api::BudgetRouter;
+use user_api::UsersRouter;
 
 pub async fn health() -> &'static str {
     "I am working!"
