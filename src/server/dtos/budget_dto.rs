@@ -10,6 +10,7 @@ impl Budget {
             name: Some(self.name),
             amount: Some(self.amount),
             description: Some(self.description),
+            frequency: Some(self.frequency),
         }
     }
 }
@@ -20,6 +21,7 @@ pub struct ResponseBudgetDto {
     pub name: Option<String>,
     pub amount: Option<f64>,
     pub description: Option<String>,
+    pub frequency: Option<String>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
