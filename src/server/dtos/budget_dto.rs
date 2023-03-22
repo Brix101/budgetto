@@ -29,6 +29,7 @@ pub struct CreateBudgetDto {
     #[validate(required, range(min = 0.00))]
     pub amount: Option<f64>,
     pub description: Option<String>,
+    pub frequency: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
@@ -36,6 +37,7 @@ pub struct UpdateBudgetDto {
     pub name: Option<String>,
     pub amount: Option<f64>,
     pub description: Option<String>,
+    pub frequency: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]

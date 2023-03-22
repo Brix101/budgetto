@@ -56,10 +56,11 @@ impl BudgetsServiceTrait for BudgetsService {
         let name = request.name.unwrap();
         let amount = request.amount.unwrap();
         let description = request.description.unwrap_or(String::from(""));
+        let frequency = request.frequency.unwrap_or(String::from("Monthly"));
 
         let created_budget = self
             .repository
-            .create_budget(user_id, name, amount, description)
+            .create_budget(user_id, name, amount, description, frequency)
             .await?;
 
         info!("user created budget successfully");
@@ -107,10 +108,17 @@ impl BudgetsServiceTrait for BudgetsService {
             let updated_amount = request.amount.unwrap_or(existing_budget.amount);
             let updated_description =
                 Some(request.description.unwrap_or(existing_budget.description));
+            let update_frequency = request.frequency.unwrap_or(existing_budget.frequency);
 
             let updated_budget = self
                 .repository
-                .update_budget(id, updated_name, updated_amount, updated_description)
+                .update_budget(
+                    id,
+                    updated_name,
+                    updated_amount,
+                    updated_description,
+                    update_frequency,
+                )
                 .await?;
 
             return Ok(updated_budget.into_dto());

@@ -4,7 +4,7 @@ use sqlx::{query, query_as};
 
 use crate::database::Database;
 
-use super::repository::{Budget, BudgetsRepository};
+use super::repository::{Budget, BudgetsRepository,};
 
 #[async_trait]
 impl BudgetsRepository for Database {
@@ -14,18 +14,20 @@ impl BudgetsRepository for Database {
         name: String,
         amount: f64,
         description: String,
-    ) -> anyhow::Result<Budget> {
+        frequency: String,
+    ) -> anyhow::Result<Budget> {        
         query_as!(
             Budget,
             r#"
-        insert into budgets (created_at, updated_at, name, amount, description,user_id)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint)
+        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar)
         returning *
             "#,
             name,
             amount,
             description,
-            user_id
+            user_id,
+            frequency 
         )
         .fetch_one(&self.pool)
         .await
@@ -69,6 +71,7 @@ impl BudgetsRepository for Database {
         name: String,
         amount: f64,
         description: Option<String>,
+        frequency: String,
     ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,
@@ -78,13 +81,15 @@ impl BudgetsRepository for Database {
             name = $1::varchar,
             amount = $2::float,
             description = $3::varchar,
-            updated_at = current_timestamp
-        where id = $4
+            updated_at = current_timestamp,
+            frequency = $4::varchar
+        where id = $5
         returning *
             "#,
             name,
             amount,
             description,
+            frequency,
             id
         )
         .fetch_one(&self.pool)

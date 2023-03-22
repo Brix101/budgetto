@@ -68,7 +68,7 @@
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
-  "2ec9e920ac00290c8bd5941b8923902c2a3b3ee90702420a2a93b2500500efde": {
+  "30db023c94e1639ba922133fe79fe0476de865133cf2142ae58433da6c456289": {
     "describe": {
       "columns": [
         {
@@ -92,27 +92,33 @@
           "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "frequency",
           "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 5,
           "type_info": "Int8"
         },
         {
           "name": "created_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
           "ordinal": 6,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -127,11 +133,12 @@
           "Varchar",
           "Float8",
           "Varchar",
-          "Int8"
+          "Int8",
+          "Varchar"
         ]
       }
     },
-    "query": "\n        insert into budgets (created_at, updated_at, name, amount, description,user_id)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint)\n        returning *\n            "
+    "query": "\n        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar)\n        returning *\n            "
   },
   "3f3b186aff4b48f520027fe1114be28b9ad7caa8dda64a55fcc51ac1d16e0d0c": {
     "describe": {
@@ -157,27 +164,33 @@
           "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "frequency",
           "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 5,
           "type_info": "Int8"
         },
         {
           "name": "created_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
           "ordinal": 6,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -390,6 +403,78 @@
     },
     "query": "\n        delete from budgets\n        where id = $1\n        "
   },
+  "969785d3faa56c975a76fcbf2852e20d8f7ff553224d623d71cc72b37d713093": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "frequency",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 5,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Float8",
+          "Varchar",
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        update budgets\n        set\n            name = $1::varchar,\n            amount = $2::float,\n            description = $3::varchar,\n            updated_at = current_timestamp,\n            frequency = $4::varchar\n        where id = $5\n        returning *\n            "
+  },
   "a1f2a6a5f0b3bf75267d257217cd496e3b7ecad2fcf36fe7dfaa7f8873a699d0": {
     "describe": {
       "columns": [
@@ -482,27 +567,33 @@
           "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "frequency",
           "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 5,
           "type_info": "Int8"
         },
         {
           "name": "created_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
           "ordinal": 6,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -587,70 +678,5 @@
       }
     },
     "query": "\n        select *\n        from users\n        where email = $1::varchar\n            "
-  },
-  "f85616d59774c6ad123aa80b9d5bf921d919789fa6cc9267bcf7836d8a107873": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "amount",
-          "ordinal": 2,
-          "type_info": "Float8"
-        },
-        {
-          "name": "description",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 4,
-          "type_info": "Int8"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Float8",
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        update budgets\n        set\n            name = $1::varchar,\n            amount = $2::float,\n            description = $3::varchar,\n            updated_at = current_timestamp\n        where id = $4\n        returning *\n            "
   }
 }

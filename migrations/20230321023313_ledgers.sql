@@ -1,11 +1,13 @@
 -- add the article tables
-drop type if exists ledger_category;
-drop type if exists ledger_type;
+-- drop type if exists ledger_category;
+-- drop type if exists ledger_type;
 
-create type ledger_category as ENUM ('essential','non_essential');
-create type ledger_type as ENUM ('income','expense');
--- create type if not exists ledger_periodical as ENUM ("DAILY","WEEKLY","MONTHLY","QUARTERLY","ANNUAL");
-
+-- create type ledger_category as ENUM (
+--   'Essential','Non_Essential'
+-- );
+-- create type ledger_type as ENUM (
+--   'Income','Expense'
+-- );
 
 create table if not exists ledgers
 (
@@ -13,8 +15,8 @@ create table if not exists ledgers
     name        varchar     not null default '',
     amount      float         not null default 0.00,
     description varchar     not null default '',
-    type        ledger_type ,
-    category    ledger_category not null default 'non_essential',
+    type        varchar not null default 'Expense',
+    category    varchar not null default 'Non_Essential',
     user_id     bigint      not null references users (id) on delete cascade,
     created_at  timestamptz not null default current_timestamp,
     updated_at  timestamptz not null default current_timestamp,
