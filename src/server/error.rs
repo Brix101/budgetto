@@ -25,7 +25,7 @@ impl ApiError {
 
 pub type AppResult<T> = Result<T, Error>;
 
-pub type AppErrorMap = HashMap<Cow<'static, str>, Vec<Cow<'static, str>>>;
+pub type ErrorMap = HashMap<Cow<'static, str>, Vec<Cow<'static, str>>>;
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -48,7 +48,7 @@ pub enum Error {
     #[error("{0}")]
     ObjectConflict(String),
     #[error("unprocessable request has occurred")]
-    UnprocessableEntity { errors: AppErrorMap },
+    UnprocessableEntity { errors: ErrorMap },
     #[error(transparent)]
     ValidationError(#[from] ValidationErrors),
     #[error(transparent)]
@@ -60,7 +60,7 @@ pub enum Error {
 impl Error {
     /// Maps `validator`'s `ValidationrErrors` to a simple map of property name/error messages structure.
     pub fn unprocessable_entity(errors: ValidationErrors) -> Response {
-        let mut validation_errors = AppErrorMap::new();
+        let mut validation_errors = ErrorMap::new();
 
         // roll through the struct errors at the top level
         for (field_property, error_kind) in errors.into_errors() {
@@ -130,6 +130,7 @@ impl IntoResponse for Error {
                 Self::InvalidLoginAttmpt.to_string(),
             ),
             Self::Unauthorized => (StatusCode::UNAUTHORIZED, Self::Unauthorized.to_string()),
+            Self::Forbidden => (StatusCode::FORBIDDEN, Self::Forbidden.to_string()),
             Self::AxumJsonRejection(err) => (StatusCode::BAD_REQUEST, err.body_text()),
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -137,8 +138,6 @@ impl IntoResponse for Error {
             ),
         };
 
-        // I'm not a fan of the error specification, so for the sake of consistency,
-        // serialize singular errors as a map of vectors similar to the 422 validation responses
         let body = Json(ApiError::new(error_message));
 
         (status, body).into_response()
