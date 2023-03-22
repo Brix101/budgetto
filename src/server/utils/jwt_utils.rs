@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 
 use crate::config::AppConfig;
-use crate::server::error::{AppError, AppResult};
+use crate::server::error::{AppResult, Error};
 
 // use mockall::automock;
 
@@ -63,7 +63,7 @@ impl JwtUtil for JwtTokenUtil {
             &claims,
             &EncodingKey::from_secret(self.config.access_token_secret.as_bytes()),
         )
-        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
+        .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(token)
     }
@@ -83,7 +83,7 @@ impl JwtUtil for JwtTokenUtil {
             &claims,
             &EncodingKey::from_secret(self.config.refresh_token_secret.as_bytes()),
         )
-        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
+        .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(token)
     }
@@ -94,7 +94,7 @@ impl JwtUtil for JwtTokenUtil {
             &DecodingKey::from_secret(self.config.access_token_secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
-        .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
+        .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(decoded_token.claims.user_id)
     }

@@ -7,7 +7,7 @@ use http::Request;
 use serde::de::DeserializeOwned;
 use validator::Validate;
 
-use crate::server::error::AppError;
+use crate::server::error::Error;
 
 pub struct ValidatedRequest<T>(pub T);
 
@@ -21,7 +21,7 @@ where
     B::Data: Send,
     B::Error: Into<BoxError>,
 {
-    type Rejection = AppError;
+    type Rejection = Error;
 
     async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
         let Json(value) = Json::<T>::from_request(req, state).await?;

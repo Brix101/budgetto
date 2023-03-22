@@ -10,19 +10,16 @@ impl Budget {
             name: Some(self.name),
             amount: Some(self.amount),
             description: Some(self.description),
-            user_id: self.user_id,
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct ResponseBudgetDto {
-    #[serde(skip_serializing, skip_deserializing)]
     pub id: i64,
     pub name: Option<String>,
     pub amount: Option<f64>,
     pub description: Option<String>,
-    pub user_id: i64,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
@@ -39,4 +36,9 @@ pub struct UpdateBudgetDto {
     pub name: Option<String>,
     pub amount: Option<f64>,
     pub description: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Default)]
+pub struct GetBudgetRequestDto {
+    pub budget_id: Option<i64>,
 }

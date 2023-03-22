@@ -23,12 +23,12 @@ impl ApiError {
     }
 }
 
-pub type AppResult<T> = Result<T, AppError>;
+pub type AppResult<T> = Result<T, Error>;
 
 pub type AppErrorMap = HashMap<Cow<'static, str>, Vec<Cow<'static, str>>>;
 
 #[derive(Error, Debug)]
-pub enum AppError {
+pub enum Error {
     #[error("authentication is required to access this resource")]
     Unauthorized,
     #[error("username or password is incorrect")]
@@ -57,7 +57,7 @@ pub enum AppError {
     AnyhowError(#[from] anyhow::Error),
 }
 
-impl AppError {
+impl Error {
     /// Maps `validator`'s `ValidationrErrors` to a simple map of property name/error messages structure.
     pub fn unprocessable_entity(errors: ValidationErrors) -> Response {
         let mut validation_errors = AppErrorMap::new();
@@ -115,7 +115,7 @@ impl AppError {
     }
 }
 
-impl IntoResponse for AppError {
+impl IntoResponse for Error {
     fn into_response(self) -> Response {
         if let Self::ValidationError(e) = self {
             return Self::unprocessable_entity(e);

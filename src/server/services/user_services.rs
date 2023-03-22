@@ -10,7 +10,7 @@ use crate::{
             session_dto::NewSessionDto,
             user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
         },
-        error::{AppError, AppResult},
+        error::{AppResult, Error},
         utils::{argon_utils::DynArgonUtil, jwt_utils::DynJwtUtil},
     },
 };
@@ -71,7 +71,7 @@ impl UsersServiceTrait for UsersService {
 
         if existing_user.is_some() {
             error!("user {:?} already exists", email);
-            return Err(AppError::ObjectConflict(String::from("email is taken")));
+            return Err(Error::ObjectConflict(String::from("email is taken")));
         }
 
         info!("creating password hash for user {:?}", email);
@@ -94,9 +94,7 @@ impl UsersServiceTrait for UsersService {
         let existing_user = self.repository.get_user_by_email(&email).await?;
 
         if existing_user.is_none() {
-            return Err(AppError::NotFound(String::from(
-                "user email does not exist",
-            )));
+            return Err(Error::NotFound(String::from("user email does not exist")));
         }
 
         let user = existing_user.unwrap();
@@ -108,7 +106,7 @@ impl UsersServiceTrait for UsersService {
 
         if !is_valid_login_attempt {
             error!("invalid login attempt for user {:?}", email);
-            return Err(AppError::InvalidLoginAttmpt);
+            return Err(Error::InvalidLoginAttmpt);
         }
 
         info!("user login successful, generating token");

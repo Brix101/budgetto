@@ -7,7 +7,7 @@ use crate::{
     database::budget::repository::{Budget, DynBudgetsRepository},
     server::{
         dtos::budget_dto::{CreateBudgetDto, ResponseBudgetDto, UpdateBudgetDto},
-        error::{AppError, AppResult},
+        error::{AppResult, Error},
     },
 };
 
@@ -21,7 +21,7 @@ pub trait BudgetsServiceTrait {
         request: CreateBudgetDto,
     ) -> AppResult<ResponseBudgetDto>;
 
-    async fn get_budget_by_id(&self, id: i64) -> AppResult<ResponseBudgetDto>;
+    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<ResponseBudgetDto>;
 
     async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>>;
 
@@ -55,7 +55,7 @@ impl BudgetsServiceTrait for BudgetsService {
     ) -> AppResult<ResponseBudgetDto> {
         let name = request.name.unwrap();
         let amount = request.amount.unwrap();
-        let description = request.description;
+        let description = request.description.unwrap_or(String::from(""));
 
         let created_budget = self
             .repository
@@ -67,17 +67,20 @@ impl BudgetsServiceTrait for BudgetsService {
         Ok(created_budget.into_dto())
     }
 
-    async fn get_budget_by_id(&self, id: i64) -> AppResult<ResponseBudgetDto> {
+    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<ResponseBudgetDto> {
         info!("searching for existing budget {:?}", id);
-        let existing_budget = self.repository.get_budget_by_id(id).await?;
+        let budget = self.repository.get_budget_by_id(id).await?;
 
-        if existing_budget.is_none() {
-            return Err(AppError::NotFound(String::from("Budget does not exist")));
+        if let Some(existing_budget) = budget {
+            // verify the user IDs match on the request and the budget
+            if existing_budget.user_id != user_id {
+                return Err(Error::Forbidden);
+            }
+
+            return Ok(existing_budget.into_dto());
         }
 
-        let budget = existing_budget.unwrap();
-
-        Ok(budget.into_dto())
+        Err(Error::NotFound(String::from("budget was not found")))
     }
 
     async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>> {
@@ -97,7 +100,7 @@ impl BudgetsServiceTrait for BudgetsService {
         if let Some(existing_budget) = budget_to_update {
             // verify the user IDs match on the request and the budget
             if existing_budget.user_id != user_id {
-                return Err(AppError::Unauthorized);
+                return Err(Error::Forbidden);
             }
 
             let updated_name = request.name.unwrap_or(existing_budget.name);
@@ -113,7 +116,7 @@ impl BudgetsServiceTrait for BudgetsService {
             return Ok(updated_budget.into_dto());
         }
 
-        Err(AppError::NotFound(String::from("budget was not found")))
+        Err(Error::NotFound(String::from("budget was not found")))
     }
 
     async fn delete_budget(&self, user_id: i64, id: i64) -> AppResult<()> {
@@ -122,7 +125,7 @@ impl BudgetsServiceTrait for BudgetsService {
         if let Some(existing_budget) = budget {
             // verify the user IDs match on the request and the budget
             if existing_budget.user_id != user_id {
-                return Err(AppError::Unauthorized);
+                return Err(Error::Forbidden);
             }
 
             self.repository.delete_budget(existing_budget.id).await?;
@@ -130,7 +133,7 @@ impl BudgetsServiceTrait for BudgetsService {
             return Ok(());
         }
 
-        Err(AppError::NotFound(String::from("budget was not found")))
+        Err(Error::NotFound(String::from("budget was not found")))
     }
 }
 

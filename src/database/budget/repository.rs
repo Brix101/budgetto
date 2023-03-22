@@ -14,7 +14,7 @@ pub trait BudgetsRepository {
         user_id: i64,
         name: String,
         amount: f64,
-        description: Option<String>,
+        description: String,
     ) -> anyhow::Result<Budget>;
 
     async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Option<Budget>>;
@@ -32,7 +32,7 @@ pub trait BudgetsRepository {
     async fn delete_budget(&self, id: i64) -> anyhow::Result<()>;
 }
 
-#[derive(FromRow)]
+#[derive(FromRow, Debug)]
 pub struct Budget {
     pub id: i64,
     pub name: String,

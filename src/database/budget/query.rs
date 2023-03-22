@@ -13,7 +13,7 @@ impl BudgetsRepository for Database {
         user_id: i64,
         name: String,
         amount: f64,
-        description: Option<String>,
+        description: String,
     ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,

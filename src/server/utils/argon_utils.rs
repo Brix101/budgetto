@@ -4,7 +4,7 @@ use argon2::Config;
 
 use crate::{
     config::AppConfig,
-    server::error::{AppError, AppResult},
+    server::error::{AppResult, Error},
 };
 
 /// A security service for handling JWT authentication.
@@ -45,9 +45,8 @@ impl ArgonUtil for ArgonSecurityUtil {
         stored_password: &str,
         attempted_password: String,
     ) -> AppResult<bool> {
-        let hashes_match =
-            argon2::verify_encoded(stored_password, attempted_password.as_bytes())
-                .map_err(|err| AppError::InternalServerErrorWithContext(err.to_string()))?;
+        let hashes_match = argon2::verify_encoded(stored_password, attempted_password.as_bytes())
+            .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(hashes_match)
     }
