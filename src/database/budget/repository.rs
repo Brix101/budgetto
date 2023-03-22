@@ -11,23 +11,25 @@ pub type DynBudgetsRepository = Arc<dyn BudgetsRepository + Send + Sync>;
 pub trait BudgetsRepository {
     async fn create_budget(
         &self,
-        email: &str,
-        name: &str,
-        hash_password: &str,
+        user_id: i64,
+        name: String,
+        amount: f64,
+        description: Option<String>,
     ) -> anyhow::Result<Budget>;
 
     async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Budget>;
+
     async fn get_budgets(&self, user_id: i64) -> anyhow::Result<Vec<Budget>>;
 
-    async fn update_user(
+    async fn update_budget(
         &self,
         id: i64,
-        email: String,
         name: String,
-        password: String,
-        bio: String,
-        image: String,
+        amount: f64,
+        description: Option<String>,
     ) -> anyhow::Result<Budget>;
+
+    async fn delete_budget(&self, id: i64) -> anyhow::Result<()>;
 }
 
 #[derive(FromRow)]
@@ -35,8 +37,9 @@ pub struct Budget {
     pub id: i64,
     pub name: String,
     pub amount: f64,
-    pub desciption: String,
+    pub description: String,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
     pub deleted_at: Option<OffsetDateTime>,
+    pub user_id: i64,
 }
