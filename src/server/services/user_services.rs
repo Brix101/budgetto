@@ -4,13 +4,11 @@ use tracing::{error, info};
 use async_trait::async_trait;
 
 use crate::{
-    database::user::{DynUsersRepository, User},
+    database::user::DynUsersRepository,
     server::{
         dtos::{
             session_dto::NewSessionDto,
-            user_dto::{
-                ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto, UserProfileDto,
-            },
+            user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto, UpdateUserDto},
         },
         error::{AppError, AppResult},
         utils::{argon_utils::DynArgonUtil, jwt_utils::DynJwtUtil},
@@ -22,28 +20,6 @@ use super::session_services::DynSessionsService;
 /// A reference counter for our user service allows us safely pass instances user utils
 /// around which themselves depend on the user repostiory, and ultimately, our Posgres connection pool.
 pub type DynUsersService = Arc<dyn UsersServiceTrait + Send + Sync>;
-
-impl User {
-    pub fn into_dto(self, token: String) -> ResponseUserDto {
-        ResponseUserDto {
-            id: self.id,
-            email: self.email,
-            name: self.name,
-            bio: Some(self.bio),
-            image: Some(self.image),
-            access_token: Some(token),
-        }
-    }
-
-    pub fn into_profile(self, following: bool) -> UserProfileDto {
-        UserProfileDto {
-            name: self.name,
-            bio: self.bio,
-            image: self.image,
-            following,
-        }
-    }
-}
 
 #[async_trait]
 pub trait UsersServiceTrait {
@@ -107,12 +83,7 @@ impl UsersServiceTrait for UsersService {
             .create_user(&email, &name, &hashed_password)
             .await?;
 
-        info!("user successfully created, generating token");
-        let token = self
-            .jwt_util
-            .new_access_token(created_user.id, &created_user.email)?;
-
-        Ok(created_user.into_dto(token))
+        Ok(created_user.into_dto("".to_string()))
     }
 
     async fn signin_user(&self, request: SignInUserDto) -> AppResult<(ResponseUserDto, String)> {

@@ -24,8 +24,8 @@ pub mod user_services;
 #[derive(Clone)]
 pub struct Services {
     pub users: DynUsersService,
-    pub jwt_util: DynJwtUtil,
     pub sessions: DynSessionsService,
+    pub jwt_util: DynJwtUtil,
 }
 
 impl Services {
@@ -49,8 +49,8 @@ impl Services {
 
         Self {
             users: users_service,
-            jwt_util,
             sessions: sessions_service,
+            jwt_util,
         }
     }
 }

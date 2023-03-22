@@ -5,7 +5,7 @@ use tracing::info;
 
 use async_trait::async_trait;
 
-use crate::database::session::{DynSessionsRepository, Session};
+use crate::database::session::DynSessionsRepository;
 use crate::server::dtos::session_dto::{NewSessionDto, SessionResponseDto};
 use crate::server::error::AppResult;
 use crate::server::utils::jwt_utils::DynJwtUtil;
@@ -13,19 +13,6 @@ use crate::server::utils::jwt_utils::DynJwtUtil;
 /// A reference counter for our user service allows us safely pass instances user utils
 /// around which themselves depend on the user repostiory, and ultimately, our Posgres connection pool.
 pub type DynSessionsService = Arc<dyn SessionsServiceTrait + Send + Sync>;
-
-impl Session {
-    pub fn new(self) -> SessionResponseDto {
-        SessionResponseDto {
-            access_token: "access_token".to_string(),
-            refresh_token: "refresh_token".to_string(),
-        }
-    }
-
-    pub fn new_access_token(self) -> String {
-        "access_token".to_string()
-    }
-}
 
 #[async_trait]
 pub trait SessionsServiceTrait {

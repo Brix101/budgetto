@@ -1,6 +1,30 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
+use crate::database::user::User;
+
+impl User {
+    pub fn into_dto(self, token: String) -> ResponseUserDto {
+        ResponseUserDto {
+            id: self.id,
+            email: self.email,
+            name: self.name,
+            bio: Some(self.bio),
+            image: Some(self.image),
+            access_token: Some(token),
+        }
+    }
+
+    pub fn into_profile(self, following: bool) -> UserProfileDto {
+        UserProfileDto {
+            name: self.name,
+            bio: self.bio,
+            image: self.image,
+            following,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct ResponseUserDto {
     #[serde(skip_serializing, skip_deserializing)]
