@@ -3,18 +3,17 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use mockall::automock;
 use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 
 use crate::config::AppConfig;
 use crate::server::error::{AppResult, Error};
 
-// use mockall::automock;
-
 /// A security service for handling JWT authentication.
 pub type DynJwtUtil = Arc<dyn JwtUtil + Send + Sync>;
 
-// #[automock]
+#[automock]
 pub trait JwtUtil {
     fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String>;
     fn new_refresh_token(&self, sub: i64) -> AppResult<String>;

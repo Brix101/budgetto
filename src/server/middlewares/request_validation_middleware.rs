@@ -25,8 +25,6 @@ where
 
     async fn from_request(req: Request<B>, state: &S) -> Result<Self, Self::Rejection> {
         let Json(value) = Json::<T>::from_request(req, state).await?;
-
-        // let headers = req.borrow().clone() /.headers().get(USER_AGENT);
         value.validate()?;
         Ok(ValidatedRequest(value))
     }

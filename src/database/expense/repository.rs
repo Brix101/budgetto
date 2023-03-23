@@ -1,12 +1,14 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use mockall::automock;
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynExpensesRepository = Arc<dyn ExpensesRepository + Send + Sync>;
 
+#[automock]
 #[async_trait]
 pub trait ExpensesRepository {
     async fn create_expense(

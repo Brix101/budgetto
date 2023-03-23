@@ -4,7 +4,7 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::server::dtos::budget_dto::{
-    BudgetCreateDto, BudgetGetQueryDto, BudgetResponseDto, BudgetUpdateDto,
+    BudgetCreateDto, BudgetQuery, BudgetResponseDto, BudgetUpdateDto,
 };
 use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
@@ -22,7 +22,7 @@ impl BudgetRouter {
     }
 
     pub async fn get_user_budgets(
-        query_params: Query<BudgetGetQueryDto>,
+        query_params: Query<BudgetQuery>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<Json<Vec<BudgetResponseDto>>> {

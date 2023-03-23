@@ -1,6 +1,7 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::SystemTime};
 
 use async_trait::async_trait;
+use mockall::automock;
 // use mockall::automock;
 use sqlx::{types::time::OffsetDateTime, FromRow};
 
@@ -9,6 +10,7 @@ use crate::database::user::User;
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynSessionsRepository = Arc<dyn SessionsRepository + Send + Sync>;
 
+#[automock]
 #[async_trait]
 pub trait SessionsRepository {
     async fn new_session(
@@ -27,4 +29,15 @@ pub struct Session {
     pub user_id: i64,
     pub exp: OffsetDateTime,
     pub user_agent: String,
+}
+
+impl Default for Session {
+    fn default() -> Self {
+        Self {
+            id: 1,
+            user_id: 1,
+            exp: OffsetDateTime::from(SystemTime::now()),
+            user_agent: String::from("stub user agent"),
+        }
+    }
 }

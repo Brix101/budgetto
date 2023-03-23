@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use argon2::Config;
+use mockall::automock;
 
 use crate::{
     config::AppConfig,
@@ -10,6 +11,7 @@ use crate::{
 /// A security service for handling JWT authentication.
 pub type DynArgonUtil = Arc<dyn ArgonUtil + Send + Sync>;
 
+#[automock]
 pub trait ArgonUtil {
     fn hash_password(&self, raw_password: &str) -> AppResult<String>;
 

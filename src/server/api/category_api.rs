@@ -4,7 +4,7 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::server::dtos::category_dto::{
-    CategoryCreateDto, CategoryGetQueryDto, CategoryResponseDto, CategoryUpdateDto,
+    CategoryCreateDto, CategoryQuery, CategoryResponseDto, CategoryUpdateDto,
 };
 use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
@@ -22,7 +22,7 @@ impl CategoryRouter {
     }
 
     pub async fn get_user_categories(
-        query_params: Query<CategoryGetQueryDto>,
+        query_params: Query<CategoryQuery>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<Json<Vec<CategoryResponseDto>>> {

@@ -30,6 +30,14 @@ pub struct CategoryUpdateDto {
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct CategoryGetQueryDto {
+pub struct CategoryQuery {
     pub category_id: Option<i64>,
+}
+
+impl CategoryCreateDto {
+    pub fn new_stub() -> Self {
+        Self {
+            name: Some(String::from("stub category")),
+        }
+    }
 }

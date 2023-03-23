@@ -11,7 +11,7 @@ use expense_api::ExpenseRouter;
 use user_api::UsersRouter;
 
 pub async fn health() -> &'static str {
-    "I am working!"
+    "🚀🚀🚀 Server Running"
 }
 
 pub fn app() -> Router {
