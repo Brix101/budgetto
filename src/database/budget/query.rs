@@ -72,7 +72,7 @@ impl BudgetsRepository for Database {
         id: i64,
         name: String,
         amount: f64,
-        description: Option<String>,
+        description: String,
         frequency: String,
         category_id: i64,
     ) -> anyhow::Result<Budget> {

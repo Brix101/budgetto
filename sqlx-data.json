@@ -1,6 +1,6 @@
 {
   "db": "PostgreSQL",
-  "0608b5e22dbe66e5ea869c28ef686d5575ac30579b1678d5a94d29fff1cda5ff": {
+  "0a24aef0a0d5a455e3161beeb66c1d98946c3eaa4f29d80042ef06cd438b5458": {
     "describe": {
       "columns": [
         {
@@ -9,33 +9,28 @@
           "type_info": "Int8"
         },
         {
-          "name": "amount",
+          "name": "name",
           "ordinal": 1,
-          "type_info": "Float8"
+          "type_info": "Varchar"
         },
         {
-          "name": "category_id",
+          "name": "user_id",
           "ordinal": 2,
           "type_info": "Int8"
         },
         {
-          "name": "user_id",
-          "ordinal": 3,
-          "type_info": "Int8"
-        },
-        {
           "name": "created_at",
-          "ordinal": 4,
+          "ordinal": 3,
           "type_info": "Timestamptz"
         },
         {
           "name": "updated_at",
-          "ordinal": 5,
+          "ordinal": 4,
           "type_info": "Timestamptz"
         },
         {
           "name": "deleted_at",
-          "ordinal": 6,
+          "ordinal": 5,
           "type_info": "Timestamptz"
         }
       ],
@@ -45,18 +40,16 @@
         false,
         false,
         false,
-        false,
         true
       ],
       "parameters": {
         "Left": [
-          "Float8",
-          "Int8",
+          "Varchar",
           "Int8"
         ]
       }
     },
-    "query": "\n        insert into expenses (created_at, updated_at, amount, category_id, user_id)\n        values (current_timestamp, current_timestamp, $1, $2, $3)\n        returning *\n            "
+    "query": "\n        insert into categories (created_at, updated_at, name, user_id)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::bigint)\n        returning *\n            "
   },
   "2cf1f6d9811d9213a0e640e1d97197d262c0024c27df6f5730aa02f7f6f01640": {
     "describe": {
@@ -125,6 +118,57 @@
       }
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
+  },
+  "3157629a83c3b93f2d1b411f9bed700cafcac2e6a6eb796f5302a15f7dd9ad8e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        update categories\n        set\n            name = $1::varchar\n        where id = $2\n        returning *\n            "
   },
   "3bc1cf61850e5bcf9d7a2a3fcd8cf9caf289913c30d1044c1b23e449e6f12b78": {
     "describe": {
@@ -460,57 +504,6 @@
     },
     "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
   },
-  "65a652751bfcaeab84aeaad3a6ce64f5f521524628cc56b7a38f98b778d12ee4": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 2,
-          "type_info": "Int8"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 3,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        insert into categories (created_at, updated_at, name, user_id)\n        values (current_timestamp, current_timestamp, $1, $2)\n        returning *\n            "
-  },
   "75b03ed61a380220a8e5d5ce59bff918909c57b051df7845aee14ca487a44eec": {
     "describe": {
       "columns": [
@@ -707,32 +700,38 @@
           "type_info": "Float8"
         },
         {
-          "name": "category_id",
+          "name": "description",
           "ordinal": 2,
-          "type_info": "Int8"
+          "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "category_id",
           "ordinal": 3,
           "type_info": "Int8"
         },
         {
-          "name": "created_at",
+          "name": "user_id",
           "ordinal": 4,
-          "type_info": "Timestamptz"
+          "type_info": "Int8"
         },
         {
-          "name": "updated_at",
+          "name": "created_at",
           "ordinal": 5,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -763,32 +762,38 @@
           "type_info": "Float8"
         },
         {
-          "name": "category_id",
+          "name": "description",
           "ordinal": 2,
-          "type_info": "Int8"
+          "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "category_id",
           "ordinal": 3,
           "type_info": "Int8"
         },
         {
-          "name": "created_at",
+          "name": "user_id",
           "ordinal": 4,
-          "type_info": "Timestamptz"
+          "type_info": "Int8"
         },
         {
-          "name": "updated_at",
+          "name": "created_at",
           "ordinal": 5,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -829,7 +834,7 @@
     },
     "query": "\n        delete from expenses\n        where id = $1\n        "
   },
-  "b506954c534fb1ef014b420938fc510b375afe9ebb4a50a07c3836d1972e25a1": {
+  "bb080af32045fe3c8e722949f2e921a49e19af7c0dea78d1c63432a0b57edd05": {
     "describe": {
       "columns": [
         {
@@ -843,32 +848,38 @@
           "type_info": "Float8"
         },
         {
-          "name": "category_id",
+          "name": "description",
           "ordinal": 2,
-          "type_info": "Int8"
+          "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "category_id",
           "ordinal": 3,
           "type_info": "Int8"
         },
         {
-          "name": "created_at",
+          "name": "user_id",
           "ordinal": 4,
-          "type_info": "Timestamptz"
+          "type_info": "Int8"
         },
         {
-          "name": "updated_at",
+          "name": "created_at",
           "ordinal": 5,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -880,12 +891,78 @@
       "parameters": {
         "Left": [
           "Float8",
+          "Varchar",
           "Int8",
           "Int8"
         ]
       }
     },
-    "query": "\n        update expenses\n        set\n            amount = $1,\n            category_id = $2\n        where id = $3\n        returning *\n            "
+    "query": "\n        update expenses\n        set\n            amount = $1::float,\n            description = $2::varchar,\n            category_id = $3::bigint\n        where id = $4\n        returning *\n            "
+  },
+  "c84f89373f50e868b0b4c1260e3332bdf1dd09793af7a893a8df80664612bbf1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 4,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Varchar",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        insert into expenses (created_at, updated_at, amount, description, category_id, user_id)\n        values (current_timestamp, current_timestamp, $1::float, $2::varchar, $3::bigint, $4::bigint)\n        returning *\n            "
   },
   "c8a3cecafe02ad891bd6381d5ea1bb82d65bfb0ab593fca414c088cdcbc5632c": {
     "describe": {
@@ -1039,57 +1116,6 @@
       }
     },
     "query": "\n        select budgets.*\n        from budgets\n        inner join users on budgets.user_id=users.id\n        where users.id = $1\n            "
-  },
-  "dfafd640edb48b3653681bbc031c6a6ff6f32a8031715402f50b6ec88dd7a506": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 2,
-          "type_info": "Int8"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 3,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        update categories\n        set\n            name = $1\n        where id = $2\n        returning *\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {

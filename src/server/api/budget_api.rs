@@ -4,7 +4,7 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::server::dtos::budget_dto::{
-    CreateBudgetDto, GetBudgetRequestDto, ResponseBudgetDto, UpdateBudgetDto,
+    BudgetCreateDto, BudgetGetQueryDto, BudgetResponseDto, BudgetUpdateDto,
 };
 use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
@@ -22,10 +22,10 @@ impl BudgetRouter {
     }
 
     pub async fn get_user_budgets(
-        query_params: Query<GetBudgetRequestDto>,
+        query_params: Query<BudgetGetQueryDto>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
-    ) -> AppResult<Json<Vec<ResponseBudgetDto>>> {
+    ) -> AppResult<Json<Vec<BudgetResponseDto>>> {
         info!("received request to get current user budgets");
 
         if let Some(id) = query_params.budget_id {
@@ -43,8 +43,8 @@ impl BudgetRouter {
     pub async fn create_budget(
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
-        ValidatedRequest(request): ValidatedRequest<CreateBudgetDto>,
-    ) -> AppResult<Json<ResponseBudgetDto>> {
+        ValidatedRequest(request): ValidatedRequest<BudgetCreateDto>,
+    ) -> AppResult<Json<BudgetResponseDto>> {
         info!("received request to create budget");
 
         let new_budget = services.budgets.create_budget(user_id, request).await?;
@@ -56,8 +56,8 @@ impl BudgetRouter {
         Path(id): Path<i64>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
-        Json(request): Json<UpdateBudgetDto>,
-    ) -> AppResult<Json<ResponseBudgetDto>> {
+        Json(request): Json<BudgetUpdateDto>,
+    ) -> AppResult<Json<BudgetResponseDto>> {
         info!("recieved request to update budget {:?}", id);
 
         let updated_budget = services

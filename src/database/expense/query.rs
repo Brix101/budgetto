@@ -11,17 +11,19 @@ impl ExpensesRepository for Database {
     async fn create_expense(
         &self,
         amount: f64,
+        description: String,
         category_id: i64,
         user_id: i64,
     ) -> anyhow::Result<Expense> {
         query_as!(
             Expense,
             r#"
-        insert into expenses (created_at, updated_at, amount, category_id, user_id)
-        values (current_timestamp, current_timestamp, $1, $2, $3)
+        insert into expenses (created_at, updated_at, amount, description, category_id, user_id)
+        values (current_timestamp, current_timestamp, $1::float, $2::varchar, $3::bigint, $4::bigint)
         returning *
             "#,
             amount,
+            description,
             category_id,
             user_id
         )
@@ -65,6 +67,7 @@ impl ExpensesRepository for Database {
         &self,
         id: i64,
         amount: f64,
+        description: String,
         category_id: i64,
     ) -> anyhow::Result<Expense> {
         query_as!(
@@ -72,12 +75,14 @@ impl ExpensesRepository for Database {
             r#"
         update expenses
         set
-            amount = $1,
-            category_id = $2
-        where id = $3
+            amount = $1::float,
+            description = $2::varchar,
+            category_id = $3::bigint
+        where id = $4
         returning *
             "#,
             amount,
+            description,
             category_id,
             id
         )

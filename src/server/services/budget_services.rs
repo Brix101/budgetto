@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use crate::{
     database::budget::repository::{Budget, DynBudgetsRepository},
     server::{
-        dtos::budget_dto::{CreateBudgetDto, ResponseBudgetDto, UpdateBudgetDto},
+        dtos::budget_dto::{BudgetCreateDto, BudgetResponseDto, BudgetUpdateDto},
         error::{AppResult, Error},
     },
 };
@@ -18,19 +18,19 @@ pub trait BudgetsServiceTrait {
     async fn create_budget(
         &self,
         user_id: i64,
-        request: CreateBudgetDto,
-    ) -> AppResult<ResponseBudgetDto>;
+        request: BudgetCreateDto,
+    ) -> AppResult<BudgetResponseDto>;
 
-    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<ResponseBudgetDto>;
+    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<BudgetResponseDto>;
 
-    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>>;
+    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<BudgetResponseDto>>;
 
     async fn updated_budget(
         &self,
         id: i64,
         user_id: i64,
-        request: UpdateBudgetDto,
-    ) -> AppResult<ResponseBudgetDto>;
+        request: BudgetUpdateDto,
+    ) -> AppResult<BudgetResponseDto>;
 
     async fn delete_budget(&self, user_id: i64, id: i64) -> AppResult<()>;
 }
@@ -51,8 +51,8 @@ impl BudgetsServiceTrait for BudgetsService {
     async fn create_budget(
         &self,
         user_id: i64,
-        request: CreateBudgetDto,
-    ) -> AppResult<ResponseBudgetDto> {
+        request: BudgetCreateDto,
+    ) -> AppResult<BudgetResponseDto> {
         let name = request.name.unwrap();
         let amount = request.amount.unwrap();
         let description = request.description.unwrap_or(String::from(""));
@@ -69,7 +69,7 @@ impl BudgetsServiceTrait for BudgetsService {
         Ok(created_budget.into_dto())
     }
 
-    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<ResponseBudgetDto> {
+    async fn get_budget_by_id(&self, id: i64, user_id: i64) -> AppResult<BudgetResponseDto> {
         info!("searching for existing budget {:?}", id);
         let budget = self.repository.get_budget_by_id(id).await?;
 
@@ -85,7 +85,7 @@ impl BudgetsServiceTrait for BudgetsService {
         Err(Error::NotFound(String::from("budget was not found")))
     }
 
-    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<ResponseBudgetDto>> {
+    async fn get_budgets(&self, user_id: i64) -> AppResult<Vec<BudgetResponseDto>> {
         let budgets = self.repository.get_budgets(user_id).await?;
 
         self.map_to_budgets(budgets).await
@@ -95,8 +95,8 @@ impl BudgetsServiceTrait for BudgetsService {
         &self,
         id: i64,
         user_id: i64,
-        request: UpdateBudgetDto,
-    ) -> AppResult<ResponseBudgetDto> {
+        request: BudgetUpdateDto,
+    ) -> AppResult<BudgetResponseDto> {
         let budget_to_update = self.repository.get_budget_by_id(id).await?;
 
         if let Some(existing_budget) = budget_to_update {
@@ -107,8 +107,7 @@ impl BudgetsServiceTrait for BudgetsService {
 
             let updated_name = request.name.unwrap_or(existing_budget.name);
             let updated_amount = request.amount.unwrap_or(existing_budget.amount);
-            let updated_description =
-                Some(request.description.unwrap_or(existing_budget.description));
+            let updated_description = request.description.unwrap_or(existing_budget.description);
             let updated_frequency = request.frequency.unwrap_or(existing_budget.frequency);
             let updated_category_id = request.category_id.unwrap_or(existing_budget.category_id);
 
@@ -149,10 +148,10 @@ impl BudgetsServiceTrait for BudgetsService {
 }
 
 impl BudgetsService {
-    async fn map_to_budgets(&self, budgets: Vec<Budget>) -> AppResult<Vec<ResponseBudgetDto>> {
+    async fn map_to_budgets(&self, budgets: Vec<Budget>) -> AppResult<Vec<BudgetResponseDto>> {
         info!("found {} budgets", budgets.len());
 
-        let mut mapped_budgets: Vec<ResponseBudgetDto> = Vec::new();
+        let mut mapped_budgets: Vec<BudgetResponseDto> = Vec::new();
 
         if !budgets.is_empty() {
             for budget in budgets {
