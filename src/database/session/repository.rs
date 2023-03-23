@@ -18,10 +18,10 @@ pub trait SessionsRepository {
         exp: &OffsetDateTime,
     ) -> anyhow::Result<Session>;
 
-    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<User>;
+    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<Option<User>>;
 }
 
-#[derive(FromRow)]
+#[derive(FromRow, Debug)]
 pub struct Session {
     pub id: i64,
     pub user_id: i64,

@@ -32,18 +32,18 @@ impl SessionsRepository for Database {
         .context("an unexpected error occured while creating a session")
     }
 
-    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<User> {
+    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<Option<User>> {
         query_as!(
             User,
             r#"
         select users.* from users
         inner join sessions
         on users.id = sessions.user_id
-        where sessions.id = $1
+        where sessions.exp >= now() and sessions.id = $1
             "#,
             id,
         )
-        .fetch_one(&self.pool)
+        .fetch_optional(&self.pool)
         .await
         .context("user was not found")
     }

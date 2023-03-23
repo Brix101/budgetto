@@ -19,6 +19,7 @@ pub trait JwtUtil {
     fn new_access_token(&self, user_id: i64, email: &str) -> AppResult<String>;
     fn new_refresh_token(&self, sub: i64) -> AppResult<String>;
     fn get_user_id_from_token(&self, token: String) -> AppResult<i64>;
+    fn get_session_id_from_token(&self, token: String) -> AppResult<i64>;
 }
 
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
@@ -97,5 +98,16 @@ impl JwtUtil for JwtTokenUtil {
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(decoded_token.claims.user_id)
+    }
+
+    fn get_session_id_from_token(&self, token: String) -> AppResult<i64> {
+        let decoded_token = decode::<RefreshTokenClaims>(
+            token.as_str(),
+            &DecodingKey::from_secret(self.config.refresh_token_secret.as_bytes()),
+            &Validation::new(Algorithm::HS256),
+        )
+        .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
+
+        Ok(decoded_token.claims.sub)
     }
 }
