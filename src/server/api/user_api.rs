@@ -18,8 +18,8 @@ impl UsersRouter {
         Router::new()
             .route("/signup", post(Self::signup_user_endpoint))
             .route("/signin", post(Self::signin_user_endpoint))
-            .route("/user", get(Self::get_current_user_endpoint))
-            .route("/user", put(Self::update_user_endpoint))
+            .route("/whoami", get(Self::get_current_user_endpoint))
+            .route("/", put(Self::update_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(

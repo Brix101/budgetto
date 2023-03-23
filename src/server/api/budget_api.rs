@@ -73,7 +73,7 @@ impl BudgetRouter {
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<()> {
-        info!("recieved request to remove comment {:?}", id);
+        info!("recieved request to remove budget {:?}", id);
 
         services.budgets.delete_budget(user_id, id).await?;
 
