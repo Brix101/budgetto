@@ -12,6 +12,7 @@ pub trait ExpensesRepository {
     async fn create_expense(
         &self,
         amount: f64,
+        description: String,
         category_id: i64,
         user_id: i64,
     ) -> anyhow::Result<Expense>;
@@ -24,6 +25,7 @@ pub trait ExpensesRepository {
         &self,
         id: i64,
         amount: f64,
+        description: String,
         category_id: i64,
     ) -> anyhow::Result<Expense>;
 
@@ -34,6 +36,7 @@ pub trait ExpensesRepository {
 pub struct Expense {
     pub id: i64,
     pub amount: f64,
+    pub description: String,
     pub category_id: i64,
     pub user_id: i64,
     pub created_at: OffsetDateTime,

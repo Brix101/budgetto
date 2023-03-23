@@ -13,7 +13,7 @@ impl CategoriesRepository for Database {
             Category,
             r#"
         insert into categories (created_at, updated_at, name, user_id)
-        values (current_timestamp, current_timestamp, $1, $2)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::bigint)
         returning *
             "#,
             name,
@@ -61,7 +61,7 @@ impl CategoriesRepository for Database {
             r#"
         update categories
         set
-            name = $1
+            name = $1::varchar
         where id = $2
         returning *
             "#,

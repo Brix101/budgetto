@@ -1,51 +1,42 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::database::budget::repository::Budget;
+use crate::database::expense::repository::Expense;
 
-impl Budget {
-    pub fn into_dto(self) -> BudgetResponseDto {
-        BudgetResponseDto {
+impl Expense {
+    pub fn into_dto(self) -> ExpenseResponseDto {
+        ExpenseResponseDto {
             id: self.id,
-            name: Some(self.name),
             amount: Some(self.amount),
             description: Some(self.description),
-            frequency: Some(self.frequency),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub struct BudgetResponseDto {
+pub struct ExpenseResponseDto {
     pub id: i64,
-    pub name: Option<String>,
     pub amount: Option<f64>,
     pub description: Option<String>,
-    pub frequency: Option<String>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
-pub struct BudgetCreateDto {
-    #[validate(required, length(min = 1))]
-    pub name: Option<String>,
+pub struct ExpenseCreateDto {
     #[validate(required, range(min = 0.00))]
     pub amount: Option<f64>,
     pub description: Option<String>,
-    pub frequency: Option<String>,
     #[validate(required, range(min = 1))]
     pub category_id: Option<i64>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct BudgetUpdateDto {
-    pub name: Option<String>,
+pub struct ExpenseUpdateDto {
     pub amount: Option<f64>,
     pub description: Option<String>,
-    pub frequency: Option<String>,
     pub category_id: Option<i64>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct BudgetGetQueryDto {
-    pub budget_id: Option<i64>,
+pub struct ExpenseGetQueryDto {
+    pub expense_id: Option<i64>,
 }
