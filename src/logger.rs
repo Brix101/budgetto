@@ -7,8 +7,8 @@ use tracing::{error, level_filters::LevelFilter};
 #[cfg(debug_assertions)]
 const MAX_LEVEL: LevelFilter = LevelFilter::DEBUG;
 
-#[cfg(not(debug_assertions))]
-const MAX_LEVEL: LevelFilter = LevelFilter::INFO;
+// #[cfg(not(debug_assertions))]
+// const MAX_LEVEL: LevelFilter = LevelFilter::INFO;
 
 /// Initialize logger (tracing and panic hook).
 pub fn init() {
