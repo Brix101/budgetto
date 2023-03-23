@@ -12,6 +12,7 @@ create table if not exists budgets
     amount      float      not null default 0.00,
     description varchar     not null default '',
     frequency   varchar    not null default 'Monthly',
+    category_id    bigint not null references categories (id) on delete cascade,
     user_id     bigint      not null references users (id) on delete cascade,
     created_at  timestamptz not null default current_timestamp,
     updated_at  timestamptz not null default current_timestamp,

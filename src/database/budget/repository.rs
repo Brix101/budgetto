@@ -16,6 +16,7 @@ pub trait BudgetsRepository {
         amount: f64,
         description: String,
         frequency: String,
+        category_id: i64,
     ) -> anyhow::Result<Budget>;
 
     async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Option<Budget>>;
@@ -29,6 +30,7 @@ pub trait BudgetsRepository {
         amount: f64,
         description: Option<String>,
         frequency: String,
+        category_id: i64,
     ) -> anyhow::Result<Budget>;
 
     async fn delete_budget(&self, id: i64) -> anyhow::Result<()>;
@@ -40,9 +42,10 @@ pub struct Budget {
     pub name: String,
     pub amount: f64,
     pub description: String,
+    pub frequency: String,
+    pub category_id: i64,
+    pub user_id: i64,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
     pub deleted_at: Option<OffsetDateTime>,
-    pub user_id: i64,
-    pub frequency: String,
 }

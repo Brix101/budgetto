@@ -18,7 +18,7 @@ pub trait SessionsRepository {
         exp: &OffsetDateTime,
     ) -> anyhow::Result<Session>;
 
-    async fn get_user_session_by_id(&self, id: i64) -> anyhow::Result<User>;
+    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<User>;
 }
 
 #[derive(FromRow)]
