@@ -124,7 +124,7 @@ impl UsersServiceTrait for UsersService {
             .session_service
             .new_session(NewSessionDto {
                 user_id: Some(user.id),
-                user_agent: user_agent,
+                user_agent,
             })
             .await
             .unwrap();

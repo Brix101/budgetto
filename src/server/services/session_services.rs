@@ -7,6 +7,7 @@ use async_trait::async_trait;
 
 use crate::database::session::DynSessionsRepository;
 use crate::server::dtos::session_dto::{NewSessionDto, SessionResponseDto};
+use crate::server::dtos::user_dto::ResponseUserDto;
 use crate::server::error::AppResult;
 use crate::server::utils::jwt_utils::DynJwtUtil;
 
@@ -18,10 +19,7 @@ pub type DynSessionsService = Arc<dyn SessionsServiceTrait + Send + Sync>;
 pub trait SessionsServiceTrait {
     async fn new_session(&self, request: NewSessionDto) -> AppResult<SessionResponseDto>;
 
-    // async fn new_access_token(
-    //     &self,
-    //     request: SignInUserDto,
-    // ) -> AppResult<(ResponseUserDto, String)>;
+    async fn refresh_access_token(&self, id: i64) -> AppResult<ResponseUserDto>;
 }
 
 #[derive(Clone)]
@@ -56,7 +54,8 @@ impl SessionsServiceTrait for SessionsService {
         let user_session = self
             .repository
             .get_user_by_session_id(created_session.id)
-            .await?;
+            .await?
+            .unwrap();
 
         info!("user successfully created, generating token");
         let access_token = self
@@ -71,10 +70,16 @@ impl SessionsServiceTrait for SessionsService {
         })
     }
 
-    // async fn new_access_token(
-    //     &self,
-    //     request: SignInUserDto,
-    // ) -> AppResult<(ResponseUserDto, String)> {
+    async fn refresh_access_token(&self, id: i64) -> AppResult<ResponseUserDto> {
+        let user_in_session = self.repository.get_user_by_session_id(id).await?;
 
-    // }
+        if let Some(user) = user_in_session {
+            info!("user successfully created, generating token");
+            let access_token = self.jwt_util.new_access_token(user.id, &user.email)?;
+
+            return Ok(user.into_dto(access_token));
+        }
+
+        Err(crate::server::error::Error::Unauthorized)
+    }
 }

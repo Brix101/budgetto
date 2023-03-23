@@ -8,7 +8,9 @@ use crate::server::dtos::user_dto::{
     SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::{RequiredAuthentication, UserAgent, ValidatedRequest};
+use crate::server::middlewares::{
+    DeserializeSession, RequiredAuthentication, UserAgent, ValidatedRequest,
+};
 use crate::server::services::Services;
 
 pub struct UsersRouter;
@@ -20,6 +22,7 @@ impl UsersRouter {
             .route("/signin", post(Self::signin_user_endpoint))
             .route("/whoami", get(Self::get_current_user_endpoint))
             .route("/", put(Self::update_user_endpoint))
+            .route("/refresh", get(Self::refresh_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(
@@ -75,5 +78,22 @@ impl UsersRouter {
         let updated_user = services.users.updated_user(user_id, request).await?;
 
         Ok(Json(UserAuthenicationResponse { user: updated_user }))
+    }
+
+    pub async fn refresh_user_endpoint(
+        jar: CookieJar,
+        Extension(services): Extension<Services>,
+        DeserializeSession(session_id, refresh_token): DeserializeSession,
+    ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
+        info!(
+            "recieved request to get accesstoken session {:?}",
+            session_id
+        );
+
+        let user = services.sessions.refresh_access_token(session_id).await?;
+
+        let cookie = jar.add(Cookie::new("refresh_token", refresh_token));
+
+        Ok((cookie, Json(UserAuthenicationResponse { user })))
     }
 }
