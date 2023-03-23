@@ -23,6 +23,7 @@ impl UsersRouter {
             .route("/whoami", get(Self::get_current_user_endpoint))
             .route("/", put(Self::update_user_endpoint))
             .route("/refresh", get(Self::refresh_user_endpoint))
+            .route("/signout", post(Self::signout_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(
@@ -95,5 +96,22 @@ impl UsersRouter {
         let cookie = jar.add(Cookie::new("refresh_token", refresh_token));
 
         Ok((cookie, Json(UserAuthenicationResponse { user })))
+    }
+
+    pub async fn signout_user_endpoint(
+        jar: CookieJar,
+        Extension(services): Extension<Services>,
+        DeserializeSession(session_id, _refresh_token): DeserializeSession,
+    ) -> AppResult<CookieJar> {
+        info!(
+            "recieved request to get accesstoken session {:?}",
+            session_id
+        );
+
+        services.sessions.refresh_access_token(session_id).await?;
+
+        let cookie = jar.remove(Cookie::named("refresh_token"));
+
+        Ok(cookie)
     }
 }
