@@ -86,10 +86,7 @@ impl UsersRouter {
         Extension(services): Extension<Services>,
         DeserializeSession(session_id, refresh_token): DeserializeSession,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
-        info!(
-            "recieved request to get accesstoken session {:?}",
-            session_id
-        );
+        info!("recieved request to refresh access token {:?}", session_id);
 
         let user = services.sessions.refresh_access_token(session_id).await?;
 
@@ -103,10 +100,7 @@ impl UsersRouter {
         Extension(services): Extension<Services>,
         DeserializeSession(session_id, _refresh_token): DeserializeSession,
     ) -> AppResult<CookieJar> {
-        info!(
-            "recieved request to get accesstoken session {:?}",
-            session_id
-        );
+        info!("recieved request to signout session {:?}", session_id);
 
         services.sessions.refresh_access_token(session_id).await?;
 
