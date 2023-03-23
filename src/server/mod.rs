@@ -23,7 +23,7 @@ use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_http::{cors::Any, cors::CorsLayer, trace::TraceLayer};
-use tracing::debug;
+use tracing::{debug, info};
 
 use crate::config::AppConfig;
 use crate::database::Database;
@@ -48,11 +48,6 @@ impl ApplicationServer {
             .install_recorder()
             .context("could not install metrics recorder")?;
 
-        // enable console logging
-        // TODO need to update this logger
-        tracing_subscriber::fmt::init();
-
-        // initialized app services
         let services = Services::new(db, config.clone());
 
         let cors_origin = &config.cors_origin;
@@ -83,6 +78,7 @@ impl ApplicationServer {
         let port = config.port;
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
 
+        info!("🚀 Server has launched on https://{addr}");
         debug!("routes initialized, listening on port {}", port);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
