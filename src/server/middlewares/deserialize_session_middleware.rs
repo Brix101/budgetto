@@ -36,9 +36,10 @@ where
                 .jwt_util
                 .get_session_id_from_token(String::from(refresh_token_value))
                 .map_err(|err| {
-                    error!("could not validate user ID from token: {:?}", err);
+                    error!("could not validate session ID from token: {:?}", err);
                     Error::Unauthorized
                 })?;
+
             Ok(DeserializeSession(
                 session_id,
                 refresh_token_value.to_string(),

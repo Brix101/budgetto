@@ -25,6 +25,7 @@ impl Database {
                 .run(&pool)
                 .await
                 .context("error while running database migrations")?;
+            info!("migrations successfully ran, initializing axum server...");
         }
 
         Ok(Self { pool })

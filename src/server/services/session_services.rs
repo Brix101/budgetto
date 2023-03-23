@@ -57,7 +57,7 @@ impl SessionsServiceTrait for SessionsService {
             .await?
             .unwrap();
 
-        info!("user successfully created, generating token");
+        info!("session successfully created, generating tokens");
         let access_token = self
             .jwt_util
             .new_access_token(user_session.id, &user_session.email)?;
@@ -74,7 +74,7 @@ impl SessionsServiceTrait for SessionsService {
         let user_in_session = self.repository.get_user_by_session_id(id).await?;
 
         if let Some(user) = user_in_session {
-            info!("user successfully created, generating token");
+            info!("existing session found, generating access token");
             let access_token = self.jwt_util.new_access_token(user.id, &user.email)?;
 
             return Ok(user.into_dto(access_token));

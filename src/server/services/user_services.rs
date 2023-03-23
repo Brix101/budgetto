@@ -117,8 +117,7 @@ impl UsersServiceTrait for UsersService {
             return Err(Error::InvalidLoginAttmpt);
         }
 
-        info!("user login successful, generating token");
-        // let test = self.session_repository.c /
+        info!("user login successful, generating tokens");
 
         let token = self
             .session_service
@@ -163,6 +162,10 @@ impl UsersServiceTrait for UsersService {
 
         // if the password is included on the request, hash it and update the stored password
         if request.password.is_some() && !request.password.as_ref().unwrap().is_empty() {
+            info!(
+                "new password found for user {:?}, hashing password",
+                user_id
+            );
             updated_hashed_password = self
                 .argon_util
                 .hash_password(request.password.unwrap().as_str())?;
