@@ -8,7 +8,7 @@ use crate::server::dtos::user_dto::{
     SignInUserDto, SignUpUserDto, UpdateUserDto, UserAuthenicationResponse,
 };
 use crate::server::error::AppResult;
-use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
+use crate::server::middlewares::{RequiredAuthentication, UserAgent, ValidatedRequest};
 use crate::server::services::Services;
 
 pub struct UsersRouter;
@@ -39,6 +39,7 @@ impl UsersRouter {
     pub async fn signin_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<Services>,
+        UserAgent(user_agent): UserAgent,
         ValidatedRequest(request): ValidatedRequest<SignInUserDto>,
     ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
         info!(
@@ -46,7 +47,7 @@ impl UsersRouter {
             request.email.as_ref().unwrap()
         );
 
-        let (user, refresh_token) = services.users.signin_user(request).await?;
+        let (user, refresh_token) = services.users.signin_user(request, user_agent).await?;
 
         let cookie = jar.add(Cookie::new("refresh_token", refresh_token.to_string()));
 
