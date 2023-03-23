@@ -26,11 +26,11 @@ use self::{
 
 use super::utils::jwt_utils::DynJwtUtil;
 
-mod budget_services;
-mod category_services;
-mod expense_services;
-mod session_services;
-mod user_services;
+pub mod budget_services;
+pub mod category_services;
+pub mod expense_services;
+pub mod session_services;
+pub mod user_services;
 
 #[derive(Clone)]
 pub struct Services {

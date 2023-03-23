@@ -1,9 +1,9 @@
+use async_trait::async_trait;
+use mockall::automock;
 use sqlx::types::time::OffsetDateTime;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use tracing::info;
-
-use async_trait::async_trait;
 
 use crate::database::session::DynSessionsRepository;
 use crate::server::dtos::session_dto::{NewSessionDto, SessionResponseDto};
@@ -15,6 +15,7 @@ use crate::server::utils::jwt_utils::DynJwtUtil;
 /// around which themselves depend on the user repostiory, and ultimately, our Posgres connection pool.
 pub type DynSessionsService = Arc<dyn SessionsServiceTrait + Send + Sync>;
 
+#[automock]
 #[async_trait]
 pub trait SessionsServiceTrait {
     async fn new_session(&self, request: NewSessionDto) -> AppResult<SessionResponseDto>;

@@ -30,6 +30,6 @@ pub struct CategoryUpdateDto {
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct CategoryGetQueryDto {
+pub struct CategoryQuery {
     pub category_id: Option<i64>,
 }

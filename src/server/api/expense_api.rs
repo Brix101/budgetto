@@ -4,7 +4,7 @@ use axum::{Extension, Router};
 use tracing::info;
 
 use crate::server::dtos::expense_dto::{
-    ExpenseCreateDto, ExpenseGetQueryDto, ExpenseResponseDto, ExpenseUpdateDto,
+    ExpenseCreateDto, ExpenseQuery, ExpenseResponseDto, ExpenseUpdateDto,
 };
 use crate::server::error::AppResult;
 use crate::server::middlewares::{RequiredAuthentication, ValidatedRequest};
@@ -22,7 +22,7 @@ impl ExpenseRouter {
     }
 
     pub async fn get_user_expenses(
-        query_params: Query<ExpenseGetQueryDto>,
+        query_params: Query<ExpenseQuery>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<Json<Vec<ExpenseResponseDto>>> {

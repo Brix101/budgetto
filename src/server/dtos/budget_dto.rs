@@ -46,6 +46,6 @@ pub struct BudgetUpdateDto {
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]
-pub struct BudgetGetQueryDto {
+pub struct BudgetQuery {
     pub budget_id: Option<i64>,
 }
