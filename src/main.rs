@@ -7,9 +7,13 @@ use dotenvy::dotenv;
 use budgetto_api::{config::AppConfig, database::Database, server::ApplicationServer};
 use tracing::info;
 
+mod logger;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
+    logger::init();
+
     let config = Arc::new(AppConfig::parse());
 
     info!("environment loaded and configuration parsed, initializing Postgres connection and running migrations...");

@@ -21,9 +21,9 @@ use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, R
 use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
-use tower::ServiceBuilder;
+use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_http::{cors::Any, cors::CorsLayer, trace::TraceLayer};
-use tracing::debug;
+use tracing::{debug, info};
 
 use crate::config::AppConfig;
 use crate::database::Database;
@@ -48,11 +48,6 @@ impl ApplicationServer {
             .install_recorder()
             .context("could not install metrics recorder")?;
 
-        // enable console logging
-        // TODO need to update this logger
-        tracing_subscriber::fmt::init();
-
-        // initialized app services
         let services = Services::new(db, config.clone());
 
         let cors_origin = &config.cors_origin;
@@ -70,10 +65,12 @@ impl ApplicationServer {
                 ServiceBuilder::new()
                     .layer(TraceLayer::new_for_http())
                     .layer(HandleErrorLayer::new(Self::handle_timeout_error))
-                    .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
+                    .timeout(Duration::from_secs(*HTTP_TIMEOUT))
+                    .layer(cors)
+                    .layer(Extension(services))
+                    .layer(BufferLayer::new(1024))
+                    .layer(RateLimitLayer::new(5, Duration::from_secs(1))),
             )
-            .layer(cors)
-            .layer(Extension(services))
             .route_layer(middleware::from_fn(Self::track_metrics));
 
         let router = router.fallback(Self::handle_404);
@@ -81,6 +78,7 @@ impl ApplicationServer {
         let port = config.port;
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
 
+        info!("🚀 Server has launched on https://{addr}");
         debug!("routes initialized, listening on port {}", port);
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
