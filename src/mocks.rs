@@ -1,7 +1,26 @@
+use crate::database::category::repository::MockCategoriesRepository;
 use crate::database::user::MockUsersRepository;
 use crate::server::services::session_services::MockSessionsServiceTrait;
 use crate::server::utils::argon_utils::MockArgonUtil;
 use crate::server::utils::jwt_utils::MockJwtUtil;
+
+pub struct CategoriesServiceTestFixture {
+    pub mock_repository: MockCategoriesRepository,
+}
+
+impl CategoriesServiceTestFixture {
+    pub fn new() -> Self {
+        CategoriesServiceTestFixture {
+            mock_repository: MockCategoriesRepository::new(),
+        }
+    }
+}
+
+impl Default for CategoriesServiceTestFixture {
+    fn default() -> Self {
+        CategoriesServiceTestFixture::new()
+    }
+}
 
 pub struct UsersServiceTestFixture {
     pub mock_repository: MockUsersRepository,

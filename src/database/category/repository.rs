@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::SystemTime;
 
 use async_trait::async_trait;
 use mockall::automock;
@@ -30,4 +31,17 @@ pub struct Category {
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
     pub deleted_at: Option<OffsetDateTime>,
+}
+
+impl Default for Category {
+    fn default() -> Self {
+        Self {
+            id: 1,
+            name: String::from("stub category"),
+            user_id: 1,
+            created_at: OffsetDateTime::from(SystemTime::now()),
+            updated_at: OffsetDateTime::from(SystemTime::now()),
+            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
+        }
+    }
 }

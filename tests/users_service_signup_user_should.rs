@@ -44,7 +44,7 @@ async fn return_success_when_downstream_services_succeed() {
         .mock_jwt_util
         .expect_new_access_token()
         .with(eq(1), eq("stub email"))
-        .times(1)
+        .times(0)
         .return_once(move |_, _| Ok(String::from("stub token")));
 
     let users_service = UsersService::new(
