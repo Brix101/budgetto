@@ -55,7 +55,7 @@ impl SessionsServiceTrait for SessionsService {
 
         let user_session = self
             .repository
-            .get_user_session_by_id(created_session.id)
+            .get_user_by_session_id(created_session.id)
             .await?;
 
         info!("user successfully created, generating token");

@@ -1,5 +1,63 @@
 {
   "db": "PostgreSQL",
+  "0608b5e22dbe66e5ea869c28ef686d5575ac30579b1678d5a94d29fff1cda5ff": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        insert into expenses (created_at, updated_at, amount, category_id, user_id)\n        values (current_timestamp, current_timestamp, $1, $2, $3)\n        returning *\n            "
+  },
   "2cf1f6d9811d9213a0e640e1d97197d262c0024c27df6f5730aa02f7f6f01640": {
     "describe": {
       "columns": [
@@ -68,147 +126,7 @@
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
-  "30db023c94e1639ba922133fe79fe0476de865133cf2142ae58433da6c456289": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "amount",
-          "ordinal": 2,
-          "type_info": "Float8"
-        },
-        {
-          "name": "description",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "frequency",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 5,
-          "type_info": "Int8"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 8,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Float8",
-          "Varchar",
-          "Int8",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar)\n        returning *\n            "
-  },
-  "3f3b186aff4b48f520027fe1114be28b9ad7caa8dda64a55fcc51ac1d16e0d0c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "amount",
-          "ordinal": 2,
-          "type_info": "Float8"
-        },
-        {
-          "name": "description",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "frequency",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 5,
-          "type_info": "Int8"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 8,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        select *\n        from budgets\n        where id = $1\n            "
-  },
-  "43bbeb7d4ed2e97cafba890f15976ecf04a8576047e5af495165541c3cbb9986": {
+  "3bc1cf61850e5bcf9d7a2a3fcd8cf9caf289913c30d1044c1b23e449e6f12b78": {
     "describe": {
       "columns": [
         {
@@ -246,7 +164,228 @@
         ]
       }
     },
-    "query": "\n        insert into user_sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
+    "query": "\n        insert into sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
+  },
+  "3f3b186aff4b48f520027fe1114be28b9ad7caa8dda64a55fcc51ac1d16e0d0c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "frequency",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select *\n        from budgets\n        where id = $1\n            "
+  },
+  "4d60809eb017c5052edeedaa05ab6f341bd26553ec964cdb93b79fd4f903acac": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "frequency",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Float8",
+          "Varchar",
+          "Int8",
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency,category_id)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar, $6::bigint)\n        returning *\n            "
+  },
+  "59ab0c70602b8c1d37f10cb6e55061982861f7a5018f38505e9f338178063392": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "password",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "image",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select users.* from users\n        inner join sessions\n        on users.id = sessions.user_id\n        where sessions.id = $1\n            "
   },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
@@ -320,6 +459,107 @@
       }
     },
     "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
+  },
+  "65a652751bfcaeab84aeaad3a6ce64f5f521524628cc56b7a38f98b778d12ee4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        insert into categories (created_at, updated_at, name, user_id)\n        values (current_timestamp, current_timestamp, $1, $2)\n        returning *\n            "
+  },
+  "75b03ed61a380220a8e5d5ce59bff918909c57b051df7845aee14ca487a44eec": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select categories.*\n        from categories\n        inner join users on categories.user_id=users.id\n        where users.id = $1\n            "
   },
   "7806f4fd33c1168dfe2ce2873a1bfb92cca0ffd792ed71455cd722361c6ce3b3": {
     "describe": {
@@ -403,7 +643,251 @@
     },
     "query": "\n        delete from budgets\n        where id = $1\n        "
   },
-  "969785d3faa56c975a76fcbf2852e20d8f7ff553224d623d71cc72b37d713093": {
+  "94795b1ae8d9d2ee00e06e66e982798e307f823733fd089d5666d9391bb1396d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select *\n        from categories\n        where id = $1\n            "
+  },
+  "a27a6ea8c0c4ac5c1411712b6c53c3e3adf56c113a34a8288cb52b6f716d2b49": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select expenses.*\n        from expenses\n        inner join users on expenses.user_id=users.id\n        where users.id = $1\n            "
+  },
+  "a647e6a19214f74149df1a013b4d49ad719496be88b52e6b3690d6ca66c0a798": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        select *\n        from expenses\n        where id = $1\n            "
+  },
+  "a7795f99e4f41ce866cadd0843e547360670fa7152c6ee201fb8feca9896d8b4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        delete from categories\n        where id = $1\n        "
+  },
+  "af4b93215fe76d5c57629372c2732e755418b3f09601cc2c227d954ef115fb2b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        delete from expenses\n        where id = $1\n        "
+  },
+  "b506954c534fb1ef014b420938fc510b375afe9ebb4a50a07c3836d1972e25a1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        update expenses\n        set\n            amount = $1,\n            category_id = $2\n        where id = $3\n        returning *\n            "
+  },
+  "c8a3cecafe02ad891bd6381d5ea1bb82d65bfb0ab593fca414c088cdcbc5632c": {
     "describe": {
       "columns": [
         {
@@ -432,27 +916,33 @@
           "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "category_id",
           "ordinal": 5,
           "type_info": "Int8"
         },
         {
-          "name": "created_at",
+          "name": "user_id",
           "ordinal": 6,
-          "type_info": "Timestamptz"
+          "type_info": "Int8"
         },
         {
-          "name": "updated_at",
+          "name": "created_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -469,79 +959,12 @@
           "Float8",
           "Varchar",
           "Varchar",
+          "Int8",
           "Int8"
         ]
       }
     },
-    "query": "\n        update budgets\n        set\n            name = $1::varchar,\n            amount = $2::float,\n            description = $3::varchar,\n            updated_at = current_timestamp,\n            frequency = $4::varchar\n        where id = $5\n        returning *\n            "
-  },
-  "a1f2a6a5f0b3bf75267d257217cd496e3b7ecad2fcf36fe7dfaa7f8873a699d0": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "email",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "password",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "bio",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "image",
-          "ordinal": 5,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 8,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        select users.* from users\n        inner join user_sessions\n        on users.id = user_sessions.user_id\n        where user_sessions.id = $1\n            "
+    "query": "\n        update budgets\n        set\n            name = $1::varchar,\n            amount = $2::float,\n            description = $3::varchar,\n            updated_at = current_timestamp,\n            frequency = $4::varchar,\n            category_id = $5::bigint\n        where id = $6\n        returning *\n            "
   },
   "d58890d82dc8572ae50310e3f0dbbb9c99f7cf41138d9e74db8ae39c85a29173": {
     "describe": {
@@ -572,27 +995,33 @@
           "type_info": "Varchar"
         },
         {
-          "name": "user_id",
+          "name": "category_id",
           "ordinal": 5,
           "type_info": "Int8"
         },
         {
-          "name": "created_at",
+          "name": "user_id",
           "ordinal": 6,
-          "type_info": "Timestamptz"
+          "type_info": "Int8"
         },
         {
-          "name": "updated_at",
+          "name": "created_at",
           "ordinal": 7,
           "type_info": "Timestamptz"
         },
         {
-          "name": "deleted_at",
+          "name": "updated_at",
           "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
           "type_info": "Timestamptz"
         }
       ],
       "nullable": [
+        false,
         false,
         false,
         false,
@@ -610,6 +1039,57 @@
       }
     },
     "query": "\n        select budgets.*\n        from budgets\n        inner join users on budgets.user_id=users.id\n        where users.id = $1\n            "
+  },
+  "dfafd640edb48b3653681bbc031c6a6ff6f32a8031715402f50b6ec88dd7a506": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        update categories\n        set\n            name = $1\n        where id = $2\n        returning *\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {

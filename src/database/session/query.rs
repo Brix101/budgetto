@@ -19,7 +19,7 @@ impl SessionsRepository for Database {
         query_as!(
             Session,
             r#"
-        insert into user_sessions (user_id,user_agent,exp)
+        insert into sessions (user_id,user_agent,exp)
         values ($1,$2,$3)
         returning *
             "#,
@@ -32,14 +32,14 @@ impl SessionsRepository for Database {
         .context("an unexpected error occured while creating a session")
     }
 
-    async fn get_user_session_by_id(&self, id: i64) -> anyhow::Result<User> {
+    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<User> {
         query_as!(
             User,
             r#"
         select users.* from users
-        inner join user_sessions
-        on users.id = user_sessions.user_id
-        where user_sessions.id = $1
+        inner join sessions
+        on users.id = sessions.user_id
+        where sessions.id = $1
             "#,
             id,
         )

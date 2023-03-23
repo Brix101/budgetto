@@ -1,7 +1,8 @@
 mod connection;
 
 pub mod budget;
-pub mod ledger;
+pub mod category;
+pub mod expense;
 pub mod session;
 pub mod user;
 

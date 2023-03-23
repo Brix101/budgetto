@@ -4,7 +4,7 @@ use sqlx::{query, query_as};
 
 use crate::database::Database;
 
-use super::repository::{Budget, BudgetsRepository,};
+use super::repository::{Budget, BudgetsRepository};
 
 #[async_trait]
 impl BudgetsRepository for Database {
@@ -15,19 +15,21 @@ impl BudgetsRepository for Database {
         amount: f64,
         description: String,
         frequency: String,
-    ) -> anyhow::Result<Budget> {        
+        category_id: i64,
+    ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,
             r#"
-        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar)
+        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency,category_id)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar, $6::bigint)
         returning *
             "#,
             name,
             amount,
             description,
             user_id,
-            frequency 
+            frequency,
+            category_id
         )
         .fetch_one(&self.pool)
         .await
@@ -72,6 +74,7 @@ impl BudgetsRepository for Database {
         amount: f64,
         description: Option<String>,
         frequency: String,
+        category_id: i64,
     ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,
@@ -82,14 +85,16 @@ impl BudgetsRepository for Database {
             amount = $2::float,
             description = $3::varchar,
             updated_at = current_timestamp,
-            frequency = $4::varchar
-        where id = $5
+            frequency = $4::varchar,
+            category_id = $5::bigint
+        where id = $6
         returning *
             "#,
             name,
             amount,
             description,
             frequency,
+            category_id,
             id
         )
         .fetch_one(&self.pool)
