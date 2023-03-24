@@ -2,6 +2,7 @@ use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
 use axum::{Extension, Router};
 use tracing::info;
+use uuid::Uuid;
 
 use crate::server::dtos::budget_dto::{
     BudgetCreateDto, BudgetQuery, BudgetResponseDto, BudgetUpdateDto,
@@ -42,18 +43,18 @@ impl BudgetRouter {
 
     pub async fn create_budget(
         Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(_user_id): RequiredAuthentication,
         ValidatedRequest(request): ValidatedRequest<BudgetCreateDto>,
     ) -> AppResult<Json<BudgetResponseDto>> {
         info!("received request to create budget");
 
-        let new_budget = services.budgets.create_budget(user_id, request).await?;
+        let new_budget = services.budgets.create_budget(request).await?;
 
         Ok(Json(new_budget))
     }
 
     pub async fn update_budget(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
         Json(request): Json<BudgetUpdateDto>,
@@ -69,7 +70,7 @@ impl BudgetRouter {
     }
 
     pub async fn delete_budget(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<()> {

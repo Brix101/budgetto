@@ -7,6 +7,7 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use thiserror::Error;
+use tracing::debug;
 use tracing::log::error;
 use validator::{ValidationErrors, ValidationErrorsKind};
 
@@ -117,6 +118,7 @@ impl Error {
 
 impl IntoResponse for Error {
     fn into_response(self) -> Response {
+        debug!("{:#?}", self);
         if let Self::ValidationError(e) = self {
             return Self::unprocessable_entity(e);
         }

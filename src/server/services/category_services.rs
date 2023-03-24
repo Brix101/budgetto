@@ -1,6 +1,7 @@
 use mockall::automock;
 use std::sync::Arc;
 use tracing::info;
+use uuid::Uuid;
 
 use async_trait::async_trait;
 
@@ -19,22 +20,22 @@ pub type DynCategoriesService = Arc<dyn CategoriesServiceTrait + Send + Sync>;
 pub trait CategoriesServiceTrait {
     async fn create_category(
         &self,
-        user_id: i64,
+        user_id: Uuid,
         request: CategoryCreateDto,
     ) -> AppResult<CategoryResponseDto>;
 
-    async fn get_category_by_id(&self, id: i64, user_id: i64) -> AppResult<CategoryResponseDto>;
+    async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryResponseDto>;
 
-    async fn get_categories(&self, user_id: i64) -> AppResult<Vec<CategoryResponseDto>>;
+    async fn get_categories(&self, user_id: Uuid) -> AppResult<Vec<CategoryResponseDto>>;
 
     async fn updated_category(
         &self,
-        id: i64,
-        user_id: i64,
+        id: Uuid,
+        user_id: Uuid,
         request: CategoryUpdateDto,
     ) -> AppResult<CategoryResponseDto>;
 
-    async fn delete_category(&self, user_id: i64, id: i64) -> AppResult<()>;
+    async fn delete_category(&self, user_id: Uuid, id: Uuid) -> AppResult<()>;
 }
 
 #[derive(Clone)]
@@ -52,19 +53,23 @@ impl CategoriesService {
 impl CategoriesServiceTrait for CategoriesService {
     async fn create_category(
         &self,
-        user_id: i64,
+        user_id: Uuid,
         request: CategoryCreateDto,
     ) -> AppResult<CategoryResponseDto> {
         let name = request.name.unwrap();
+        let cat_type = request.cat_type;
 
-        let created_category = self.repository.create_category(user_id, name).await?;
+        let created_category = self
+            .repository
+            .create_category(user_id, name, cat_type)
+            .await?;
 
         info!("user created category successfully");
 
         Ok(created_category.into_dto())
     }
 
-    async fn get_category_by_id(&self, id: i64, user_id: i64) -> AppResult<CategoryResponseDto> {
+    async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryResponseDto> {
         info!("searching for existing category {:?}", id);
         let category = self.repository.get_category_by_id(id).await?;
 
@@ -80,7 +85,7 @@ impl CategoriesServiceTrait for CategoriesService {
         Err(Error::NotFound(String::from("category was not found")))
     }
 
-    async fn get_categories(&self, user_id: i64) -> AppResult<Vec<CategoryResponseDto>> {
+    async fn get_categories(&self, user_id: Uuid) -> AppResult<Vec<CategoryResponseDto>> {
         let categories = self.repository.get_categories(user_id).await?;
 
         self.map_to_categories(categories).await
@@ -88,8 +93,8 @@ impl CategoriesServiceTrait for CategoriesService {
 
     async fn updated_category(
         &self,
-        id: i64,
-        user_id: i64,
+        id: Uuid,
+        user_id: Uuid,
         request: CategoryUpdateDto,
     ) -> AppResult<CategoryResponseDto> {
         let category_to_update = self.repository.get_category_by_id(id).await?;
@@ -101,8 +106,12 @@ impl CategoriesServiceTrait for CategoriesService {
             }
 
             let updated_name = request.name.unwrap_or(existing_category.name);
+            let update_cat_type = request.cat_type.unwrap_or(existing_category.cat_type);
 
-            let updated_category = self.repository.update_category(id, updated_name).await?;
+            let updated_category = self
+                .repository
+                .update_category(id, updated_name, update_cat_type)
+                .await?;
 
             return Ok(updated_category.into_dto());
         }
@@ -110,7 +119,7 @@ impl CategoriesServiceTrait for CategoriesService {
         Err(Error::NotFound(String::from("category was not found")))
     }
 
-    async fn delete_category(&self, user_id: i64, id: i64) -> AppResult<()> {
+    async fn delete_category(&self, user_id: Uuid, id: Uuid) -> AppResult<()> {
         let category = self.repository.get_category_by_id(id).await?;
 
         if let Some(existing_category) = category {

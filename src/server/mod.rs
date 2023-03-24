@@ -27,6 +27,7 @@ use tracing::{debug, info};
 
 use crate::config::AppConfig;
 use crate::database::Database;
+use crate::server::services::seed_services::SeedService;
 use crate::server::services::Services;
 
 lazy_static! {
@@ -49,6 +50,14 @@ impl ApplicationServer {
             .context("could not install metrics recorder")?;
 
         let services = Services::new(db, config.clone());
+
+        if config.seed {
+            info!("seeding enabled, creating test data...");
+            SeedService::new(services.clone())
+                .seed()
+                .await
+                .expect("unexpected error occurred while seeding application data");
+        }
 
         let cors_origin = &config.cors_origin;
 

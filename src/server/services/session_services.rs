@@ -4,6 +4,7 @@ use sqlx::types::time::OffsetDateTime;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use tracing::info;
+use uuid::Uuid;
 
 use crate::database::session::DynSessionsRepository;
 use crate::server::dtos::session_dto::{NewSessionDto, SessionResponseDto};
@@ -20,7 +21,7 @@ pub type DynSessionsService = Arc<dyn SessionsServiceTrait + Send + Sync>;
 pub trait SessionsServiceTrait {
     async fn new_session(&self, request: NewSessionDto) -> AppResult<SessionResponseDto>;
 
-    async fn refresh_access_token(&self, id: i64) -> AppResult<ResponseUserDto>;
+    async fn refresh_access_token(&self, id: Uuid) -> AppResult<ResponseUserDto>;
 }
 
 #[derive(Clone)]
@@ -49,7 +50,7 @@ impl SessionsServiceTrait for SessionsService {
 
         let created_session = self
             .repository
-            .new_session(&user_id, user_agent.as_str(), &exp)
+            .new_session(user_id, user_agent.as_str(), &exp)
             .await?;
 
         let user_session = self
@@ -71,7 +72,7 @@ impl SessionsServiceTrait for SessionsService {
         })
     }
 
-    async fn refresh_access_token(&self, id: i64) -> AppResult<ResponseUserDto> {
+    async fn refresh_access_token(&self, id: Uuid) -> AppResult<ResponseUserDto> {
         let user_in_session = self.repository.get_user_by_session_id(id).await?;
 
         if let Some(user) = user_in_session {

@@ -4,12 +4,13 @@ use axum::http::request::Parts;
 use axum::Extension;
 use http::header::AUTHORIZATION;
 use tracing::error;
+use uuid::Uuid;
 
 use crate::server::error::Error;
 use crate::server::services::Services;
 
 /// Extracts the JWT from the Authorization token header.
-pub struct RequiredAuthentication(pub i64);
+pub struct RequiredAuthentication(pub Uuid);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for RequiredAuthentication

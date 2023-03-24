@@ -2,6 +2,7 @@ use std::sync::Arc;
 use tracing::info;
 
 use async_trait::async_trait;
+use uuid::Uuid;
 
 use crate::{
     database::expense::repository::{DynExpensesRepository, Expense},
@@ -15,24 +16,20 @@ pub type DynExpensesService = Arc<dyn ExpensesServiceTrait + Send + Sync>;
 
 #[async_trait]
 pub trait ExpensesServiceTrait {
-    async fn create_expense(
-        &self,
-        user_id: i64,
-        request: ExpenseCreateDto,
-    ) -> AppResult<ExpenseResponseDto>;
+    async fn create_expense(&self, request: ExpenseCreateDto) -> AppResult<ExpenseResponseDto>;
 
-    async fn get_expense_by_id(&self, id: i64, user_id: i64) -> AppResult<ExpenseResponseDto>;
+    async fn get_expense_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<ExpenseResponseDto>;
 
-    async fn get_expenses(&self, user_id: i64) -> AppResult<Vec<ExpenseResponseDto>>;
+    async fn get_expenses(&self, user_id: Uuid) -> AppResult<Vec<ExpenseResponseDto>>;
 
     async fn updated_expense(
         &self,
-        id: i64,
-        user_id: i64,
+        id: Uuid,
+        user_id: Uuid,
         request: ExpenseUpdateDto,
     ) -> AppResult<ExpenseResponseDto>;
 
-    async fn delete_expense(&self, user_id: i64, id: i64) -> AppResult<()>;
+    async fn delete_expense(&self, user_id: Uuid, id: Uuid) -> AppResult<()>;
 }
 
 #[derive(Clone)]
@@ -48,18 +45,14 @@ impl ExpensesService {
 
 #[async_trait]
 impl ExpensesServiceTrait for ExpensesService {
-    async fn create_expense(
-        &self,
-        user_id: i64,
-        request: ExpenseCreateDto,
-    ) -> AppResult<ExpenseResponseDto> {
+    async fn create_expense(&self, request: ExpenseCreateDto) -> AppResult<ExpenseResponseDto> {
         let amount = request.amount.unwrap();
         let description = request.description.unwrap_or(String::from(""));
         let category_id = request.category_id.unwrap();
 
         let created_expense = self
             .repository
-            .create_expense(amount, description, category_id, user_id)
+            .create_expense(category_id, amount, description)
             .await?;
 
         info!("user created expense successfully");
@@ -67,15 +60,15 @@ impl ExpensesServiceTrait for ExpensesService {
         Ok(created_expense.into_dto())
     }
 
-    async fn get_expense_by_id(&self, id: i64, user_id: i64) -> AppResult<ExpenseResponseDto> {
+    async fn get_expense_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<ExpenseResponseDto> {
         info!("searching for existing Expense {:?}", id);
         let expense = self.repository.get_expense_by_id(id).await?;
 
         if let Some(existing_expense) = expense {
             // verify the user IDs match on the request and the expense
-            if existing_expense.user_id != user_id {
-                return Err(Error::Forbidden);
-            }
+            // if existing_expense.user_id != user_id {
+            //     return Err(Error::Forbidden);
+            // }
 
             return Ok(existing_expense.into_dto());
         }
@@ -83,7 +76,7 @@ impl ExpensesServiceTrait for ExpensesService {
         Err(Error::NotFound(String::from("expense was not found")))
     }
 
-    async fn get_expenses(&self, user_id: i64) -> AppResult<Vec<ExpenseResponseDto>> {
+    async fn get_expenses(&self, user_id: Uuid) -> AppResult<Vec<ExpenseResponseDto>> {
         let expenses = self.repository.get_expenses(user_id).await?;
 
         self.map_to_expenses(expenses).await
@@ -91,17 +84,17 @@ impl ExpensesServiceTrait for ExpensesService {
 
     async fn updated_expense(
         &self,
-        id: i64,
-        user_id: i64,
+        id: Uuid,
+        user_id: Uuid,
         request: ExpenseUpdateDto,
     ) -> AppResult<ExpenseResponseDto> {
         let expense_to_update = self.repository.get_expense_by_id(id).await?;
 
         if let Some(existing_expense) = expense_to_update {
             // verify the user IDs match on the request and the expense
-            if existing_expense.user_id != user_id {
-                return Err(Error::Forbidden);
-            }
+            // if existing_expense.user_id != user_id {
+            //     return Err(Error::Forbidden);
+            // }
 
             let updated_amount = request.amount.unwrap_or(existing_expense.amount);
             let updated_description = request.description.unwrap_or(existing_expense.description);
@@ -109,7 +102,7 @@ impl ExpensesServiceTrait for ExpensesService {
 
             let updated_expense = self
                 .repository
-                .update_expense(id, updated_amount, updated_description, updated_category_id)
+                .update_expense(id, updated_category_id, updated_amount, updated_description)
                 .await?;
 
             return Ok(updated_expense.into_dto());
@@ -118,14 +111,14 @@ impl ExpensesServiceTrait for ExpensesService {
         Err(Error::NotFound(String::from("Expense was not found")))
     }
 
-    async fn delete_expense(&self, user_id: i64, id: i64) -> AppResult<()> {
+    async fn delete_expense(&self, user_id: Uuid, id: Uuid) -> AppResult<()> {
         let expense = self.repository.get_expense_by_id(id).await?;
 
         if let Some(existing_expense) = expense {
             // verify the user IDs match on the request and the expense
-            if existing_expense.user_id != user_id {
-                return Err(Error::Forbidden);
-            }
+            // if existing_expense.user_id != user_id {
+            //     return Err(Error::Forbidden);
+            // }
 
             self.repository.delete_expense(existing_expense.id).await?;
 

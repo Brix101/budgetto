@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 use crate::database::session::Session;
@@ -26,7 +27,7 @@ pub struct SessionResponseDto {
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
 pub struct NewSessionDto {
     #[validate(required)]
-    pub user_id: Option<i64>,
+    pub user_id: Option<Uuid>,
     #[validate(required, length(min = 1))]
     pub user_agent: Option<String>,
 }
