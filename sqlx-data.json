@@ -155,19 +155,19 @@
           "type_info": "Uuid"
         },
         {
-          "name": "amount",
+          "name": "category_id",
           "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
           "type_info": "Float8"
         },
         {
           "name": "description",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "category_id",
           "ordinal": 3,
-          "type_info": "Uuid"
+          "type_info": "Varchar"
         },
         {
           "name": "created_at",
@@ -774,19 +774,19 @@
           "type_info": "Uuid"
         },
         {
-          "name": "amount",
+          "name": "category_id",
           "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
           "type_info": "Float8"
         },
         {
           "name": "description",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "category_id",
           "ordinal": 3,
-          "type_info": "Uuid"
+          "type_info": "Varchar"
         },
         {
           "name": "created_at",
@@ -911,19 +911,19 @@
           "type_info": "Uuid"
         },
         {
-          "name": "amount",
+          "name": "category_id",
           "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
           "type_info": "Float8"
         },
         {
           "name": "description",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "category_id",
           "ordinal": 3,
-          "type_info": "Uuid"
+          "type_info": "Varchar"
         },
         {
           "name": "created_at",
@@ -1078,19 +1078,19 @@
           "type_info": "Uuid"
         },
         {
-          "name": "amount",
+          "name": "category_id",
           "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 2,
           "type_info": "Float8"
         },
         {
           "name": "description",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "category_id",
           "ordinal": 3,
-          "type_info": "Uuid"
+          "type_info": "Varchar"
         },
         {
           "name": "created_at",
