@@ -1,6 +1,7 @@
 use anyhow::Context;
 use async_trait::async_trait;
 use sqlx::query_as;
+use uuid::Uuid;
 
 use crate::database::Database;
 
@@ -45,7 +46,7 @@ impl UsersRepository for Database {
         .context("unexpected error while querying for user by email")
     }
 
-    async fn get_user_by_id(&self, id: i64) -> anyhow::Result<User> {
+    async fn get_user_by_id(&self, id: Uuid) -> anyhow::Result<User> {
         query_as!(
             User,
             r#"
@@ -62,7 +63,7 @@ impl UsersRepository for Database {
 
     async fn update_user(
         &self,
-        id: i64,
+        id: Uuid,
         email: String,
         name: String,
         password: String,

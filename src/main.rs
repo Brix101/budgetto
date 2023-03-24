@@ -4,7 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use dotenvy::dotenv;
 
-use budgetto_api::{config::AppConfig, database::Database, server::ApplicationServer};
+use budgetto_api::{config::AppConfig, database::Database};
 use tracing::info;
 
 mod logger;
@@ -21,9 +21,9 @@ async fn main() -> anyhow::Result<()> {
         .await
         .expect("could not initialize the database connection pool");
 
-    ApplicationServer::serve(config, db)
-        .await
-        .context("could not initialize application routes")?;
+    // ApplicationServer::serve(config, db)
+    //     .await
+    //     .context("could not initialize application routes")?;
 
     Ok(())
 }

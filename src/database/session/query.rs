@@ -2,6 +2,7 @@ use anyhow::Context;
 use async_trait::async_trait;
 use sqlx::query_as;
 use sqlx::types::time::OffsetDateTime;
+use uuid::Uuid;
 
 use crate::database::user::User;
 use crate::database::Database;
@@ -12,7 +13,7 @@ use super::{Session, SessionsRepository};
 impl SessionsRepository for Database {
     async fn new_session(
         &self,
-        user_id: &i64,
+        user_id: Uuid,
         user_agent: &str,
         exp: &OffsetDateTime,
     ) -> anyhow::Result<Session> {
@@ -32,7 +33,7 @@ impl SessionsRepository for Database {
         .context("an unexpected error occured while creating a session")
     }
 
-    async fn get_user_by_session_id(&self, id: i64) -> anyhow::Result<Option<User>> {
+    async fn get_user_by_session_id(&self, id: Uuid) -> anyhow::Result<Option<User>> {
         query_as!(
             User,
             r#"

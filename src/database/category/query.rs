@@ -1,34 +1,41 @@
 use anyhow::Context;
 use async_trait::async_trait;
 use sqlx::{query, query_as};
+use uuid::Uuid;
 
 use crate::database::Database;
 
-use super::repository::{CategoriesRepository, Category};
+use super::repository::{CategoriesRepository, Category, CategoryType};
 
 #[async_trait]
 impl CategoriesRepository for Database {
-    async fn create_category(&self, user_id: i64, name: String) -> anyhow::Result<Category> {
+    async fn create_category(
+        &self,
+        user_id: Uuid,
+        name: String,
+        cat_type: CategoryType,
+    ) -> anyhow::Result<Category> {
         query_as!(
             Category,
             r#"
-        insert into categories (created_at, updated_at, name, user_id)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::bigint)
-        returning *
+        insert into categories (created_at, updated_at, name, user_id,cat_type)
+        values (current_timestamp, current_timestamp, $1::varchar, $2, $3)
+        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
             "#,
             name,
-            user_id
+            user_id,
+            cat_type as _
         )
         .fetch_one(&self.pool)
         .await
         .context("an unexpected error occured while creating the category")
     }
 
-    async fn get_category_by_id(&self, id: i64) -> anyhow::Result<Option<Category>> {
+    async fn get_category_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>> {
         query_as!(
             Category,
             r#"
-        select *
+        select id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
         from categories
         where id = $1
             "#,
@@ -39,11 +46,12 @@ impl CategoriesRepository for Database {
         .context("category was not found")
     }
 
-    async fn get_categories(&self, user_id: i64) -> anyhow::Result<Vec<Category>> {
+    async fn get_categories(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>> {
         query_as!(
             Category,
             r#"
-        select categories.*
+        select categories.id, categories.name, categories.cat_type as "cat_type: CategoryType",
+        categories.user_id, categories.created_at, categories.updated_at, categories.deleted_at
         from categories
         inner join users on categories.user_id=users.id
         where users.id = $1
@@ -55,17 +63,24 @@ impl CategoriesRepository for Database {
         .context("category was not found")
     }
 
-    async fn update_category(&self, id: i64, name: String) -> anyhow::Result<Category> {
+    async fn update_category(
+        &self,
+        id: Uuid,
+        name: String,
+        cat_type: CategoryType,
+    ) -> anyhow::Result<Category> {
         query_as!(
             Category,
             r#"
         update categories
         set
-            name = $1::varchar
-        where id = $2
-        returning *
+            name = $1::varchar,
+            cat_type = $2
+        where id = $3
+        returning id, name, cat_type as "cat_type: CategoryType", user_id, created_at, updated_at, deleted_at
             "#,
             name,
+            cat_type as _,
             id
         )
         .fetch_one(&self.pool)
@@ -73,7 +88,7 @@ impl CategoriesRepository for Database {
         .context("could not update the category")
     }
 
-    async fn delete_category(&self, id: i64) -> anyhow::Result<()> {
+    async fn delete_category(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         delete from categories

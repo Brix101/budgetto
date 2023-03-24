@@ -1,46 +1,43 @@
 use anyhow::Context;
 use async_trait::async_trait;
 use sqlx::{query, query_as};
+use uuid::Uuid;
 
 use crate::database::Database;
 
-use super::repository::{Budget, BudgetsRepository};
+use super::repository::{Budget, BudgetsRepository, PlanType};
 
 #[async_trait]
 impl BudgetsRepository for Database {
     async fn create_budget(
         &self,
-        user_id: i64,
-        name: String,
+        category_id: Uuid,
         amount: f64,
         description: String,
-        frequency: String,
-        category_id: i64,
+        plan: PlanType,
     ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,
             r#"
-        insert into budgets (created_at, updated_at, name, amount, description,user_id,frequency,category_id)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::float, $3::varchar, $4::bigint, $5::varchar, $6::bigint)
-        returning *
+        insert into budgets (created_at, updated_at, category_id, amount, description,plan)
+        values (current_timestamp, current_timestamp, $1, $2::float, $3::varchar, $4)
+        returning id, amount, description, category_id, plan as "plan: PlanType", created_at, updated_at, deleted_at
             "#,
-            name,
+            category_id,
             amount,
             description,
-            user_id,
-            frequency,
-            category_id
+            plan as _
         )
         .fetch_one(&self.pool)
         .await
         .context("an unexpected error occured while creating the budget")
     }
 
-    async fn get_budget_by_id(&self, id: i64) -> anyhow::Result<Option<Budget>> {
+    async fn get_budget_by_id(&self, id: Uuid) -> anyhow::Result<Option<Budget>> {
         query_as!(
             Budget,
             r#"
-        select *
+        select id, amount, description, category_id, plan as "plan: PlanType", created_at, updated_at, deleted_at
         from budgets
         where id = $1
             "#,
@@ -51,14 +48,15 @@ impl BudgetsRepository for Database {
         .context("budget was not found")
     }
 
-    async fn get_budgets(&self, user_id: i64) -> anyhow::Result<Vec<Budget>> {
+    async fn get_budgets(&self, user_id: Uuid) -> anyhow::Result<Vec<Budget>> {
         query_as!(
             Budget,
             r#"
-        select budgets.*
+        select budgets.id, budgets.amount, budgets.description, budgets.category_id, budgets.plan as "plan: PlanType",
+        budgets.created_at, budgets.updated_at, budgets.deleted_at
         from budgets
-        inner join users on budgets.user_id=users.id
-        where users.id = $1
+        inner join categories on categories.id = budgets.id
+        where categories.user_id = $1
             "#,
             user_id,
         )
@@ -69,32 +67,29 @@ impl BudgetsRepository for Database {
 
     async fn update_budget(
         &self,
-        id: i64,
-        name: String,
+        id: Uuid,
+        category_id: Uuid,
         amount: f64,
         description: String,
-        frequency: String,
-        category_id: i64,
+        plan: PlanType,
     ) -> anyhow::Result<Budget> {
         query_as!(
             Budget,
             r#"
         update budgets
         set
-            name = $1::varchar,
+            category_id = $1,
             amount = $2::float,
             description = $3::varchar,
-            updated_at = current_timestamp,
-            frequency = $4::varchar,
-            category_id = $5::bigint
-        where id = $6
-        returning *
+            plan = $4,
+            updated_at = current_timestamp
+        where id = $5
+        returning id, amount, description, category_id, plan as "plan: PlanType", created_at, updated_at, deleted_at
             "#,
-            name,
+            category_id,
             amount,
             description,
-            frequency,
-            category_id,
+            plan as _,
             id
         )
         .fetch_one(&self.pool)
@@ -102,7 +97,7 @@ impl BudgetsRepository for Database {
         .context("could not update the budget")
     }
 
-    async fn delete_budget(&self, id: i64) -> anyhow::Result<()> {
+    async fn delete_budget(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         delete from budgets
