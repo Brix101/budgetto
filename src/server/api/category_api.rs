@@ -2,6 +2,7 @@ use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
 use axum::{Extension, Router};
 use tracing::info;
+use uuid::Uuid;
 
 use crate::server::dtos::category_dto::{
     CategoryCreateDto, CategoryQuery, CategoryResponseDto, CategoryUpdateDto,
@@ -56,7 +57,7 @@ impl CategoryRouter {
     }
 
     pub async fn update_category(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
         Json(request): Json<CategoryUpdateDto>,
@@ -72,7 +73,7 @@ impl CategoryRouter {
     }
 
     pub async fn delete_category(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<()> {

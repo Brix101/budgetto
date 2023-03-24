@@ -1,6 +1,7 @@
 use mockall::automock;
 use std::sync::Arc;
 use tracing::{error, info};
+use uuid::Uuid;
 
 use async_trait::async_trait;
 
@@ -33,11 +34,11 @@ pub trait UsersServiceTrait {
         user_agent: Option<String>,
     ) -> AppResult<(ResponseUserDto, String)>;
 
-    async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto>;
+    async fn get_current_user(&self, user_id: Uuid) -> AppResult<ResponseUserDto>;
 
     async fn updated_user(
         &self,
-        user_id: i64,
+        user_id: Uuid,
         request: UpdateUserDto,
     ) -> AppResult<ResponseUserDto>;
 }
@@ -133,7 +134,7 @@ impl UsersServiceTrait for UsersService {
         Ok((user.into_dto(token.access_token), token.refresh_token))
     }
 
-    async fn get_current_user(&self, user_id: i64) -> AppResult<ResponseUserDto> {
+    async fn get_current_user(&self, user_id: Uuid) -> AppResult<ResponseUserDto> {
         info!("retrieving user {:?}", user_id);
         let user = self.repository.get_user_by_id(user_id).await?;
 
@@ -150,7 +151,7 @@ impl UsersServiceTrait for UsersService {
 
     async fn updated_user(
         &self,
-        user_id: i64,
+        user_id: Uuid,
         request: UpdateUserDto,
     ) -> AppResult<ResponseUserDto> {
         info!("retrieving user {:?}", user_id);

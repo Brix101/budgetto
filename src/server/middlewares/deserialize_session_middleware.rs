@@ -5,12 +5,13 @@ use axum::Extension;
 use axum_extra::extract::cookie::Cookie;
 use http::header::COOKIE;
 use tracing::error;
+use uuid::Uuid;
 
 use crate::server::error::Error;
 use crate::server::services::Services;
 
 /// Extracts the JWT from the Authorization token header.
-pub struct DeserializeSession(pub i64, pub String);
+pub struct DeserializeSession(pub Uuid, pub String);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for DeserializeSession

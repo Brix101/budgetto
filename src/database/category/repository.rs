@@ -12,11 +12,17 @@ use uuid::Uuid;
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynCategoriesRepository = Arc<dyn CategoriesRepository + Send + Sync>;
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug)]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone)]
 #[sqlx(type_name = "category_type")]
 pub enum CategoryType {
     Essential,
     NonEssential,
+}
+
+impl Default for CategoryType {
+    fn default() -> Self {
+        Self::NonEssential
+    }
 }
 
 #[automock]

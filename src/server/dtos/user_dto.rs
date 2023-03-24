@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 use crate::database::user::User;
@@ -28,7 +29,7 @@ impl User {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct ResponseUserDto {
     #[serde(skip_serializing, skip_deserializing)]
-    pub id: i64,
+    pub id: Uuid,
     pub name: String,
     pub email: String,
     pub bio: Option<String>,
@@ -43,7 +44,7 @@ pub struct UserAuthenicationResponse {
 
 impl UserAuthenicationResponse {
     pub fn new(
-        id: i64,
+        id: Uuid,
         name: String,
         email: String,
         // unfortunately, while our implementation returns thes optional fields as empty strings,

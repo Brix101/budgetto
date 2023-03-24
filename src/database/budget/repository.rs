@@ -10,12 +10,18 @@ use uuid::Uuid;
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynBudgetsRepository = Arc<dyn BudgetsRepository + Send + Sync>;
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug)]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone)]
 #[sqlx(type_name = "plan_type")]
 pub enum PlanType {
     Daily,
     Weekly,
     Monthly,
+}
+
+impl Default for PlanType {
+    fn default() -> Self {
+        Self::Monthly
+    }
 }
 
 #[automock]

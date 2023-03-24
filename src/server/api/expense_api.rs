@@ -2,6 +2,7 @@ use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
 use axum::{Extension, Router};
 use tracing::info;
+use uuid::Uuid;
 
 use crate::server::dtos::expense_dto::{
     ExpenseCreateDto, ExpenseQuery, ExpenseResponseDto, ExpenseUpdateDto,
@@ -42,18 +43,18 @@ impl ExpenseRouter {
 
     pub async fn create_expense(
         Extension(services): Extension<Services>,
-        RequiredAuthentication(user_id): RequiredAuthentication,
+        RequiredAuthentication(_user_id): RequiredAuthentication,
         ValidatedRequest(request): ValidatedRequest<ExpenseCreateDto>,
     ) -> AppResult<Json<ExpenseResponseDto>> {
         info!("received request to create expense");
 
-        let new_expense = services.expenses.create_expense(user_id, request).await?;
+        let new_expense = services.expenses.create_expense(request).await?;
 
         Ok(Json(new_expense))
     }
 
     pub async fn update_expense(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
         Json(request): Json<ExpenseUpdateDto>,
@@ -69,7 +70,7 @@ impl ExpenseRouter {
     }
 
     pub async fn delete_expense(
-        Path(id): Path<i64>,
+        Path(id): Path<Uuid>,
         Extension(services): Extension<Services>,
         RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<()> {
