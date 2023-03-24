@@ -29,6 +29,7 @@ use super::utils::jwt_utils::DynJwtUtil;
 pub mod budget_services;
 pub mod category_services;
 pub mod expense_services;
+pub mod seed_services;
 pub mod session_services;
 pub mod user_services;
 

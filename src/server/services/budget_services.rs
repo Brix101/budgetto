@@ -46,6 +46,7 @@ impl BudgetsService {
 #[async_trait]
 impl BudgetsServiceTrait for BudgetsService {
     async fn create_budget(&self, request: BudgetCreateDto) -> AppResult<BudgetResponseDto> {
+        println!("{:#?}", &request);
         let amount = request.amount.unwrap();
         let description = request.description.unwrap_or(String::from(""));
         let plan = request.plan.unwrap_or(PlanType::Monthly);
