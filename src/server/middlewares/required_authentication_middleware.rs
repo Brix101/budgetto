@@ -49,7 +49,16 @@ where
                     Error::Unauthorized
                 })?;
 
-            Ok(RequiredAuthentication(user_id))
+            let user = services
+                .users
+                .get_current_user(user_id)
+                .await
+                .map_err(|err| {
+                    error!("invalid user ID from token: {:?}", err);
+                    Error::Unauthorized
+                })?;
+
+            Ok(RequiredAuthentication(user.id))
         } else {
             Err(Error::Unauthorized)
         }
