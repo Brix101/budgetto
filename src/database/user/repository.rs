@@ -1,12 +1,13 @@
 // use std::str::FromStr;
 use std::sync::Arc;
+use std::time::SystemTime;
 // use std::time::SystemTime;
 
 use async_trait::async_trait;
 use mockall::automock;
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
-use uuid::Uuid;
+use uuid::{uuid, Uuid};
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynUsersRepository = Arc<dyn UsersRepository + Send + Sync>;
@@ -49,18 +50,18 @@ pub struct User {
     pub deleted_at: Option<OffsetDateTime>,
 }
 
-// impl Default for User {
-//     fn default() -> Self {
-//         User {
-//             id: Uuid::from_str("f3f898aa-ffa3-4b58-91b0-612a1c801a5e").unwrap(),
-//             bio: String::from("stub bio"),
-//             email: String::from("stub email"),
-//             name: String::from("stub name"),
-//             password: String::from("hashed password"),
-//             image: String::from("stub image"),
-//             created_at: OffsetDateTime::from(SystemTime::now()),
-//             updated_at: OffsetDateTime::from(SystemTime::now()),
-//             deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
-//         }
-//     }
-// }
+impl Default for User {
+    fn default() -> Self {
+        User {
+            id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
+            bio: String::from("stub bio"),
+            email: String::from("stub email"),
+            name: String::from("stub name"),
+            password: String::from("hashed password"),
+            image: String::from("stub image"),
+            created_at: OffsetDateTime::from(SystemTime::now()),
+            updated_at: OffsetDateTime::from(SystemTime::now()),
+            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
+        }
+    }
+}

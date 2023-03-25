@@ -1,5 +1,5 @@
 // use std::str::FromStr;
-use std::sync::Arc;
+use std::{sync::Arc, time::SystemTime};
 // use std::time::SystemTime;
 
 use async_trait::async_trait;
@@ -7,12 +7,12 @@ use mockall::automock;
 use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
-use uuid::Uuid;
+use uuid::{uuid, Uuid};
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynCategoriesRepository = Arc<dyn CategoriesRepository + Send + Sync>;
 
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone)]
+#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[sqlx(type_name = "category_type")]
 pub enum CategoryType {
     Essential,
@@ -60,15 +60,16 @@ pub struct Category {
     pub deleted_at: Option<OffsetDateTime>,
 }
 
-// impl Default for Category {
-//     fn default() -> Self {
-//         Self {
-//             id: Uuid::from_str("8024a691-cf7d-411d-9c05-6a4a84d99ad0").unwrap(),
-//             name: String::from("stub category"),
-//             user_id: Uuid::from_str("f3f898aa-ffa3-4b58-91b0-612a1c801a5e").unwrap(),
-//             created_at: OffsetDateTime::from(SystemTime::now()),
-//             updated_at: OffsetDateTime::from(SystemTime::now()),
-//             deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
-//         }
-//     }
-// }
+impl Default for Category {
+    fn default() -> Self {
+        Self {
+            id: uuid!("b7f9ddc7-c80d-4bf6-8573-f06e94addfb3"),
+            name: String::from("stub category"),
+            cat_type: CategoryType::default(),
+            user_id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
+            created_at: OffsetDateTime::from(SystemTime::now()),
+            updated_at: OffsetDateTime::from(SystemTime::now()),
+            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
+        }
+    }
+}

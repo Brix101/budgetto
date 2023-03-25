@@ -1,11 +1,12 @@
 use std::sync::Arc;
+use std::time::SystemTime;
 
 use async_trait::async_trait;
 use mockall::automock;
 use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
-use uuid::Uuid;
+use uuid::{uuid, Uuid};
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynBudgetsRepository = Arc<dyn BudgetsRepository + Send + Sync>;
@@ -61,4 +62,19 @@ pub struct Budget {
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
     pub deleted_at: Option<OffsetDateTime>,
+}
+
+impl Default for Budget {
+    fn default() -> Self {
+        Self {
+            id: uuid!("7b684cc4-e636-4d41-ac54-43e673aa9a60"),
+            amount: 99999_f64,
+            category_id: uuid!("b7f9ddc7-c80d-4bf6-8573-f06e94addfb3"),
+            description: String::from("stub expense description"),
+            plan: PlanType::default(),
+            created_at: OffsetDateTime::from(SystemTime::now()),
+            updated_at: OffsetDateTime::from(SystemTime::now()),
+            deleted_at: Some(OffsetDateTime::from(SystemTime::now())),
+        }
+    }
 }
