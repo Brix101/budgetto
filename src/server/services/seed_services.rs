@@ -7,6 +7,7 @@ use crate::{
         dtos::{
             budget_dto::BudgetCreateDto,
             category_dto::CategoryCreateDto,
+            expense_dto::ExpenseCreateDto,
             user_dto::{ResponseUserDto, SignInUserDto, SignUpUserDto},
         },
         error::AppResult,
@@ -100,6 +101,14 @@ impl SeedService {
                         amount: Some(500_f64),
                         description: Some(format!("budget description for category {:?}", index)),
                         plan: Some(PlanType::Monthly),
+                    })
+                    .await?;
+
+                self.expense_services
+                    .create_expense(ExpenseCreateDto {
+                        category_id: Some(created_category.id),
+                        amount: Some(500_f64),
+                        description: Some(format!("expense description for category {:?}", index)),
                     })
                     .await?;
             }
