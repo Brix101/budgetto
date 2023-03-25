@@ -55,7 +55,7 @@ impl BudgetsRepository for Database {
         select budgets.id, budgets.amount, budgets.description, budgets.category_id, budgets.plan as "plan: PlanType",
         budgets.created_at, budgets.updated_at, budgets.deleted_at
         from budgets
-        inner join categories on categories.id = budgets.id
+        inner join categories on categories.id = budgets.category_id
         where categories.user_id = $1
             "#,
             user_id,

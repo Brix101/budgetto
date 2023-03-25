@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::types::time::OffsetDateTime;
 use uuid::Uuid;
 use validator::Validate;
 
@@ -10,15 +11,21 @@ impl Category {
             id: self.id,
             name: Some(self.name),
             cat_type: self.cat_type,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CategoryResponseDto {
     pub id: Uuid,
     pub name: Option<String>,
     pub cat_type: CategoryType,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub updated_at: OffsetDateTime,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]

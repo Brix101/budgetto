@@ -73,79 +73,6 @@
     },
     "query": "\n        select id, amount, description, category_id, plan as \"plan: PlanType\", created_at, updated_at, deleted_at\n        from budgets\n        where id = $1\n            "
   },
-  "02de65a711b78f1487359145698c8c7aa598fd6d55e11d4cf146225fd2f842c9": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Uuid"
-        },
-        {
-          "name": "amount",
-          "ordinal": 1,
-          "type_info": "Float8"
-        },
-        {
-          "name": "description",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "category_id",
-          "ordinal": 3,
-          "type_info": "Uuid"
-        },
-        {
-          "name": "plan: PlanType",
-          "ordinal": 4,
-          "type_info": {
-            "Custom": {
-              "kind": {
-                "Enum": [
-                  "Daily",
-                  "Weekly",
-                  "Monthly"
-                ]
-              },
-              "name": "plan_type"
-            }
-          }
-        },
-        {
-          "name": "created_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Uuid"
-        ]
-      }
-    },
-    "query": "\n        select budgets.id, budgets.amount, budgets.description, budgets.category_id, budgets.plan as \"plan: PlanType\",\n        budgets.created_at, budgets.updated_at, budgets.deleted_at\n        from budgets\n        inner join categories on categories.id = budgets.id\n        where categories.user_id = $1\n            "
-  },
   "26e164f9409158d744da628d72fd9892f514ef0895d154c3935bd3ef8fc707ed": {
     "describe": {
       "columns": [
@@ -1260,5 +1187,78 @@
       }
     },
     "query": "\n        select *\n        from users\n        where email = $1::varchar\n            "
+  },
+  "fcecc10966db10fb3de8e1f8cd656077e082a8b61ede088d26219426d58f3bbd": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "plan: PlanType",
+          "ordinal": 4,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Daily",
+                  "Weekly",
+                  "Monthly"
+                ]
+              },
+              "name": "plan_type"
+            }
+          }
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select budgets.id, budgets.amount, budgets.description, budgets.category_id, budgets.plan as \"plan: PlanType\",\n        budgets.created_at, budgets.updated_at, budgets.deleted_at\n        from budgets\n        inner join categories on categories.id = budgets.category_id\n        where categories.user_id = $1\n            "
   }
 }

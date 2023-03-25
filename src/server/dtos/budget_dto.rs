@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::{types::time::OffsetDateTime, FromRow};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -12,17 +13,23 @@ impl Budget {
             amount: Some(self.amount),
             description: Some(self.description),
             plan: self.plan,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
         }
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(FromRow, Serialize, Deserialize, Debug)]
 pub struct BudgetResponseDto {
     pub id: Uuid,
     pub category_id: Uuid,
     pub amount: Option<f64>,
     pub description: Option<String>,
     pub plan: PlanType,
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
+    pub updated_at: OffsetDateTime,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, Validate, Default)]
