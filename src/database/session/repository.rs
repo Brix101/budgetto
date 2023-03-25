@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::SystemTime};
 
 use async_trait::async_trait;
 use mockall::automock;
 // use mockall::automock;
 use sqlx::{types::time::OffsetDateTime, FromRow};
-use uuid::Uuid;
+use uuid::{uuid, Uuid};
 
 use crate::database::user::User;
 
@@ -32,13 +32,13 @@ pub struct Session {
     pub user_agent: String,
 }
 
-// impl Default for Session {
-//     fn default() -> Self {
-//         Self {
-//             id: 1,
-//             user_id: 1,
-//             exp: OffsetDateTime::from(SystemTime::now()),
-//             user_agent: String::from("stub user agent"),
-//         }
-//     }
-// }
+impl Default for Session {
+    fn default() -> Self {
+        Self {
+            id: uuid!("8147a9f8-2845-4f92-9e1d-0c0c6c8db79b"),
+            user_id: uuid!("f3f898aa-ffa3-4b58-91b0-612a1c801a5e"),
+            exp: OffsetDateTime::from(SystemTime::now()),
+            user_agent: String::from("stub user agent"),
+        }
+    }
+}
