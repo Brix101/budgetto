@@ -66,9 +66,13 @@ impl ExpensesServiceTrait for ExpensesService {
 
         if let Some(existing_expense) = expense {
             // verify the user IDs match on the request and the expense
-            // if existing_expense.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let expenses = self.repository.get_expenses(user_id).await?;
+            if !expenses
+                .iter()
+                .any(|user_expense| user_expense.id == existing_expense.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             return Ok(existing_expense.into_dto());
         }
@@ -92,9 +96,13 @@ impl ExpensesServiceTrait for ExpensesService {
 
         if let Some(existing_expense) = expense_to_update {
             // verify the user IDs match on the request and the expense
-            // if existing_expense.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let expenses = self.repository.get_expenses(user_id).await?;
+            if !expenses
+                .iter()
+                .any(|user_expense| user_expense.id == existing_expense.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             let updated_amount = request.amount.unwrap_or(existing_expense.amount);
             let updated_description = request.description.unwrap_or(existing_expense.description);
@@ -116,9 +124,13 @@ impl ExpensesServiceTrait for ExpensesService {
 
         if let Some(existing_expense) = expense {
             // verify the user IDs match on the request and the expense
-            // if existing_expense.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let expenses = self.repository.get_expenses(user_id).await?;
+            if !expenses
+                .iter()
+                .any(|user_expense| user_expense.id == existing_expense.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             self.repository.delete_expense(existing_expense.id).await?;
 

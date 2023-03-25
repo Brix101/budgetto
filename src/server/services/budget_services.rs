@@ -68,9 +68,14 @@ impl BudgetsServiceTrait for BudgetsService {
 
         if let Some(existing_budget) = budget {
             // verify the user IDs match on the request and the budget
-            // if existing_budget.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let budgets = self.repository.get_budgets(user_id).await?;
+
+            if !budgets
+                .iter()
+                .any(|user_budgets| user_budgets.id == existing_budget.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             return Ok(existing_budget.into_dto());
         }
@@ -94,9 +99,14 @@ impl BudgetsServiceTrait for BudgetsService {
 
         if let Some(existing_budget) = budget_to_update {
             // verify the user IDs match on the request and the budget
-            // if existing_budget.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let budgets = self.repository.get_budgets(user_id).await?;
+
+            if !budgets
+                .iter()
+                .any(|user_budgets| user_budgets.id == existing_budget.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             let updated_amount = request.amount.unwrap_or(existing_budget.amount);
             let updated_description = request.description.unwrap_or(existing_budget.description);
@@ -125,9 +135,14 @@ impl BudgetsServiceTrait for BudgetsService {
 
         if let Some(existing_budget) = budget {
             // verify the user IDs match on the request and the budget
-            // if existing_budget.user_id != user_id {
-            //     return Err(Error::Forbidden);
-            // }
+            let budgets = self.repository.get_budgets(user_id).await?;
+
+            if !budgets
+                .iter()
+                .any(|user_budgets| user_budgets.id == existing_budget.id)
+            {
+                return Err(Error::Forbidden);
+            }
 
             self.repository.delete_budget(existing_budget.id).await?;
 
