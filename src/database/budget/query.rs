@@ -62,7 +62,7 @@ impl BudgetsRepository for Database {
         )
         .fetch_all(&self.pool)
         .await
-        .context("budget was not found")
+        .context("an unexpected error occured retrieving budgets")
     }
 
     async fn update_budget(

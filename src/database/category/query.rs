@@ -60,7 +60,7 @@ impl CategoriesRepository for Database {
         )
         .fetch_all(&self.pool)
         .await
-        .context("category was not found")
+        .context("an unexpected error occured retrieving categories")
     }
 
     async fn update_category(

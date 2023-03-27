@@ -59,7 +59,7 @@ impl ExpensesRepository for Database {
         )
         .fetch_all(&self.pool)
         .await
-        .context("expense was not found")
+        .context("an unexpected error occured retrieving expenses")
     }
 
     async fn update_expense(
