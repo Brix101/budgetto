@@ -89,7 +89,7 @@ impl SeedService {
                     .create_category(
                         user.id,
                         CategoryCreateDto {
-                            name: Some(format!("{:?} category {:?}", user.name, index)),
+                            name: Some(format!("{} category {:?}", user.name, index)),
                             cat_type: CategoryType::NonEssential,
                         },
                     )
@@ -99,10 +99,7 @@ impl SeedService {
                     .create_budget(BudgetCreateDto {
                         category_id: Some(created_category.id),
                         amount: Some(500_f64),
-                        description: Some(format!(
-                            "{:?} budget for category {:?}",
-                            user.name, index
-                        )),
+                        description: Some(format!("{} budget for category {:?}", user.name, index)),
                         plan: Some(PlanType::Monthly),
                     })
                     .await?;
@@ -112,7 +109,7 @@ impl SeedService {
                         category_id: Some(created_category.id),
                         amount: Some(500_f64),
                         description: Some(format!(
-                            "{:?} expense for category {:?}",
+                            "{} expense for category {:?}",
                             user.name, index
                         )),
                     })
