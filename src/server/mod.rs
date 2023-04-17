@@ -18,6 +18,7 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Extension;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, Router};
+use http::{header, Method};
 use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
@@ -60,11 +61,33 @@ impl ApplicationServer {
         }
 
         let cors_origin = &config.cors_origin;
+        let origins = cors_origin
+            .split(",")
+            .map(|e| e.parse().expect("Failed to parse CORS hosts"))
+            .collect::<Vec<HeaderValue>>();
 
+        println!("{:#?}", origins);
         let cors = CorsLayer::new()
-            .allow_origin(cors_origin.parse::<HeaderValue>().unwrap())
-            .allow_methods(Any)
-            .allow_headers(Any);
+            .allow_credentials(true)
+            .allow_headers(vec![
+                header::ACCEPT,
+                header::ACCEPT_LANGUAGE,
+                header::AUTHORIZATION,
+                header::CONTENT_LANGUAGE,
+                header::CONTENT_TYPE,
+            ])
+            .allow_methods(vec![
+                Method::GET,
+                Method::POST,
+                Method::PUT,
+                Method::DELETE,
+                // Method::HEAD,
+                // Method::OPTIONS,
+                // Method::CONNECT,
+                // Method::PATCH,
+                // Method::TRACE,
+            ])
+            .allow_origin(origins);
 
         let router = Router::new()
             .nest("/api/v1", api::app())
@@ -74,8 +97,8 @@ impl ApplicationServer {
                 ServiceBuilder::new()
                     .layer(TraceLayer::new_for_http())
                     .layer(HandleErrorLayer::new(Self::handle_timeout_error))
-                    .timeout(Duration::from_secs(*HTTP_TIMEOUT))
                     .layer(cors)
+                    .timeout(Duration::from_secs(*HTTP_TIMEOUT))
                     .layer(Extension(services))
                     .layer(BufferLayer::new(1024))
                     .layer(RateLimitLayer::new(5, Duration::from_secs(1))),

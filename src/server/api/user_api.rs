@@ -53,7 +53,11 @@ impl UsersRouter {
 
         let (user, refresh_token) = services.users.signin_user(request, user_agent).await?;
 
-        let cookie = jar.add(Cookie::new("refresh_token", refresh_token.to_string()));
+        let cookie = jar.add(
+            Cookie::build("refresh_token", refresh_token.to_string())
+                .http_only(false)
+                .finish(),
+        );
 
         Ok((cookie, Json(UserAuthenicationResponse { user })))
     }
