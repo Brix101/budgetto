@@ -12,5 +12,6 @@ pub struct UserDto {
     pub email: String,
     pub bio: Option<String>,
     pub image: Option<String>,
+    #[serde(rename = "accessToken")]
     pub access_token: Option<String>,
 }
