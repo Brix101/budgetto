@@ -14,3 +14,4 @@ anyhow = "1.0.70"
 clap = { version = "4.2.2", features = ["derive", "env"] }
 dotenvy = "0.15.7"
 tokio = { version = "1.27.0", features = ["full"] }
+tracing = "0.1.37"
