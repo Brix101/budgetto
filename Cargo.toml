@@ -10,5 +10,5 @@ members = [
     "crates/infrastructure",
 ]
 
-[profile.release]
-debug = true
+# [profile.release]
+# debug = true

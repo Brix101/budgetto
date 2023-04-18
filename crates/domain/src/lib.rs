@@ -1,14 +1,22 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+
+pub mod accounts;
+pub mod budgets;
+pub mod categories;
+pub mod transactions;
+pub mod users;
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ApiError {
+    pub errors: HashMap<String, Vec<String>>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+impl ApiError {
+    pub fn new(error: String) -> Self {
+        let mut error_map: HashMap<String, Vec<String>> = HashMap::new();
+        error_map.insert("message".to_owned(), vec![error]);
+        Self { errors: error_map }
     }
 }

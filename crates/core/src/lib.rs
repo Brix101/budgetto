@@ -1,14 +1,9 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod accounts;
+pub mod budgets;
+pub mod categories;
+pub mod config;
+pub mod errors;
+pub mod sessions;
+pub mod transactions;
+pub mod users;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
