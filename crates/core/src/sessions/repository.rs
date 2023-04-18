@@ -7,7 +7,6 @@ use uuid::{uuid, Uuid};
 
 use crate::users::repository::User;
 
-/// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynSessionsRepository = Arc<dyn SessionsRepository + Send + Sync>;
 
 #[automock]

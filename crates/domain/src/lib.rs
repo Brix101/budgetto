@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub mod accounts;
 pub mod budgets;
 pub mod categories;
+pub mod sessions;
 pub mod transactions;
 pub mod users;
 
