@@ -7,30 +7,29 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
-pub type DynAccountsRepository = Arc<dyn UsersRepository + Send + Sync>;
+pub type DynAccountsRepository = Arc<dyn AccountsRepository + Send + Sync>;
 
 #[automock]
 #[async_trait]
-pub trait UsersRepository {
+pub trait AccountsRepository {
     async fn create_account(
         &self,
-        email: &str,
-        name: &str,
-        hash_password: &str,
+        name: String,
+        balance: f64,
+        note: Option<String>,
+        user_id: Uuid,
     ) -> anyhow::Result<Account>;
 
-    async fn get_accounts(&self, user_id: Uuid) -> anyhow::Result<Option<Account>>;
+    async fn get_accounts(&self, user_id: Uuid) -> anyhow::Result<Vec<Account>>;
 
-    async fn get_account_by_id(&self, id: Uuid) -> anyhow::Result<Account>;
+    async fn get_account_by_id(&self, id: Uuid) -> anyhow::Result<Option<Account>>;
 
     async fn update_account(
         &self,
         id: Uuid,
-        email: String,
         name: String,
-        password: String,
-        bio: String,
-        image: String,
+        balance: f64,
+        note: Option<String>,
     ) -> anyhow::Result<Account>;
 
     async fn delete_account(&self, id: Uuid) -> anyhow::Result<()>;
@@ -40,10 +39,9 @@ pub trait UsersRepository {
 pub struct Account {
     pub id: Uuid,
     pub name: String,
-    pub email: String,
-    pub password: String,
-    pub bio: String,
-    pub image: String,
+    pub balance: f64,
+    pub note: Option<String>,
+    pub user_id: Uuid,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
 }
