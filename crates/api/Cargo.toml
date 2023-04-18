@@ -6,3 +6,23 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+core = { path = "../core" }
+domain = { path = "../domain" }
+infrastructure = { path = "../infrastructure" }
+
+anyhow = "1.0.70"
+serde = { version = "1.0.160", features = ["derive"] }
+serde_json = "1.0.96"
+validator = { version = "0.16.0", features = ["derive"] }
+tower = { version = "0.4.13", features = ["timeout", "buffer", "limit"] }
+tower-http = { version = "0.4.0", features = ["trace", "cors"] }
+axum = { version = "0.6.15", features = ["tower-log"] }
+tokio = { version = "1.27.0", features = ["full"] }
+axum-extra = { version = "0.7.3", features = ["cookie"] }
+clap = "4.2.2"
+http-body = "0.4.5"
+lazy_static = "1.4.0"
+metrics = "0.21.0"
+metrics-exporter-prometheus = "0.12.0"
+thiserror = "1.0.40"
+tracing = "0.1.37"

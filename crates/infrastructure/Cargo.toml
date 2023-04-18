@@ -6,6 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+core = { path = "../core" }
+domain = { path = "../domain" }
+
 anyhow = "1.0.70"
 async-trait = "0.1.68"
 jsonwebtoken = "8.3.0"
