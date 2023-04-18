@@ -8,6 +8,7 @@ use axum::http::{HeaderValue, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
+use axum::Extension;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, Router};
 use domain::PingResponse;
 use infrastructure::service_register::ServiceRegister;
@@ -49,6 +50,7 @@ impl ApplicationController {
                     .layer(TraceLayer::new_for_http())
                     .layer(HandleErrorLayer::new(Self::handle_timeout_error))
                     .layer(BufferLayer::new(1024))
+                    .layer(Extension(service_register))
                     .layer(RateLimitLayer::new(5, Duration::from_secs(5)))
                     .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
             )

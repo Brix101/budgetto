@@ -11,7 +11,7 @@ pub struct ServiceRegister {}
 
 /// A simple service container responsible for managing the various services our API endpoints will pull from through axum extensions.
 impl ServiceRegister {
-    pub fn new(pool: ConnectionPool, config: Arc<AppConfig>) -> Self {
+    pub fn init(pool: ConnectionPool, config: Arc<AppConfig>) -> Self {
         info!("initializing utility services...");
 
         info!("utility services initialized, building feature services...");
