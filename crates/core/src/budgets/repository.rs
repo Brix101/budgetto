@@ -4,7 +4,10 @@ use async_trait::async_trait;
 use mockall::automock;
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
+use time::format_description::well_known::Rfc3339;
 use uuid::Uuid;
+
+use domain::budgets::BudgetDto;
 
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynbudgetsRepository = Arc<dyn BudgetsRepository + Send + Sync>;
@@ -40,8 +43,21 @@ pub struct Budget {
     pub id: Uuid,
     pub name: String,
     pub balance: f64,
-    pub note: Option<String>,
+    pub note: String,
     pub user_id: Uuid,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
+}
+
+impl Budget {
+    pub fn into_dto(self) -> BudgetDto {
+        BudgetDto {
+            id: self.id,
+            name: self.name,
+            balance: self.balance,
+            note: Some(self.note),
+            created_at: self.created_at.format(&Rfc3339).unwrap(),
+            updated_at: self.updated_at.format(&Rfc3339).unwrap(),
+        }
+    }
 }
