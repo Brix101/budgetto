@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use mockall::automock;
-use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 use uuid::Uuid;
 
+use domain::categories::CategoryDto;
 /// Similar to above, we want to keep a reference count across threads so we can manage our connection pool.
 pub type DynCategoriesRepository = Arc<dyn CategoriesRepository + Send + Sync>;
 
@@ -39,8 +39,16 @@ pub trait CategoriesRepository {
 pub struct Category {
     pub id: Uuid,
     pub name: String,
-    pub note: Option<String>,
+    pub note: String,
     pub user_id: Option<Uuid>,
-    pub created_at: OffsetDateTime,
-    pub updated_at: OffsetDateTime,
+}
+
+impl Category {
+    pub fn into_dto(self) -> CategoryDto {
+        CategoryDto {
+            id: self.id,
+            name: self.name,
+            note: Some(self.note),
+        }
+    }
 }
