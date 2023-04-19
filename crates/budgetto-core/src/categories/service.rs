@@ -4,23 +4,30 @@ use async_trait::async_trait;
 use mockall::automock;
 use uuid::Uuid;
 
-// use domain::accounts::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
-use budgetto_domain::categories::CategoryDto;
+// use domain::categorys::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
+use budgetto_domain::categories::{
+    requests::{CreateCategoryDto, UpdateCategoryDto},
+    CategoryDto,
+};
 
 use crate::errors::AppResult;
 
-pub type DynUsersService = Arc<dyn UsersService + Send + Sync>;
+pub type DynCategoriesService = Arc<dyn CategoriesService + Send + Sync>;
 
 #[automock]
 #[async_trait]
-pub trait UsersService {
-    async fn create_account(&self) -> AppResult<CategoryDto>;
+pub trait CategoriesService {
+    async fn create_category(&self, request: CreateCategoryDto) -> AppResult<CategoryDto>;
 
-    async fn get_account_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
+    async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
 
-    async fn get_accounts(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>>;
+    async fn get_categories(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>>;
 
-    async fn updated_account(&self) -> AppResult<CategoryDto>;
+    async fn updated_category(
+        &self,
+        id: Uuid,
+        request: UpdateCategoryDto,
+    ) -> AppResult<CategoryDto>;
 
-    async fn delete_account(&self, id: Uuid) -> AppResult<()>;
+    async fn delete_category(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
 }
