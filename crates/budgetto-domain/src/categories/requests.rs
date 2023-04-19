@@ -7,12 +7,15 @@ pub struct CreateCategoryDto {
     #[validate(required)]
     pub name: Option<String>,
     pub note: Option<String>,
-    pub user_id: Option<Uuid>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct UpdateCategoryDto {
     pub name: Option<String>,
     pub note: Option<String>,
-    pub user_id: Option<Uuid>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Default)]
+pub struct QueryCategory {
+    pub category_id: Option<Uuid>,
 }
