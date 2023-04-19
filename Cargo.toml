@@ -1,13 +1,13 @@
 [workspace]
 members = [
     # our runnable applications
-    "crates/bin",
-    # "crates/web",
+    "crates/budgetto-bin",
+    # "crates/budgetto-web",
     # our dependent library crates
-    "crates/api",
-    "crates/core",
-    "crates/domain",
-    "crates/infrastructure",
+    "crates/budgetto-api",
+    "crates/budgetto-core",
+    "crates/budgetto-domain",
+    "crates/budgetto-infrastructure",
 ]
 
 # [profile.release]
