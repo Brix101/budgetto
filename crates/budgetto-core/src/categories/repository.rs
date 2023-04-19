@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use mockall::automock;
+use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 use uuid::Uuid;
 
@@ -15,9 +16,8 @@ pub trait CategoriesRepository {
     async fn create_category(
         &self,
         name: String,
-        balance: f64,
         note: Option<String>,
-        user_id: Uuid,
+        user_id: Option<Uuid>,
     ) -> anyhow::Result<Category>;
 
     async fn get_categories(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>>;
@@ -28,7 +28,6 @@ pub trait CategoriesRepository {
         &self,
         id: Uuid,
         name: String,
-        balance: f64,
         note: Option<String>,
     ) -> anyhow::Result<Category>;
 
@@ -39,8 +38,11 @@ pub trait CategoriesRepository {
 pub struct Category {
     pub id: Uuid,
     pub name: String,
-    pub note: String,
+    pub note: Option<String>,
     pub user_id: Option<Uuid>,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
+    pub deleted_at: Option<OffsetDateTime>,
 }
 
 impl Category {
@@ -48,7 +50,7 @@ impl Category {
         CategoryDto {
             id: self.id,
             name: self.name,
-            note: Some(self.note),
+            note: self.note,
         }
     }
 }
