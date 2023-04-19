@@ -24,7 +24,7 @@ impl BudgettoCategoriesService {
         Self { repository }
     }
     async fn map_to_categories(&self, categorys: Vec<Category>) -> AppResult<Vec<CategoryDto>> {
-        info!("found {} categorys", categorys.len());
+        info!("found {} categories", categorys.len());
 
         let mut mapped_categories: Vec<CategoryDto> = Vec::new();
 
@@ -40,10 +40,13 @@ impl BudgettoCategoriesService {
 
 #[async_trait]
 impl CategoriesService for BudgettoCategoriesService {
-    async fn create_category(&self, request: CreateCategoryDto) -> AppResult<CategoryDto> {
+    async fn create_category(
+        &self,
+        user_id: Option<Uuid>,
+        request: CreateCategoryDto,
+    ) -> AppResult<CategoryDto> {
         let name = request.name.unwrap();
         let note = request.note;
-        let user_id = request.user_id;
 
         let created_category = self.repository.create_category(name, note, user_id).await?;
 
@@ -77,13 +80,14 @@ impl CategoriesService for BudgettoCategoriesService {
     async fn updated_category(
         &self,
         id: Uuid,
+        user_id: Uuid,
         request: UpdateCategoryDto,
     ) -> AppResult<CategoryDto> {
         let category_to_update = self.repository.get_category_by_id(id).await?;
 
         if let Some(existing_category) = category_to_update {
             // verify the user IDs match on the request and the category
-            if existing_category.user_id.unwrap() != request.user_id.unwrap() {
+            if existing_category.user_id.unwrap() != user_id {
                 return Err(Error::Forbidden);
             }
 

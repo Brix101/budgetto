@@ -17,7 +17,11 @@ pub type DynCategoriesService = Arc<dyn CategoriesService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait CategoriesService {
-    async fn create_category(&self, request: CreateCategoryDto) -> AppResult<CategoryDto>;
+    async fn create_category(
+        &self,
+        user_id: Option<Uuid>,
+        request: CreateCategoryDto,
+    ) -> AppResult<CategoryDto>;
 
     async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
 
@@ -26,6 +30,7 @@ pub trait CategoriesService {
     async fn updated_category(
         &self,
         id: Uuid,
+        user_id: Uuid,
         request: UpdateCategoryDto,
     ) -> AppResult<CategoryDto>;
 
