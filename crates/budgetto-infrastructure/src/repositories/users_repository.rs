@@ -30,7 +30,7 @@ impl UsersRepository for PostgresUsersRepository {
             User,
             r#"
         insert into users (created_at, updated_at, name, email, password, image)
-        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, NULL)
+        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '')
         returning *
             "#,
             name,

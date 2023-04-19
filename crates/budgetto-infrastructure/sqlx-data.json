@@ -68,6 +68,114 @@
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
+  "3a6b59ec5172e666285b00f2fcf4ecc7d4ca8ddd2805f30c5afa5723c2753512": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "password",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "image",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "is_active",
+          "ordinal": 6,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        select users.* from users\n        inner join sessions\n        on users.id = sessions.user_id\n        where sessions.exp >= now() and sessions.id = $1\n            "
+  },
+  "3bc1cf61850e5bcf9d7a2a3fcd8cf9caf289913c30d1044c1b23e449e6f12b78": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "exp",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_agent",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n        insert into sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
+  },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
       "columns": [
@@ -141,7 +249,7 @@
     },
     "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
   },
-  "934dc49fe564dc8eb78297787dc6de5115bd0496391f45b74250611c576f4ff5": {
+  "66027461db778b12099b5d67425a603c0aabc903d34d9385ed1c4c77b9a000c9": {
     "describe": {
       "columns": [
         {
@@ -209,7 +317,7 @@
         ]
       }
     },
-    "query": "\n        insert into users (created_at, updated_at, name, email, password, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, NULL)\n        returning *\n            "
+    "query": "\n        insert into users (created_at, updated_at, name, email, password, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '')\n        returning *\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {

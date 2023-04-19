@@ -20,6 +20,7 @@ use tracing::info;
 use budgetto_domain::PingResponse;
 use budgetto_infrastructure::service_register::ServiceRegister;
 
+use crate::endpoints;
 
 lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
@@ -45,6 +46,7 @@ impl ApplicationController {
             .context("could not install metrics recorder")?;
 
         let router = Router::new()
+            .nest("/api/v1", endpoints::app())
             .route("/api/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(
