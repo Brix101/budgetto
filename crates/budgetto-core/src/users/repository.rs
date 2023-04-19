@@ -50,14 +50,14 @@ pub struct User {
 }
 
 impl User {
-    pub fn into_dto(self, access_token: Option<String>) -> UserDto {
+    pub fn into_dto(self, access_token: String) -> UserDto {
         UserDto {
             id: self.id,
             email: self.email,
             name: self.name,
             bio: Some(self.bio),
             image: Some(self.image),
-            access_token,
+            access_token: Some(access_token),
         }
     }
 }

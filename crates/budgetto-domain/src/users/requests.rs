@@ -38,6 +38,7 @@ pub struct SignInUserDto {
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 pub struct UpdateUserDto {
+    pub name: Option<String>,
     pub email: Option<String>,
     pub password: Option<String>,
     pub bio: Option<String>,
