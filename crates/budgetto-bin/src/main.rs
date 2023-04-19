@@ -5,9 +5,9 @@ use clap::Parser;
 use dotenvy::dotenv;
 use tracing::info;
 
-use api::router::ApplicationController;
-use core::{config::AppConfig, logger};
-use infrastructure::{connection_pool::ConnectionManager, service_register::ServiceRegister};
+use budgetto_api::router::ApplicationController;
+use budgetto_core::{config::AppConfig, logger};
+use budgetto_infrastructure::{connection_pool::ConnectionManager, service_register::ServiceRegister};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

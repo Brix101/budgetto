@@ -68,6 +68,79 @@
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
+  "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "password",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "image",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "is_active",
+          "ordinal": 6,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
+  },
   "934dc49fe564dc8eb78297787dc6de5115bd0496391f45b74250611c576f4ff5": {
     "describe": {
       "columns": [
@@ -137,78 +210,6 @@
       }
     },
     "query": "\n        insert into users (created_at, updated_at, name, email, password, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, NULL)\n        returning *\n            "
-  },
-  "e1b3ea7d812e8536e8cea03c212cef16106ad77583b8ad6c4ea7a1582c51beda": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Uuid"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "email",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "password",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "bio",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "image",
-          "ordinal": 5,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "is_active",
-          "ordinal": 6,
-          "type_info": "Bool"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 7,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 8,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Uuid"
-        ]
-      }
-    },
-    "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            image = $4::varchar,\n            updated_at = current_timestamp\n        where id = $5\n        returning *\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {

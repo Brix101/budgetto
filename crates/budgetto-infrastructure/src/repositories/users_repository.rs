@@ -89,14 +89,16 @@ impl UsersRepository for PostgresUsersRepository {
             name = $1::varchar,
             email = $2::varchar,
             password = $3::varchar,
-            image = $4::varchar,
+            bio = $4::varchar,
+            image = $5::varchar,
             updated_at = current_timestamp
-        where id = $5
+        where id = $6
         returning *
             "#,
             name,
             email,
             hash_password,
+            bio,
             image,
             id
         )

@@ -10,14 +10,16 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Extension;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, Router};
-use domain::PingResponse;
-use infrastructure::service_register::ServiceRegister;
 use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_http::{cors::Any, cors::CorsLayer, trace::TraceLayer};
-use tracing::{debug, info};
+use tracing::info;
+
+use budgetto_domain::PingResponse;
+use budgetto_infrastructure::service_register::ServiceRegister;
+
 
 lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
@@ -66,7 +68,6 @@ impl ApplicationController {
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
 
         info!("🚀 Server has launched on https://{addr}");
-        debug!("routes initialized, listening on port {}", port);
 
         axum::Server::bind(&addr)
             .serve(router.into_make_service())
