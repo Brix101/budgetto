@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use budgetto_domain::categories::{
     requests::{CreateCategoryDto, UpdateCategoryDto},
+    responses::CategoriesResponse,
     CategoryDto,
 };
 use tracing::info;
@@ -23,7 +24,7 @@ impl BudgettoCategoriesService {
     pub fn new(repository: DynCategoriesRepository) -> Self {
         Self { repository }
     }
-    async fn map_to_categories(&self, categorys: Vec<Category>) -> AppResult<Vec<CategoryDto>> {
+    async fn map_to_categories(&self, categorys: Vec<Category>) -> AppResult<CategoriesResponse> {
         info!("found {} categories", categorys.len());
 
         let mut mapped_categories: Vec<CategoryDto> = Vec::new();
@@ -34,7 +35,9 @@ impl BudgettoCategoriesService {
             }
         }
 
-        Ok(mapped_categories)
+        Ok(CategoriesResponse {
+            categories: mapped_categories,
+        })
     }
 }
 
@@ -60,20 +63,23 @@ impl CategoriesService for BudgettoCategoriesService {
     async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto> {
         info!("searching for existing category {:?}", id);
         let category = self.repository.get_category_by_id(id).await?;
-
+        println!("=======================================================================================================");
+        println!("{:#?}", id);
+        println!("{:#?}", category);
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
-            if existing_category.user_id.unwrap() != user_id {
-                return Err(Error::Forbidden);
+            if let Some(category_user_id) = existing_category.user_id {
+                if category_user_id != user_id {
+                    return Err(Error::Forbidden);
+                }
             }
-
             return Ok(existing_category.into_dto());
         }
 
         Err(Error::NotFound(String::from("category was not found")))
     }
 
-    async fn get_categories(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>> {
+    async fn get_categories(&self, user_id: Uuid) -> AppResult<CategoriesResponse> {
         let categories = self.repository.get_categories(user_id).await?;
 
         self.map_to_categories(categories).await
@@ -89,8 +95,10 @@ impl CategoriesService for BudgettoCategoriesService {
 
         if let Some(existing_category) = category_to_update {
             // verify the user IDs match on the request and the category
-            if existing_category.user_id.unwrap() != user_id {
-                return Err(Error::Forbidden);
+            if let Some(category_user_id) = existing_category.user_id {
+                if category_user_id != user_id {
+                    return Err(Error::Forbidden);
+                }
             }
 
             let updated_name = request.name.unwrap_or(existing_category.name);
@@ -110,10 +118,15 @@ impl CategoriesService for BudgettoCategoriesService {
     async fn delete_category(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
         let category = self.repository.get_category_by_id(id).await?;
 
+        println!("=======================================================================================================");
+        println!("{:#?}", id);
+        println!("{:#?}", category);
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
-            if existing_category.user_id.unwrap() != user_id {
-                return Err(Error::Forbidden);
+            if let Some(category_user_id) = existing_category.user_id {
+                if category_user_id != user_id {
+                    return Err(Error::Forbidden);
+                }
             }
 
             self.repository

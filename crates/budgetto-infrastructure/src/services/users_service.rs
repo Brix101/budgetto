@@ -93,6 +93,10 @@ impl UsersService for BudgettoUsersService {
             return Err(Error::InvalidLoginAttmpt);
         }
 
+        if user_agent.is_some() {
+            info!("user login successful, generating token");
+        }
+
         let token = self
             .session_service
             .new_session(NewSessionDto {

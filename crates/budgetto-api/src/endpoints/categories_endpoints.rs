@@ -3,6 +3,7 @@ use axum::routing::{delete, get, post, put};
 use axum::Router;
 use budgetto_core::errors::AppResult;
 use budgetto_domain::categories::requests::{CreateCategoryDto, QueryCategory, UpdateCategoryDto};
+use budgetto_domain::categories::responses::CategoriesResponse;
 use tracing::info;
 use uuid::Uuid;
 
@@ -16,23 +17,25 @@ pub struct CategoryController;
 impl CategoryController {
     pub fn app() -> Router {
         Router::new()
-            .route("/", get(Self::get_user_categories))
+            .route("/", get(Self::get_categories))
             .route("/", post(Self::create_category))
             .route("/:id", put(Self::update_category))
             .route("/:id", delete(Self::delete_category))
     }
 
-    pub async fn get_user_categories(
+    pub async fn get_categories(
         query_params: Query<QueryCategory>,
         RequiredAuthentication(user, services): RequiredAuthentication,
-    ) -> AppResult<Json<Vec<CategoryDto>>> {
+    ) -> AppResult<Json<CategoriesResponse>> {
         info!("received request to get current user categorys");
 
         if let Some(id) = query_params.category_id {
             // return this function if the query params has value
             let category = services.categories.get_category_by_id(id, user.id).await?;
 
-            return Ok(Json(vec![category]));
+            return Ok(Json(CategoriesResponse {
+                categories: vec![category],
+            }));
         }
 
         let categories = services.categories.get_categories(user.id).await?;
@@ -75,7 +78,7 @@ impl CategoryController {
     ) -> AppResult<()> {
         info!("recieved request to remove category {:?}", id);
 
-        services.categories.delete_category(user.id, id).await?;
+        services.categories.delete_category(id, user.id).await?;
 
         Ok(())
     }

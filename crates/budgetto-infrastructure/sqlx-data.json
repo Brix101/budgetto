@@ -176,62 +176,6 @@
     },
     "query": "\n        insert into sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
   },
-  "42c03212454f94e2f10382ed8822492475daee592d9b7eb9ae4fae2591042034": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Uuid"
-        },
-        {
-          "name": "name",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "note",
-          "ordinal": 2,
-          "type_info": "Text"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 3,
-          "type_info": "Uuid"
-        },
-        {
-          "name": "created_at",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "updated_at",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "deleted_at",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        true
-      ],
-      "parameters": {
-        "Left": [
-          "Uuid"
-        ]
-      }
-    },
-    "query": "\n        select *\n        from categories\n        where id = $1 AND \"deleted_at\" IS NULL\n            "
-  },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
       "columns": [
@@ -375,7 +319,7 @@
     },
     "query": "\n        insert into users (created_at, updated_at, name, email, password, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '')\n        returning *\n            "
   },
-  "83a518ff9ffcb2d1c4c6c5198cd5a4e848f34af7307bc0aae014db4076a24daf": {
+  "6ab4b2a7a2cd4272cf8411d42f254e1de5c0cb7cde7f2904aa94faa0d18e82d5": {
     "describe": {
       "columns": [
         {
@@ -429,7 +373,7 @@
         ]
       }
     },
-    "query": "\n        SELECT *\n        FROM \"categories\"\n        WHERE \"user_id\" IS NULL OR \"user_id\" = $1 AND \"deleted_at\" IS NULL\n            "
+    "query": "\n        SELECT * \n        FROM \"categories\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
   },
   "a7fed2d26e7f02aebcfbf122a63169052670b4fe6c4170eebe12417f736ce402": {
     "describe": {
@@ -558,6 +502,62 @@
       }
     },
     "query": "\n        update categories\n        set\n            name = $1::varchar,\n            note = $2,\n            updated_at = current_timestamp\n        where id = $3\n        returning *\n            "
+  },
+  "e34a8491d961d2051a811eebb0dcb0458e3b0e590fac70f7cd6fb860eec72818": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "note",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT *\n        FROM \"categories\"\n        WHERE \"user_id\" IS NULL OR \"user_id\" = $1 AND \"deleted_at\" IS NULL\n        ORDER BY name ASC\n            "
   },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {
