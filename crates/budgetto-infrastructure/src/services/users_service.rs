@@ -63,7 +63,7 @@ impl UsersService for BudgettoUsersService {
             .create_user(&email, &name, &hashed_password)
             .await?;
 
-        Ok(created_user.into_dto(String::new()))
+        Ok(created_user.into_dto(None))
     }
 
     async fn signin_user(
@@ -106,7 +106,7 @@ impl UsersService for BudgettoUsersService {
             .await
             .unwrap();
 
-        Ok((user.into_dto(token.access_token), token.refresh_token))
+        Ok((user.into_dto(Some(token.access_token)), token.refresh_token))
     }
 
     async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto> {
@@ -121,7 +121,7 @@ impl UsersService for BudgettoUsersService {
             .token_service
             .new_access_token(user.id, user.email.as_str())?;
 
-        Ok(user.into_dto(token))
+        Ok(user.into_dto(Some(token)))
     }
 
     async fn updated_user(&self, user_id: Uuid, request: UpdateUserDto) -> AppResult<UserDto> {
@@ -163,7 +163,7 @@ impl UsersService for BudgettoUsersService {
             .token_service
             .new_access_token(user_id, updated_email.as_str())?;
 
-        Ok(updated_user.into_dto(token))
+        Ok(updated_user.into_dto(Some(token)))
     }
 
     async fn get_user_by_email(&self, email: String) -> AppResult<UserDto> {
@@ -174,6 +174,6 @@ impl UsersService for BudgettoUsersService {
             info!("user found with email {:?}", email);
         }
 
-        Ok(user.unwrap().into_dto(String::new()))
+        Ok(user.unwrap().into_dto(None))
     }
 }
