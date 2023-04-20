@@ -93,8 +93,6 @@ impl UsersService for BudgettoUsersService {
             return Err(Error::InvalidLoginAttmpt);
         }
 
-        info!("user login successful, generating tokens");
-
         let token = self
             .session_service
             .new_session(NewSessionDto {
@@ -162,5 +160,16 @@ impl UsersService for BudgettoUsersService {
             .new_access_token(user_id, updated_email.as_str())?;
 
         Ok(updated_user.into_dto(token))
+    }
+
+    async fn get_user_by_email(&self, email: String) -> AppResult<UserDto> {
+        info!("retrieving user {:?}", email);
+        let user = self.repository.get_user_by_email(&email).await?;
+
+        if user.is_some() {
+            info!("user found with email {:?}", email);
+        }
+
+        Ok(user.unwrap().into_dto(String::new()))
     }
 }

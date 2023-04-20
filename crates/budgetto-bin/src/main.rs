@@ -7,7 +7,10 @@ use tracing::info;
 
 use budgetto_api::router::ApplicationController;
 use budgetto_core::{config::AppConfig, logger};
-use budgetto_infrastructure::{connection_pool::ConnectionManager, service_register::ServiceRegister};
+use budgetto_infrastructure::{
+    connection_pool::ConnectionManager, service_register::ServiceRegister,
+    services::utils::seed_service::SeedService,
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -23,6 +26,14 @@ async fn main() -> anyhow::Result<()> {
         .expect("could not initialize the database connection pool");
 
     let service_register = ServiceRegister::init(pg_pool, config.clone());
+
+    if config.seed {
+        info!("seeding enabled, creating test data...");
+        SeedService::new(service_register.clone())
+            .seed()
+            .await
+            .expect("unexpected error occurred while seeding application data");
+    }
 
     info!("migrations successfully ran, initializing axum server...");
     ApplicationController::serve(config.port, &config.cors_origin, service_register).await?;
