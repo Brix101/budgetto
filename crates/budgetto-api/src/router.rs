@@ -4,7 +4,8 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context;
 use axum::extract::MatchedPath;
-use axum::http::{HeaderValue, Request};
+use axum::http::header::COOKIE;
+use axum::http::{HeaderValue, Request, Response};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -46,7 +47,7 @@ impl ApplicationController {
             .context("could not install metrics recorder")?;
 
         let router = Router::new()
-            .nest("/api/v1", endpoints::app())
+            .nest("/api", endpoints::app())
             .route("/api/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(
@@ -64,7 +65,8 @@ impl ApplicationController {
                     .allow_methods(Any)
                     .allow_headers(Any),
             )
-            .route_layer(middleware::from_fn(Self::track_metrics));
+            .route_layer(middleware::from_fn(Self::track_metrics))
+            .route_layer(middleware::from_fn(Self::deserialize_user));
 
         let router = router.fallback(Self::handle_404);
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
@@ -78,6 +80,16 @@ impl ApplicationController {
             .context("error while starting API server")?;
 
         Ok(())
+    }
+
+    async fn deserialize_user<B>(request: Request<B>, next: Next<B>) -> impl IntoResponse {
+        if let Some(authorization_header) = request.headers().get(COOKIE) {
+            println!("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            println!("{:#?}", authorization_header);
+        }
+
+        let response = next.run(request).await;
+        response
     }
 
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
