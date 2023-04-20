@@ -50,7 +50,9 @@ impl CategoriesService for BudgettoCategoriesService {
 
         let created_category = self.repository.create_category(name, note, user_id).await?;
 
-        info!("user created category successfully");
+        if user_id.is_some() {
+            info!("user created category successfully");
+        }
 
         Ok(created_category.into_dto())
     }

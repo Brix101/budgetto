@@ -1,0 +1,82 @@
+use axum::extract::{Json, Path, Query};
+use axum::routing::{delete, get, post, put};
+use axum::Router;
+use budgetto_core::errors::AppResult;
+use budgetto_domain::categories::requests::{CreateCategoryDto, QueryCategory, UpdateCategoryDto};
+use tracing::info;
+use uuid::Uuid;
+
+use budgetto_domain::categories::CategoryDto;
+
+use crate::extractors::required_authentication_extractor::RequiredAuthentication;
+use crate::extractors::validation_extractor::ValidationExtractor;
+
+pub struct CategoryController;
+
+impl CategoryController {
+    pub fn app() -> Router {
+        Router::new()
+            .route("/", get(Self::get_user_categories))
+            .route("/", post(Self::create_category))
+            .route("/:id", put(Self::update_category))
+            .route("/:id", delete(Self::delete_category))
+    }
+
+    pub async fn get_user_categories(
+        query_params: Query<QueryCategory>,
+        RequiredAuthentication(user, services): RequiredAuthentication,
+    ) -> AppResult<Json<Vec<CategoryDto>>> {
+        info!("received request to get current user categorys");
+
+        if let Some(id) = query_params.category_id {
+            // return this function if the query params has value
+            let category = services.categories.get_category_by_id(id, user.id).await?;
+
+            return Ok(Json(vec![category]));
+        }
+
+        let categories = services.categories.get_categories(user.id).await?;
+
+        Ok(Json(categories))
+    }
+
+    pub async fn create_category(
+        RequiredAuthentication(user, services): RequiredAuthentication,
+        ValidationExtractor(request): ValidationExtractor<CreateCategoryDto>,
+    ) -> AppResult<Json<CategoryDto>> {
+        info!("received request to create category");
+
+        let new_category = services
+            .categories
+            .create_category(Some(user.id), request)
+            .await?;
+
+        Ok(Json(new_category))
+    }
+
+    pub async fn update_category(
+        Path(id): Path<Uuid>,
+        RequiredAuthentication(user, services): RequiredAuthentication,
+        Json(request): Json<UpdateCategoryDto>,
+    ) -> AppResult<Json<CategoryDto>> {
+        info!("recieved request to update category {:?}", id);
+
+        let updated_category = services
+            .categories
+            .updated_category(id, user.id, request)
+            .await?;
+
+        Ok(Json(updated_category))
+    }
+
+    pub async fn delete_category(
+        Path(id): Path<Uuid>,
+        RequiredAuthentication(user, services): RequiredAuthentication,
+    ) -> AppResult<()> {
+        info!("recieved request to remove category {:?}", id);
+
+        services.categories.delete_category(user.id, id).await?;
+
+        Ok(())
+    }
+}
