@@ -36,6 +36,10 @@ impl SessionsService for BudgettoSessionsService {
         let expired_future_time = SystemTime::now().checked_add(from_now).unwrap();
         let exp = OffsetDateTime::from(expired_future_time);
 
+        if user_agent.is_some() {
+            info!("user login successful, creating session");
+        }
+
         match user_agent {
             Some(user_agent) => {
                 let created_session = self
