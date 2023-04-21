@@ -7,12 +7,12 @@ use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 use uuid::Uuid;
 
-pub type DynAccountsRepository = Arc<dyn TransactionsRepository + Send + Sync>;
+pub type DynTransactionsRepository = Arc<dyn TransactionsRepository + Send + Sync>;
 
 #[automock]
 #[async_trait]
 pub trait TransactionsRepository {
-    async fn create_account(
+    async fn create_transaction(
         &self,
         name: String,
         balance: f64,
@@ -20,11 +20,11 @@ pub trait TransactionsRepository {
         user_id: Uuid,
     ) -> anyhow::Result<Transaction>;
 
-    async fn get_accounts(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>>;
+    async fn get_transactions(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>>;
 
-    async fn get_account_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>>;
+    async fn get_transaction_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>>;
 
-    async fn update_account(
+    async fn update_transaction(
         &self,
         id: Uuid,
         name: String,
@@ -32,7 +32,7 @@ pub trait TransactionsRepository {
         note: Option<String>,
     ) -> anyhow::Result<Transaction>;
 
-    async fn delete_account(&self, id: Uuid) -> anyhow::Result<()>;
+    async fn delete_transaction(&self, id: Uuid) -> anyhow::Result<()>;
 }
 
 #[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, PartialEq)]
