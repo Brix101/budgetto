@@ -32,3 +32,9 @@ impl UserAuthenicationResponse {
         }
     }
 }
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct ReAuthResponse {
+    #[serde(rename = "accessToken")]
+    pub access_token: Option<String>,
+}

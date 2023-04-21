@@ -46,6 +46,11 @@ impl ApplicationController {
             .install_recorder()
             .context("could not install metrics recorder")?;
 
+        let allowed_origin = cors_origin
+            .split(",")
+            .map(|origin| origin.parse::<HeaderValue>().unwrap())
+            .collect::<Vec<HeaderValue>>();
+
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
             .route("/api/ping", get(Self::ping))
@@ -62,7 +67,7 @@ impl ApplicationController {
             )
             .layer(
                 CorsLayer::new()
-                    .allow_origin(cors_origin.parse::<HeaderValue>().unwrap())
+                    .allow_origin(allowed_origin)
                     .allow_methods(Any)
                     .allow_headers(Any),
             )

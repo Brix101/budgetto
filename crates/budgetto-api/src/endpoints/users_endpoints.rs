@@ -6,7 +6,7 @@ use tracing::info;
 
 use budgetto_core::errors::AppResult;
 use budgetto_domain::users::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
-use budgetto_domain::users::responses::UserAuthenicationResponse;
+use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationResponse};
 use budgetto_infrastructure::service_register::ServiceRegister;
 
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
@@ -23,7 +23,7 @@ impl UserRouter {
             .route("/signin", post(Self::signin_user_endpoint))
             .route("/signout", post(Self::signout_user_endpoint))
             .route("/whoami", get(Self::get_current_user_endpoint))
-            .route("/refresh", get(Self::refresh_user_endpoint))
+            .route("/reAuth", get(Self::re_auth_endpoint))
             .route("/", put(Self::update_user_endpoint))
     }
 
@@ -80,18 +80,23 @@ impl UserRouter {
         Ok(Json(UserAuthenicationResponse { user: updated_user }))
     }
 
-    pub async fn refresh_user_endpoint(
+    pub async fn re_auth_endpoint(
         jar: CookieJar,
         Extension(services): Extension<ServiceRegister>,
         SessionExtractor(session_id, refresh_token): SessionExtractor,
-    ) -> AppResult<(CookieJar, Json<UserAuthenicationResponse>)> {
+    ) -> AppResult<(CookieJar, Json<ReAuthResponse>)> {
         info!("recieved request to refresh access token {:?}", session_id);
 
         let user = services.sessions.refresh_access_token(session_id).await?;
 
         let cookie = jar.add(Cookie::new("refresh_token", refresh_token));
 
-        Ok((cookie, Json(UserAuthenicationResponse { user })))
+        Ok((
+            cookie,
+            Json(ReAuthResponse {
+                access_token: user.access_token,
+            }),
+        ))
     }
 
     pub async fn signout_user_endpoint(
