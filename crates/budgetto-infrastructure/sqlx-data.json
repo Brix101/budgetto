@@ -1,5 +1,67 @@
 {
   "db": "PostgreSQL",
+  "16283b2a3bb5d690747545d541d42d3dad0871fdc71eef678c97238fb1a3aaf7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "balance",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT * \n        FROM \"accounts\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
+  },
   "2cf1f6d9811d9213a0e640e1d97197d262c0024c27df6f5730aa02f7f6f01640": {
     "describe": {
       "columns": [
@@ -375,6 +437,71 @@
     },
     "query": "\n        SELECT * \n        FROM \"categories\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
   },
+  "92c28068c7226809a740ba4f55405e916eeac79448ce5f5032851296d075fdcf": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "balance",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Float8",
+          "Text",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO \"accounts\" (\"name\", \"balance\", \"note\", \"user_id\", \"created_at\", \"updated_at\")\n        VALUES ($1, $2, $3, $4, current_timestamp, current_timestamp)\n        RETURNING * \n            "
+  },
   "a7fed2d26e7f02aebcfbf122a63169052670b4fe6c4170eebe12417f736ce402": {
     "describe": {
       "columns": [
@@ -433,6 +560,68 @@
     },
     "query": "\n        insert into categories (name, note, user_id,created_at, updated_at)\n        values ($1::varchar, $2, $3, current_timestamp, current_timestamp)\n        returning * \n            "
   },
+  "aafd359c58013a5ac6f1bf3b0fa01757746d625d600bc5c1a6b9b932744dd7d3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "balance",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT *\n        FROM \"accounts\"\n        WHERE \"deleted_at\" IS NULL AND \"user_id\" = $1\n        ORDER BY name ASC\n            "
+  },
   "bbb0a17182fbd9fd507b392ee10d528252291a95a42554f67ea7046f099df4fd": {
     "describe": {
       "columns": [],
@@ -444,6 +633,71 @@
       }
     },
     "query": "\n        update categories\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
+  },
+  "cc2875a273aee24cd62163979b3e51f4aad2a09693edd3e3aaa663474d38bf55": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "balance",
+          "ordinal": 2,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Float8",
+          "Text",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update accounts\n        set\n            name = $1,\n            balance = $2,\n            note = $3,\n            updated_at = current_timestamp\n        where id = $4\n        returning *\n            "
   },
   "db0fbe28c979ef27aa81ea09fcb3b26e0dfb85cc4d1d8fed37498321137019d2": {
     "describe": {
@@ -626,5 +880,17 @@
       }
     },
     "query": "\n        select *\n        from users\n        where email = $1::varchar\n            "
+  },
+  "e8754b9b9ec338a45a655df3a6c6c5b3c23e38be2b304fc8aafac8318f00b7d8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update accounts\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
   }
 }

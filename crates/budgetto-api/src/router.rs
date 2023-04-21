@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context;
 use axum::extract::MatchedPath;
-use axum::http::header::{self, COOKIE};
+use axum::http::header;
 use axum::http::{HeaderValue, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;

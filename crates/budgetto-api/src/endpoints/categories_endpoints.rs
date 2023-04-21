@@ -1,12 +1,12 @@
 use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
 use axum::Router;
-use budgetto_core::errors::AppResult;
-use budgetto_domain::categories::requests::{CreateCategoryDto, QueryCategory, UpdateCategoryDto};
-use budgetto_domain::categories::responses::CategoriesResponse;
 use tracing::info;
 use uuid::Uuid;
 
+use budgetto_core::errors::AppResult;
+use budgetto_domain::categories::requests::{CreateCategoryDto, QueryCategory, UpdateCategoryDto};
+use budgetto_domain::categories::responses::CategoriesResponse;
 use budgetto_domain::categories::CategoryDto;
 
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
@@ -27,7 +27,7 @@ impl CategoryController {
         query_params: Query<QueryCategory>,
         RequiredAuthentication(user, services): RequiredAuthentication,
     ) -> AppResult<Json<CategoriesResponse>> {
-        info!("received request to get current user categorys");
+        info!("received request to get current user categories");
 
         if let Some(id) = query_params.category_id {
             // return this function if the query params has value

@@ -42,10 +42,11 @@ pub struct Account {
     pub id: Uuid,
     pub name: String,
     pub balance: f64,
-    pub note: String,
+    pub note: Option<String>,
     pub user_id: Uuid,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
+    pub deleted_at: Option<OffsetDateTime>,
 }
 
 impl Account {
@@ -54,7 +55,7 @@ impl Account {
             id: self.id,
             name: self.name,
             balance: self.balance,
-            note: Some(self.note),
+            note: self.note,
             created_at: self.created_at.format(&Rfc3339).unwrap(),
             updated_at: self.updated_at.format(&Rfc3339).unwrap(),
         }

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use tracing::info;
 
 use budgetto_core::{
+    accounts::{repository::DynAccountsRepository, service::DynAccountsService},
     categories::{repository::DynCategoriesRepository, service::DynCategoriesService},
     config::AppConfig,
     sessions::{repository::DynSessionsRepository, service::DynSessionsService},
@@ -13,10 +14,12 @@ use budgetto_core::{
 use crate::{
     connection_pool::ConnectionPool,
     repositories::{
+        accounts_repository::PostgresAccountsRepository,
         categories_repository::PostgresCategoriesRepository,
         sessions_repository::PostgresSessionsRepository, users_repository::PostgresUsersRepository,
     },
     services::{
+        accounts_service::BudgettoAccountsService,
         categories_service::BudgettoCategoriesService,
         sessions_service::BudgettoSessionsService,
         users_service::BudgettoUsersService,
@@ -30,6 +33,7 @@ pub struct ServiceRegister {
     pub users: DynUsersService,
     pub sessions: DynSessionsService,
     pub categories: DynCategoriesService,
+    pub accounts: DynAccountsService,
 }
 
 /// A simple service container responsible for managing the various services our API endpoints will pull from through axum extensions.
@@ -65,12 +69,19 @@ impl ServiceRegister {
         let categories =
             Arc::new(BudgettoCategoriesService::new(categories_repository)) as DynCategoriesService;
 
+        let accounts_repository =
+            Arc::new(PostgresAccountsRepository::new(pool.clone())) as DynAccountsRepository;
+
+        let accounts =
+            Arc::new(BudgettoAccountsService::new(accounts_repository)) as DynAccountsService;
+
         info!("feature services successfully initialized!");
         ServiceRegister {
             token_service,
             users,
             sessions,
             categories,
+            accounts,
         }
     }
 }
