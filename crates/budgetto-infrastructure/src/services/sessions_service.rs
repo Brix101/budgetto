@@ -80,7 +80,7 @@ impl SessionsService for BudgettoSessionsService {
             info!("existing session found, generating access token");
             let access_token = self.token_service.new_access_token(user.id, &user.email)?;
 
-            return Ok(user.into_dto(access_token));
+            return Ok(user.into_dto(Some(access_token)));
         }
 
         Err(Error::Unauthorized)

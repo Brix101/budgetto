@@ -46,9 +46,10 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         query_as!(
             Category,
             r#"
-        select *
-        from categories
-        where id = $1 AND "deleted_at" IS NULL
+        SELECT * 
+        FROM "categories" 
+        WHERE "id" = $1 
+        AND "deleted_at" IS NULL
             "#,
             id,
         )
@@ -64,6 +65,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         SELECT *
         FROM "categories"
         WHERE "user_id" IS NULL OR "user_id" = $1 AND "deleted_at" IS NULL
+        ORDER BY name ASC
             "#,
             user_id,
         )

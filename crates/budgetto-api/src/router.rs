@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context;
 use axum::extract::MatchedPath;
+use axum::http::header;
 use axum::http::{HeaderValue, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
@@ -56,7 +57,8 @@ impl ApplicationController {
                     .layer(BufferLayer::new(1024))
                     .layer(Extension(service_register))
                     .layer(RateLimitLayer::new(5, Duration::from_secs(5)))
-                    .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
+                    .timeout(Duration::from_secs(*HTTP_TIMEOUT))
+                    .layer(middleware::from_fn(Self::deserialize_user)),
             )
             .layer(
                 CorsLayer::new()
@@ -79,7 +81,14 @@ impl ApplicationController {
 
         Ok(())
     }
+    async fn deserialize_user<B>(request: Request<B>, next: Next<B>) -> impl IntoResponse {
+        let mut response = next.run(request).await;
+        response
+            .headers_mut()
+            .insert(header::SERVER, "axum".parse().unwrap());
 
+        response
+    }
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {

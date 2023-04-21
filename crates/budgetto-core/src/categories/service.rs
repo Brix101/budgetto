@@ -7,6 +7,7 @@ use uuid::Uuid;
 // use domain::categorys::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
 use budgetto_domain::categories::{
     requests::{CreateCategoryDto, UpdateCategoryDto},
+    responses::CategoriesResponse,
     CategoryDto,
 };
 
@@ -25,7 +26,7 @@ pub trait CategoriesService {
 
     async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
 
-    async fn get_categories(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>>;
+    async fn get_categories(&self, user_id: Uuid) -> AppResult<CategoriesResponse>;
 
     async fn updated_category(
         &self,
