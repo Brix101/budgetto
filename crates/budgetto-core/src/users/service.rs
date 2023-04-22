@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use budgetto_domain::sessions::responses::SessionResponse;
 use mockall::automock;
 use uuid::Uuid;
 
@@ -22,7 +23,7 @@ pub trait UsersService {
         &self,
         request: SignInUserDto,
         user_agent: Option<String>,
-    ) -> AppResult<(UserDto, String)>;
+    ) -> AppResult<SessionResponse>;
 
     async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto>;
 

@@ -5,6 +5,7 @@ use std::time::{Duration, SystemTime};
 use budgetto_core::config::AppConfig;
 use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::utils::token_service::TokenService;
+use budgetto_domain::users::UserDto;
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
@@ -13,8 +14,8 @@ use uuid::Uuid;
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
 #[derive(Debug, Serialize, Deserialize)]
 struct AccessTokenClaims {
-    sub: String,
-    user_id: Uuid,
+    sub: Uuid,
+    user: UserDto,
     exp: usize,
     iat: usize,
 }
@@ -38,17 +39,17 @@ impl JwtService {
 }
 
 impl TokenService for JwtService {
-    fn new_access_token(&self, user_id: Uuid, email: &str) -> AppResult<String> {
+    fn new_access_token(&self, sub: Uuid, user: UserDto) -> AppResult<String> {
         let from_now = Duration::from_secs(3600); //? expires every 15 min
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
         let now = OffsetDateTime::now_utc();
 
         let claims = AccessTokenClaims {
-            sub: String::from(email),
+            sub,
+            user,
             exp: exp.unix_timestamp() as usize,
             iat: now.unix_timestamp() as usize,
-            user_id,
         };
 
         let token = encode(
@@ -91,8 +92,8 @@ impl TokenService for JwtService {
             &Validation::new(Algorithm::HS256),
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
-
-        Ok(decoded_token.claims.user_id)
+        println!("{:#?}", decoded_token.claims);
+        Ok(decoded_token.claims.user.id)
     }
 
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid> {
