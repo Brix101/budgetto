@@ -18,7 +18,6 @@ impl UserAuthenicationResponse {
         // strings as `Option` option values for now
         bio: Option<String>,
         image: Option<String>,
-        access_token: Option<String>,
     ) -> Self {
         UserAuthenicationResponse {
             user: UserDto {
@@ -27,7 +26,6 @@ impl UserAuthenicationResponse {
                 email,
                 bio,
                 image,
-                access_token,
             },
         }
     }
@@ -36,5 +34,5 @@ impl UserAuthenicationResponse {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct ReAuthResponse {
     #[serde(rename = "accessToken")]
-    pub access_token: Option<String>,
+    pub access_token: String,
 }

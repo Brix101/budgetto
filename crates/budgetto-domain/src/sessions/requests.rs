@@ -9,3 +9,9 @@ pub struct NewSessionDto {
     #[validate(required, length(min = 1))]
     pub user_agent: Option<String>,
 }
+
+#[derive(Serialize, Deserialize, Default, Debug, Validate)]
+pub struct NewAccessTokenRequest {
+    #[validate(required, length(min = 1))]
+    pub refresh_token: Option<String>,
+}

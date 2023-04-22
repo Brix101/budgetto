@@ -9,7 +9,7 @@ edition = "2021"
 budgetto-domain = { path = "../budgetto-domain" }
 
 anyhow = "1.0.70"
-axum = "0.6.15"
+axum = "0.6.10"
 clap = { version = "4.2.2", features = ["derive", "env"] }
 serde_json = "1.0.96"
 thiserror = "1.0.40"

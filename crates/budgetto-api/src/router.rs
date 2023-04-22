@@ -4,8 +4,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::Context;
 use axum::extract::MatchedPath;
-use axum::http::header;
-use axum::http::{HeaderValue, Request};
+use axum::http::{header, HeaderValue, Method, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -15,7 +14,7 @@ use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
-use tower_http::{cors::Any, cors::CorsLayer, trace::TraceLayer};
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing::info;
 
 use budgetto_domain::PingResponse;
@@ -51,6 +50,26 @@ impl ApplicationController {
             .map(|origin| origin.parse::<HeaderValue>().unwrap())
             .collect::<Vec<HeaderValue>>();
 
+        let cors = CorsLayer::new()
+            .allow_credentials(true)
+            .allow_headers(vec![
+                header::ACCEPT,
+                header::ACCEPT_LANGUAGE,
+                header::AUTHORIZATION,
+                header::CONTENT_LANGUAGE,
+                header::CONTENT_TYPE,
+                header::ORIGIN,
+            ])
+            .allow_methods(vec![
+                Method::GET,
+                Method::POST,
+                Method::PUT,
+                Method::DELETE,
+                Method::OPTIONS,
+            ])
+            .allow_origin(allowed_origin)
+            .max_age(Duration::from_secs(60 * 60));
+
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
             .route("/api/ping", get(Self::ping))
@@ -61,16 +80,10 @@ impl ApplicationController {
                     .layer(HandleErrorLayer::new(Self::handle_timeout_error))
                     .layer(BufferLayer::new(1024))
                     .layer(Extension(service_register))
-                    .layer(RateLimitLayer::new(5, Duration::from_secs(5)))
-                    .timeout(Duration::from_secs(*HTTP_TIMEOUT))
-                    .layer(middleware::from_fn(Self::deserialize_user)),
+                    .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
+                    .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
             )
-            .layer(
-                CorsLayer::new()
-                    .allow_origin(allowed_origin)
-                    .allow_methods(Any)
-                    .allow_headers(Any),
-            )
+            .layer(cors)
             .route_layer(middleware::from_fn(Self::track_metrics));
 
         let router = router.fallback(Self::handle_404);
@@ -86,14 +99,7 @@ impl ApplicationController {
 
         Ok(())
     }
-    async fn deserialize_user<B>(request: Request<B>, next: Next<B>) -> impl IntoResponse {
-        let mut response = next.run(request).await;
-        response
-            .headers_mut()
-            .insert(header::SERVER, "axum".parse().unwrap());
 
-        response
-    }
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {

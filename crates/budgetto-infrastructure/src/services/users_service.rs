@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use budgetto_domain::{
-    sessions::requests::NewSessionDto,
+    sessions::{requests::NewSessionDto, responses::SessionResponse},
     users::{
         requests::{SignInUserDto, SignUpUserDto, UpdateUserDto},
         UserDto,
@@ -12,7 +12,7 @@ use budgetto_core::{
     errors::{AppResult, Error},
     sessions::service::DynSessionsService,
     users::{repository::DynUsersRepository, service::UsersService},
-    utils::{security_service::DynSecurityService, token_service::DynTokenService},
+    utils::security_service::DynSecurityService,
 };
 use uuid::Uuid;
 
@@ -20,7 +20,6 @@ use uuid::Uuid;
 pub struct BudgettoUsersService {
     repository: DynUsersRepository,
     security_service: DynSecurityService,
-    token_service: DynTokenService,
     session_service: DynSessionsService,
 }
 
@@ -28,13 +27,11 @@ impl BudgettoUsersService {
     pub fn new(
         repository: DynUsersRepository,
         security_service: DynSecurityService,
-        token_service: DynTokenService,
         session_service: DynSessionsService,
     ) -> Self {
         Self {
             repository,
             security_service,
-            token_service,
             session_service,
         }
     }
@@ -63,14 +60,14 @@ impl UsersService for BudgettoUsersService {
             .create_user(&email, &name, &hashed_password)
             .await?;
 
-        Ok(created_user.into_dto(None))
+        Ok(created_user.into_dto())
     }
 
     async fn signin_user(
         &self,
         request: SignInUserDto,
         user_agent: Option<String>,
-    ) -> AppResult<(UserDto, String)> {
+    ) -> AppResult<SessionResponse> {
         let email = request.email.unwrap();
         let attempted_password = request.password.unwrap();
 
@@ -97,7 +94,7 @@ impl UsersService for BudgettoUsersService {
             info!("user login successful, generating token");
         }
 
-        let token = self
+        let tokens = self
             .session_service
             .new_session(NewSessionDto {
                 user_id: Some(user.id),
@@ -106,7 +103,7 @@ impl UsersService for BudgettoUsersService {
             .await
             .unwrap();
 
-        Ok((user.into_dto(Some(token.access_token)), token.refresh_token))
+        Ok(tokens)
     }
 
     async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto> {
@@ -117,11 +114,8 @@ impl UsersService for BudgettoUsersService {
             "user found with email {:?}, generating new token",
             user.email
         );
-        let token = self
-            .token_service
-            .new_access_token(user.id, user.email.as_str())?;
 
-        Ok(user.into_dto(Some(token)))
+        Ok(user.into_dto())
     }
 
     async fn updated_user(&self, user_id: Uuid, request: UpdateUserDto) -> AppResult<UserDto> {
@@ -158,12 +152,7 @@ impl UsersService for BudgettoUsersService {
             )
             .await?;
 
-        info!("user {:?} updated, generating a new token", user_id);
-        let token = self
-            .token_service
-            .new_access_token(user_id, updated_email.as_str())?;
-
-        Ok(updated_user.into_dto(Some(token)))
+        Ok(updated_user.into_dto())
     }
 
     async fn get_user_by_email(&self, email: String) -> AppResult<UserDto> {
@@ -174,6 +163,6 @@ impl UsersService for BudgettoUsersService {
             info!("user found with email {:?}", email);
         }
 
-        Ok(user.unwrap().into_dto(None))
+        Ok(user.unwrap().into_dto())
     }
 }

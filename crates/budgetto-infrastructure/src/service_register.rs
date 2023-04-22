@@ -59,7 +59,6 @@ impl ServiceRegister {
         let users = Arc::new(BudgettoUsersService::new(
             users_repository.clone(),
             security_service,
-            token_service.clone(),
             sessions.clone(),
         )) as DynUsersService;
 
