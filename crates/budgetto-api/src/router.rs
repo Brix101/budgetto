@@ -47,28 +47,8 @@ impl ApplicationController {
 
         let allowed_origin = cors_origin
             .split(",")
-            .map(|origin| origin.parse::<HeaderValue>().unwrap())
+            .map(|origin| origin.parse().unwrap())
             .collect::<Vec<HeaderValue>>();
-
-        let cors = CorsLayer::new()
-            .allow_credentials(true)
-            .allow_headers(vec![
-                header::ACCEPT,
-                header::ACCEPT_LANGUAGE,
-                header::AUTHORIZATION,
-                header::CONTENT_LANGUAGE,
-                header::CONTENT_TYPE,
-                header::ORIGIN,
-            ])
-            .allow_methods(vec![
-                Method::GET,
-                Method::POST,
-                Method::PUT,
-                Method::DELETE,
-                Method::OPTIONS,
-            ])
-            .allow_origin(allowed_origin)
-            .max_age(Duration::from_secs(60 * 60));
 
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
@@ -83,7 +63,27 @@ impl ApplicationController {
                     .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
                     .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
             )
-            .layer(cors)
+            .layer(
+                CorsLayer::new()
+                    .allow_credentials(true)
+                    .allow_headers(vec![
+                        header::ACCEPT,
+                        header::ACCEPT_LANGUAGE,
+                        header::AUTHORIZATION,
+                        header::CONTENT_LANGUAGE,
+                        header::CONTENT_TYPE,
+                        header::ORIGIN,
+                    ])
+                    .allow_methods(vec![
+                        Method::GET,
+                        Method::POST,
+                        Method::PUT,
+                        Method::DELETE,
+                        Method::OPTIONS,
+                    ])
+                    .allow_origin(allowed_origin)
+                    .max_age(Duration::from_secs(60 * 60)),
+            )
             .route_layer(middleware::from_fn(Self::track_metrics));
 
         let router = router.fallback(Self::handle_404);

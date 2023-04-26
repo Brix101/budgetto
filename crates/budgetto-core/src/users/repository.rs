@@ -36,7 +36,7 @@ pub trait UsersRepository {
     ) -> anyhow::Result<User>;
 }
 
-#[derive(FromRow, Debug)]
+#[derive(FromRow, Debug, Clone)]
 pub struct User {
     pub id: Uuid,
     pub name: String,
