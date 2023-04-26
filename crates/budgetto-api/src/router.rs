@@ -47,43 +47,43 @@ impl ApplicationController {
 
         let allowed_origin = cors_origin
             .split(",")
-            .map(|origin| origin.parse().unwrap())
+            .map(|origin| origin.trim().parse().unwrap())
             .collect::<Vec<HeaderValue>>();
+
+        let cors_layer = CorsLayer::new()
+            .allow_credentials(true)
+            .allow_headers(vec![
+                header::ACCEPT,
+                header::ACCEPT_LANGUAGE,
+                header::AUTHORIZATION,
+                header::CONTENT_LANGUAGE,
+                header::CONTENT_TYPE,
+                header::ORIGIN,
+            ])
+            .allow_methods(vec![
+                Method::GET,
+                Method::POST,
+                Method::PUT,
+                Method::DELETE,
+                Method::OPTIONS,
+            ])
+            .allow_origin(allowed_origin)
+            .max_age(Duration::from_secs(60 * 60));
+
+        let service_builder = ServiceBuilder::new()
+            .layer(TraceLayer::new_for_http())
+            .layer(HandleErrorLayer::new(Self::handle_timeout_error))
+            .layer(BufferLayer::new(1024))
+            .layer(Extension(service_register))
+            .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
+            .timeout(Duration::from_secs(*HTTP_TIMEOUT));
 
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
             .route("/api/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
-            .layer(
-                ServiceBuilder::new()
-                    .layer(TraceLayer::new_for_http())
-                    .layer(HandleErrorLayer::new(Self::handle_timeout_error))
-                    .layer(BufferLayer::new(1024))
-                    .layer(Extension(service_register))
-                    .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
-                    .timeout(Duration::from_secs(*HTTP_TIMEOUT)),
-            )
-            .layer(
-                CorsLayer::new()
-                    .allow_credentials(true)
-                    .allow_headers(vec![
-                        header::ACCEPT,
-                        header::ACCEPT_LANGUAGE,
-                        header::AUTHORIZATION,
-                        header::CONTENT_LANGUAGE,
-                        header::CONTENT_TYPE,
-                        header::ORIGIN,
-                    ])
-                    .allow_methods(vec![
-                        Method::GET,
-                        Method::POST,
-                        Method::PUT,
-                        Method::DELETE,
-                        Method::OPTIONS,
-                    ])
-                    .allow_origin(allowed_origin)
-                    .max_age(Duration::from_secs(60 * 60)),
-            )
+            .layer(service_builder)
+            .layer(cors_layer)
             .route_layer(middleware::from_fn(Self::track_metrics));
 
         let router = router.fallback(Self::handle_404);
