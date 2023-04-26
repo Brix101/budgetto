@@ -15,8 +15,8 @@ serde = { version = "1.0.160", features = ["derive"] }
 serde_json = "1.0.96"
 validator = { version = "0.16.0", features = ["derive"] }
 tower = { version = "0.4.13", features = ["timeout", "buffer", "limit"] }
-tower-http = { version = "0.4.0", features = ["full", "cors"] }
-axum = { version = "0.6.9", features = ["tower-log"] }
+tower-http = { version = "0.4.0", features = ["trace", "cors"] }
+axum = { version = "0.6.10", features = ["tower-log"] }
 tokio = { version = "1.27.0", features = ["full"] }
 axum-extra = { version = "0.7.3", features = ["cookie"] }
 clap = "4.2.2"
