@@ -80,7 +80,7 @@ impl ApplicationController {
 
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
-            .route("/api/ping", get(Self::ping))
+            .route("/api/v1/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(service_builder)
             .layer(cors_layer)
