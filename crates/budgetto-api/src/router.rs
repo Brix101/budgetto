@@ -47,7 +47,7 @@ impl ApplicationController {
 
         let allowed_origin = cors_origin
             .split(",")
-            .map(|origin| origin.parse::<HeaderValue>().unwrap())
+            .map(|origin| origin.parse().unwrap())
             .collect::<Vec<HeaderValue>>();
 
         let router = Router::new()

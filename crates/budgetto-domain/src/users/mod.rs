@@ -4,7 +4,7 @@ use uuid::Uuid;
 pub mod requests;
 pub mod responses;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct UserDto {
     // #[serde(skip_serializing, skip_deserializing)]
     pub id: Uuid,

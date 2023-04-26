@@ -56,16 +56,18 @@ impl SessionsService for BudgettoSessionsService {
 
                 let access_token = self
                     .token_service
-                    .new_access_token(new_session.id, user_in_session.into_dto())?;
+                    .new_access_token(new_session.id, user_in_session.clone().into_dto())?;
 
                 let refresh_token = self.token_service.new_refresh_token(new_session.id)?;
 
                 Ok(SessionResponse {
+                    user: Some(user_in_session.into_dto()),
                     access_token,
                     refresh_token,
                 })
             }
             None => Ok(SessionResponse {
+                user: None,
                 access_token: String::new(),
                 refresh_token: String::new(),
             }),
