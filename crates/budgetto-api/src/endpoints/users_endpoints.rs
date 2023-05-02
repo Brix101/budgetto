@@ -1,6 +1,8 @@
 use axum::extract::Json;
 use axum::routing::{get, post, put};
 use axum::{Extension, Router};
+use axum_extra::extract::cookie::Cookie;
+use axum_extra::extract::CookieJar;
 use budgetto_domain::sessions::requests::NewAccessTokenRequest;
 use budgetto_domain::sessions::responses::SessionResponse;
 use tracing::info;
@@ -42,10 +44,11 @@ impl UserRouter {
         Ok(Json(UserAuthenicationResponse { user: created_user }))
     }
     pub async fn signin_user_endpoint(
+        jar: CookieJar,
         Extension(services): Extension<ServiceRegister>,
         UserAgentExtractor(user_agent): UserAgentExtractor,
         ValidationExtractor(request): ValidationExtractor<SignInUserDto>,
-    ) -> AppResult<Json<SessionResponse>> {
+    ) -> AppResult<(CookieJar, Json<SessionResponse>)> {
         info!(
             "recieved request to login user {:?}",
             request.email.as_ref().unwrap()
@@ -53,9 +56,15 @@ impl UserRouter {
 
         let tokens = services.users.signin_user(request, user_agent).await?;
 
-        // let cookie = jar.add(Cookie::new("refresh_token", refresh_token.to_string()));
+        let cookie = Cookie::build("x_refresh", tokens.refresh_token.to_owned().to_string())
+            .path("/")
+            .secure(false)
+            .http_only(true)
+            .finish();
 
-        Ok(Json(tokens))
+        let cookie_jar = jar.add(cookie);
+
+        Ok((cookie_jar, Json(tokens)))
     }
 
     pub async fn get_current_user_endpoint(

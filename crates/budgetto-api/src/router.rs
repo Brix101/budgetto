@@ -2,7 +2,7 @@ use std::future::ready;
 use std::net::{Ipv4Addr, SocketAddr};
 use std::time::{Duration, Instant};
 
-use anyhow::Context;
+use anyhow::{Context, Ok};
 use axum::extract::MatchedPath;
 use axum::http::{header, HeaderValue, Method, Request};
 use axum::middleware::{self, Next};

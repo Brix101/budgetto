@@ -85,7 +85,7 @@ impl TokenService for JwtService {
         Ok(token)
     }
 
-    fn get_user_id_from_token(&self, token: String) -> AppResult<Uuid> {
+    fn get_user_from_token(&self, token: String) -> AppResult<UserDto> {
         let decoded_token = decode::<AccessTokenClaims>(
             token.as_str(),
             &DecodingKey::from_secret(self.config.access_token_secret.as_bytes()),
@@ -93,7 +93,7 @@ impl TokenService for JwtService {
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
         println!("{:#?}", decoded_token.claims);
-        Ok(decoded_token.claims.user.id)
+        Ok(decoded_token.claims.user)
     }
 
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid> {

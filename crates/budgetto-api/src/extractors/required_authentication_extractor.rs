@@ -42,20 +42,11 @@ where
             }
 
             let token_value = tokenized_value.into_iter().nth(1).unwrap();
-            let user_id = services
+            let user = services
                 .token_service
-                .get_user_id_from_token(String::from(token_value))
+                .get_user_from_token(String::from(token_value))
                 .map_err(|err| {
                     error!("could not validate user ID from token: {:?}", err);
-                    Error::Unauthorized
-                })?;
-
-            let user = services
-                .users
-                .get_current_user(user_id)
-                .await
-                .map_err(|err| {
-                    error!("invalid user ID from token: {:?}", err);
                     Error::Unauthorized
                 })?;
 
