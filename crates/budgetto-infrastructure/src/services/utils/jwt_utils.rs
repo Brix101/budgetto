@@ -85,9 +85,9 @@ impl TokenService for JwtService {
         Ok(token)
     }
 
-    fn get_user_from_token(&self, token: String) -> AppResult<UserDto> {
+    fn verify_access_token(&self, token: &str) -> AppResult<UserDto> {
         let decoded_token = decode::<AccessTokenClaims>(
-            token.as_str(),
+            token,
             &DecodingKey::from_secret(self.config.access_token_secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         )

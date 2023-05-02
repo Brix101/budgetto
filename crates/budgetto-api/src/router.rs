@@ -99,7 +99,37 @@ impl ApplicationController {
 
         Ok(())
     }
+    // async fn deserialize_user<B>(request: Request<B>, next: Next<B>) -> impl IntoResponse {
+    //     let response = next.run(request).await;
+    //     let (parts, body) = request.into_parts();
 
+    //     println!("{:#?}", parts.headers);
+    //     let header_cookie = parts.headers.get(COOKIE);
+    //     let header_auth = parts.headers.get(AUTHORIZATION);
+
+    //     let auth_result =
+    //         if let (Some(cookie_result), Some(auth_result)) = (header_cookie, header_auth) {
+    //             println!("{:#?}", cookie_result);
+    //             println!("{:#?}", auth_result);
+
+    //             let header_cookie_value = cookie_result.to_str().unwrap();
+    //             let header_auth_value = auth_result.to_str().unwrap();
+
+    //             let cookie_value = Cookie::parse(header_cookie_value).unwrap();
+
+    //             let refresh_token_value = cookie_value.value();
+
+    //             println!("{:#?}", refresh_token_value);
+
+    //             Ok(header_auth_value.replace("Bearer", "Token"))
+    //         } else {
+    //             Ok(String::new())
+    //         };
+    //     println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    //     println!("{:#?}", auth_result.unwrap());
+
+    //     ([("x-custom", "custom")], response)
+    // }
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {
