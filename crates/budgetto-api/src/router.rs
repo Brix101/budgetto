@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Ok};
 use axum::extract::MatchedPath;
 use axum::http::header::{AUTHORIZATION, COOKIE};
-use axum::http::{header, HeaderValue, Method, Request};
+use axum::http::{header, HeaderName, HeaderValue, Method, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -71,7 +71,8 @@ impl ApplicationController {
                 Method::OPTIONS,
             ])
             .allow_origin(allowed_origin)
-            .max_age(Duration::from_secs(60 * 60));
+            .max_age(Duration::from_secs(60 * 60))
+            .expose_headers([HeaderName::from_lowercase(b"x-access-token").unwrap()]);
 
         let service_builder = ServiceBuilder::new()
             .layer(TraceLayer::new_for_http())
@@ -104,6 +105,7 @@ impl ApplicationController {
 
         Ok(())
     }
+
     async fn token_refresher<B>(
         Extension(services): Extension<ServiceRegister>,
         mut request: Request<B>,
@@ -145,16 +147,17 @@ impl ApplicationController {
         if !new_token.is_empty() {
             headers.insert(
                 AUTHORIZATION,
-                format!("Bearer {}", new_token.clone()).parse().unwrap(),
+                HeaderValue::from_str(&format!("Bearer {}", new_token.clone())).unwrap(),
             );
         }
 
         let mut response = next.run(request).await;
 
         if !new_token.is_empty() {
-            response
-                .headers_mut()
-                .insert("x-access-token", new_token.clone().parse().unwrap());
+            response.headers_mut().insert(
+                "x-access-token",
+                HeaderValue::from_str(&new_token.clone()).unwrap(),
+            );
         }
         response
     }

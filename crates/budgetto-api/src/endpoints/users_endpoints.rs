@@ -13,6 +13,7 @@ use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationRespons
 use budgetto_infrastructure::service_register::ServiceRegister;
 
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
+use crate::extractors::session_extractor::SessionExtractor;
 use crate::extractors::user_agent_extractor::UserAgentExtractor;
 use crate::extractors::validation_extractor::ValidationExtractor;
 
@@ -90,11 +91,17 @@ impl UserRouter {
 
     pub async fn re_auth_endpoint(
         Extension(services): Extension<ServiceRegister>,
-        ValidationExtractor(request): ValidationExtractor<NewAccessTokenRequest>,
+        SessionExtractor(_session_id, refresh_token): SessionExtractor,
     ) -> AppResult<Json<ReAuthResponse>> {
         info!("recieved request to refresh access token");
 
-        let new_token = services.sessions.refresh_access_token(request).await?;
+        let token_request = NewAccessTokenRequest {
+            refresh_token: Some(refresh_token),
+        };
+        let new_token = services
+            .sessions
+            .refresh_access_token(token_request)
+            .await?;
 
         Ok(Json(new_token))
     }
