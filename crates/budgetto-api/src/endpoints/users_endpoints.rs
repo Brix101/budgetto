@@ -26,7 +26,7 @@ impl UserRouter {
             .route("/whoami", get(Self::get_current_user_endpoint))
             .route("/", put(Self::update_user_endpoint))
             .route("/reAuth", post(Self::re_auth_endpoint))
-        // .route("/signout", post(Self::signout_user_endpoint))
+            .route("/signout", post(Self::signout_user_endpoint))
     }
 
     pub async fn signup_user_endpoint(
@@ -56,7 +56,7 @@ impl UserRouter {
 
         let tokens = services.users.signin_user(request, user_agent).await?;
 
-        let cookie = Cookie::build("x_refresh", tokens.refresh_token.to_owned().to_string())
+        let cookie = Cookie::build("x-refresh", tokens.refresh_token.to_owned().to_string())
             .path("/")
             .secure(false)
             .http_only(true)
@@ -99,19 +99,15 @@ impl UserRouter {
         Ok(Json(new_token))
     }
 
-    pub async fn signout_user_endpoint(// jar: CookieJar,
-        // SessionResponsextension(services): Extension<ServiceRegister>,
+    pub async fn signout_user_endpoint(
+        jar: CookieJar,
+        // Extension(_services): Extension<ServiceRegister>,
         // SessionExtractor(session_id, _refresh_token): SessionExtractor,
-    ) -> AppResult<SessionResponse> {
+    ) -> AppResult<CookieJar> {
         info!("recieved request to signout session");
-        // TODO! update this function
         // services.sessions.refresh_access_token(session_id).await?;
 
-        // let cookie = jar.remove(Cookie::named("refresh_token"));
-        todo!()
-        // Ok(SessionResponse {
-        //     access_token: String::new(),
-        //     refresh_token: String::new(),
-        // })
+        let cookie_jar = jar.remove(Cookie::named("x-refresh"));
+        Ok(cookie_jar)
     }
 }

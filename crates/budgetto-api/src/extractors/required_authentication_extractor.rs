@@ -25,7 +25,6 @@ where
                 .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         let parts_authorization_header = parts.headers.get(AUTHORIZATION);
-        // let parts_cookie_value = parts.headers.get(COOKIE);
 
         if let Some(authorization_header) = parts_authorization_header {
             let header_value = authorization_header
@@ -44,12 +43,12 @@ where
                 return Err(Error::Unauthorized);
             }
 
-            let access_token = tokenized_value.into_iter().nth(1).unwrap();
+            let token_value = tokenized_value.into_iter().nth(1).unwrap();
             let user = services
                 .token_service
-                .verify_access_token(access_token)
+                .verify_access_token(token_value)
                 .map_err(|err| {
-                    println!("error: {:#?}", err.to_string());
+                    error!("could not validate user ID from token: {:?}", err);
                     Error::Unauthorized
                 })?;
 

@@ -4,12 +4,15 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Ok};
 use axum::extract::MatchedPath;
+use axum::http::header::{AUTHORIZATION, COOKIE};
 use axum::http::{header, HeaderValue, Method, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Extension;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, Router};
+use axum_extra::extract::cookie::Cookie;
+use budgetto_domain::sessions::requests::NewAccessTokenRequest;
 use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
@@ -74,7 +77,7 @@ impl ApplicationController {
             .layer(TraceLayer::new_for_http())
             .layer(HandleErrorLayer::new(Self::handle_timeout_error))
             .layer(BufferLayer::new(1024))
-            .layer(Extension(service_register))
+            .layer(Extension(service_register.clone()))
             .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
             .timeout(Duration::from_secs(*HTTP_TIMEOUT));
 
@@ -84,7 +87,9 @@ impl ApplicationController {
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(service_builder)
             .layer(cors_layer)
-            .route_layer(middleware::from_fn(Self::track_metrics));
+            .route_layer(middleware::from_fn(Self::token_refresher))
+            .route_layer(middleware::from_fn(Self::track_metrics))
+            .layer(Extension(service_register.clone()));
 
         let router = router.fallback(Self::handle_404);
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
@@ -99,37 +104,65 @@ impl ApplicationController {
 
         Ok(())
     }
-    // async fn deserialize_user<B>(request: Request<B>, next: Next<B>) -> impl IntoResponse {
-    //     let response = next.run(request).await;
-    //     let (parts, body) = request.into_parts();
+    async fn token_refresher<B>(
+        Extension(services): Extension<ServiceRegister>,
+        mut request: Request<B>,
+        next: Next<B>,
+    ) -> impl IntoResponse {
+        let headers = request.headers_mut();
+        let header_cookie = headers.get(COOKIE);
+        let header_auth = headers.get(AUTHORIZATION);
+        let auth_result =
+            if let (Some(cookie_result), Some(auth_result)) = (header_cookie, header_auth) {
+                let header_cookie_value = cookie_result.to_str().unwrap();
+                let header_auth_value = auth_result.to_str().unwrap();
 
-    //     println!("{:#?}", parts.headers);
-    //     let header_cookie = parts.headers.get(COOKIE);
-    //     let header_auth = parts.headers.get(AUTHORIZATION);
+                let cookie_value = Cookie::parse(header_cookie_value).unwrap();
 
-    //     let auth_result =
-    //         if let (Some(cookie_result), Some(auth_result)) = (header_cookie, header_auth) {
-    //             println!("{:#?}", cookie_result);
-    //             println!("{:#?}", auth_result);
+                let refresh_token_value = cookie_value.value();
+                let access_token_value = header_auth_value.to_string();
 
-    //             let header_cookie_value = cookie_result.to_str().unwrap();
-    //             let header_auth_value = auth_result.to_str().unwrap();
+                let verify_result = services
+                    .token_service
+                    .verify_access_token(&access_token_value);
 
-    //             let cookie_value = Cookie::parse(header_cookie_value).unwrap();
+                if !verify_result.is_err() {
+                    println!("Old {:#?}", header_auth_value.clone());
+                    Ok(header_auth_value.replace("Bearer ", ""))
+                } else {
+                    let token_request = NewAccessTokenRequest {
+                        refresh_token: Some(refresh_token_value.to_string()),
+                    };
+                    let new_access_token = services
+                        .sessions
+                        .refresh_access_token(token_request)
+                        .await
+                        .unwrap();
+                    println!("New {:#?}", new_access_token);
+                    Ok(new_access_token.access_token)
+                }
+            } else {
+                Ok(String::new())
+            };
+        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        let new_token = auth_result.unwrap();
 
-    //             let refresh_token_value = cookie_value.value();
+        headers.insert("user", "test".parse().unwrap());
+        if !new_token.is_empty() {
+            headers.insert(
+                AUTHORIZATION,
+                format!("Bearer {}", new_token.clone()).parse().unwrap(),
+            );
+        }
+        let mut response = next.run(request).await;
 
-    //             println!("{:#?}", refresh_token_value);
-
-    //             Ok(header_auth_value.replace("Bearer", "Token"))
-    //         } else {
-    //             Ok(String::new())
-    //         };
-    //     println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-    //     println!("{:#?}", auth_result.unwrap());
-
-    //     ([("x-custom", "custom")], response)
-    // }
+        if !new_token.is_empty() {
+            response
+                .headers_mut()
+                .insert("x-access-token", new_token.clone().parse().unwrap());
+        }
+        response
+    }
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {
