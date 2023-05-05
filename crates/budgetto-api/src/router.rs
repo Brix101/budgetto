@@ -88,7 +88,7 @@ impl ApplicationController {
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .layer(service_builder)
             .layer(cors_layer)
-            .route_layer(middleware::from_fn(Self::token_refresher))
+            .route_layer(middleware::from_fn(Self::deserialize_auth_user))
             .route_layer(middleware::from_fn(Self::track_metrics))
             .layer(Extension(service_register.clone()));
 
@@ -106,7 +106,7 @@ impl ApplicationController {
         Ok(())
     }
 
-    async fn token_refresher<B>(
+    async fn deserialize_auth_user<B>(
         Extension(services): Extension<ServiceRegister>,
         mut request: Request<B>,
         next: Next<B>,
@@ -122,19 +122,19 @@ impl ApplicationController {
             let header_auth_value = auth_result.to_str().unwrap();
 
             let cookie_value = Cookie::parse(header_cookie_value).unwrap();
-
             let refresh_token_value = cookie_value.value();
 
             let token_value = header_auth_value.replace("Bearer ", "");
             let verified_user = services.token_service.verify_access_token(&token_value);
 
+            let token_request = NewAccessTokenRequest {
+                refresh_token: Some(refresh_token_value.to_string()),
+            };
+
             if verified_user.is_ok() {
                 request.extensions_mut().insert(verified_user.unwrap());
                 Ok(token_value)
             } else {
-                let token_request = NewAccessTokenRequest {
-                    refresh_token: Some(refresh_token_value.to_string()),
-                };
                 let requested_token = services.sessions.refresh_access_token(token_request).await;
 
                 if requested_token.is_ok() {
