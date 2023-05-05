@@ -8,6 +8,6 @@ pub struct SessionResponse {
     pub user: Option<UserDto>,
     #[serde(rename = "accessToken")]
     pub access_token: String,
-    #[serde(rename = "refreshToken")]
+    #[serde(skip_serializing, skip_deserializing)]
     pub refresh_token: String,
 }
