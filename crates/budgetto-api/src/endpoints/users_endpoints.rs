@@ -55,9 +55,9 @@ impl UserRouter {
             request.email.as_ref().unwrap()
         );
 
-        let tokens = services.users.signin_user(request, user_agent).await?;
+        let user = services.users.signin_user(request, user_agent).await?;
 
-        let cookie = Cookie::build("x-refresh", tokens.refresh_token.to_owned().to_string())
+        let cookie = Cookie::build("x-refresh", user.refresh_token.clone().unwrap())
             .path("/")
             .secure(false)
             .http_only(true)
@@ -65,7 +65,7 @@ impl UserRouter {
 
         let cookie_jar = jar.add(cookie);
 
-        Ok((cookie_jar, Json(tokens)))
+        Ok((cookie_jar, Json(user)))
     }
 
     pub async fn get_current_user_endpoint(
