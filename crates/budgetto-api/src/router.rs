@@ -120,15 +120,12 @@ impl ApplicationController {
                 let cookie_value = Cookie::parse(header_cookie_value).unwrap();
 
                 let refresh_token_value = cookie_value.value();
-                let access_token_value = header_auth_value.to_string();
 
-                let verify_result = services
-                    .token_service
-                    .verify_access_token(&access_token_value);
+                let token_value = header_auth_value.replace("Bearer ", "");
+                let verify_result = services.token_service.verify_access_token(&token_value);
 
-                if !verify_result.is_err() {
-                    println!("Old {:#?}", header_auth_value.clone());
-                    Ok(header_auth_value.replace("Bearer ", ""))
+                if verify_result.is_ok() {
+                    Ok(token_value)
                 } else {
                     let token_request = NewAccessTokenRequest {
                         refresh_token: Some(refresh_token_value.to_string()),
@@ -138,13 +135,11 @@ impl ApplicationController {
                         .refresh_access_token(token_request)
                         .await
                         .unwrap();
-                    println!("New {:#?}", new_access_token);
                     Ok(new_access_token.access_token)
                 }
             } else {
                 Ok(String::new())
             };
-        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         let new_token = auth_result.unwrap();
 
         headers.insert("user", "test".parse().unwrap());
