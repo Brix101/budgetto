@@ -149,15 +149,13 @@ impl ApplicationController {
             Ok(String::new())
         };
 
-        let new_token = auth_result.unwrap();
-
         let mut response = next.run(request).await;
 
+        let new_token = auth_result.unwrap();
         if !new_token.is_empty() {
-            response.headers_mut().insert(
-                "x-access-token",
-                HeaderValue::from_str(&new_token.clone()).unwrap(),
-            );
+            response
+                .headers_mut()
+                .insert("x-access-token", HeaderValue::from_str(&new_token).unwrap());
         }
         response
     }
