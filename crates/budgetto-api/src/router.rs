@@ -114,6 +114,7 @@ impl ApplicationController {
         let headers = request.headers_mut();
         let header_cookie = headers.get(COOKIE);
         let header_auth = headers.get(AUTHORIZATION);
+
         let auth_result =
             if let (Some(cookie_result), Some(auth_result)) = (header_cookie, header_auth) {
                 let header_cookie_value = cookie_result.to_str().unwrap();
@@ -142,6 +143,7 @@ impl ApplicationController {
             } else {
                 Ok(String::new())
             };
+
         let new_token = auth_result.unwrap();
 
         if !new_token.is_empty() {
