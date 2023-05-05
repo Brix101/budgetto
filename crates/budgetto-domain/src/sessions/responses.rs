@@ -7,7 +7,7 @@ pub struct SessionResponse {
     // #[serde(skip_serializing, skip_deserializing)]
     pub user: Option<UserDto>,
     #[serde(rename = "accessToken")]
-    pub access_token: String,
+    pub access_token: Option<String>,
     #[serde(skip_serializing, skip_deserializing)]
-    pub refresh_token: String,
+    pub refresh_token: Option<String>,
 }

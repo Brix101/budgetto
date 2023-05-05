@@ -62,14 +62,14 @@ impl SessionsService for BudgettoSessionsService {
 
                 Ok(SessionResponse {
                     user: Some(user_in_session.into_dto()),
-                    access_token,
-                    refresh_token,
+                    access_token: Some(access_token),
+                    refresh_token: Some(refresh_token),
                 })
             }
             None => Ok(SessionResponse {
                 user: None,
-                access_token: String::new(),
-                refresh_token: String::new(),
+                access_token: None,
+                refresh_token: None,
             }),
         }
     }
