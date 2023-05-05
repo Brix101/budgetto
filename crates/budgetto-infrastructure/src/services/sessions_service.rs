@@ -92,11 +92,15 @@ impl SessionsService for BudgettoSessionsService {
 
         if let Some(user) = user_in_session {
             info!("existing session found, generating access token");
+            let user_dto = user.into_dto();
             let access_token = self
                 .token_service
-                .new_access_token(session_id, user.into_dto())?;
+                .new_access_token(session_id, user_dto.clone())?;
 
-            return Ok(ReAuthResponse { access_token });
+            return Ok(ReAuthResponse {
+                user: user_dto,
+                access_token,
+            });
         }
 
         Err(Error::Unauthorized)

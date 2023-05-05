@@ -69,17 +69,16 @@ impl UserRouter {
     }
 
     pub async fn get_current_user_endpoint(
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to retrieve current user");
 
-        let current_user = services.users.get_current_user(user.id).await?;
-
-        Ok(Json(UserAuthenicationResponse { user: current_user }))
+        Ok(Json(UserAuthenicationResponse { user }))
     }
 
     pub async fn update_user_endpoint(
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
         Json(request): Json<UpdateUserDto>,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user.id);

@@ -1,10 +1,11 @@
 use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
-use axum::Router;
+use axum::{Extension, Router};
 use budgetto_core::errors::AppResult;
 use budgetto_domain::accounts::requests::{CreateAccountDto, QueryAccount, UpdateAccountDto};
 use budgetto_domain::accounts::responses::AccountsResponse;
 use budgetto_domain::accounts::AccountDto;
+use budgetto_infrastructure::service_register::ServiceRegister;
 use tracing::info;
 use uuid::Uuid;
 
@@ -24,7 +25,8 @@ impl AccountController {
 
     pub async fn get_accounts(
         query_params: Query<QueryAccount>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<AccountsResponse>> {
         info!("received request to get current user accounts");
 
@@ -43,7 +45,8 @@ impl AccountController {
     }
 
     pub async fn create_account(
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(request): ValidationExtractor<CreateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("received request to create account");
@@ -55,7 +58,8 @@ impl AccountController {
 
     pub async fn update_account(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
         Json(request): Json<UpdateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to update account {:?}", id);
@@ -70,7 +74,8 @@ impl AccountController {
 
     pub async fn delete_account(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove account {:?}", id);
 

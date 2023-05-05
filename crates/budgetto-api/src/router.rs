@@ -115,43 +115,41 @@ impl ApplicationController {
         let header_cookie = headers.get(COOKIE);
         let header_auth = headers.get(AUTHORIZATION);
 
-        let auth_result =
-            if let (Some(cookie_result), Some(auth_result)) = (header_cookie, header_auth) {
-                let header_cookie_value = cookie_result.to_str().unwrap();
-                let header_auth_value = auth_result.to_str().unwrap();
+        let auth_result = if let (Some(cookie_result), Some(auth_result)) =
+            (header_cookie, header_auth)
+        {
+            let header_cookie_value = cookie_result.to_str().unwrap();
+            let header_auth_value = auth_result.to_str().unwrap();
 
-                let cookie_value = Cookie::parse(header_cookie_value).unwrap();
+            let cookie_value = Cookie::parse(header_cookie_value).unwrap();
 
-                let refresh_token_value = cookie_value.value();
+            let refresh_token_value = cookie_value.value();
 
-                let token_value = header_auth_value.replace("Bearer ", "");
-                let verify_result = services.token_service.verify_access_token(&token_value);
+            let token_value = header_auth_value.replace("Bearer ", "");
+            let verified_user = services.token_service.verify_access_token(&token_value);
 
-                if verify_result.is_ok() {
-                    Ok(token_value)
-                } else {
-                    let token_request = NewAccessTokenRequest {
-                        refresh_token: Some(refresh_token_value.to_string()),
-                    };
-                    let new_access_token = services
-                        .sessions
-                        .refresh_access_token(token_request)
-                        .await
-                        .unwrap();
-                    Ok(new_access_token.access_token)
-                }
+            if verified_user.is_ok() {
+                request.extensions_mut().insert(verified_user.unwrap());
+                Ok(token_value)
             } else {
-                Ok(String::new())
-            };
+                let token_request = NewAccessTokenRequest {
+                    refresh_token: Some(refresh_token_value.to_string()),
+                };
+                let requested_token = services.sessions.refresh_access_token(token_request).await;
+
+                if requested_token.is_ok() {
+                    let token = requested_token.unwrap();
+                    request.extensions_mut().insert(token.user);
+                    Ok(token.access_token)
+                } else {
+                    Ok(String::new())
+                }
+            }
+        } else {
+            Ok(String::new())
+        };
 
         let new_token = auth_result.unwrap();
-
-        if !new_token.is_empty() {
-            headers.insert(
-                AUTHORIZATION,
-                HeaderValue::from_str(&format!("Bearer {}", new_token.clone())).unwrap(),
-            );
-        }
 
         let mut response = next.run(request).await;
 

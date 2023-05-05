@@ -1,6 +1,7 @@
 use axum::extract::{Json, Path, Query};
 use axum::routing::{delete, get, post, put};
-use axum::Router;
+use axum::{Extension, Router};
+use budgetto_infrastructure::service_register::ServiceRegister;
 use tracing::info;
 use uuid::Uuid;
 
@@ -25,7 +26,8 @@ impl CategoryController {
 
     pub async fn get_categories(
         query_params: Query<QueryCategory>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<CategoriesResponse>> {
         info!("received request to get current user categories");
 
@@ -44,7 +46,8 @@ impl CategoryController {
     }
 
     pub async fn create_category(
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(request): ValidationExtractor<CreateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("received request to create category");
@@ -59,7 +62,8 @@ impl CategoryController {
 
     pub async fn update_category(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
         Json(request): Json<UpdateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to update category {:?}", id);
@@ -74,7 +78,8 @@ impl CategoryController {
 
     pub async fn delete_category(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user, services): RequiredAuthentication,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove category {:?}", id);
 
