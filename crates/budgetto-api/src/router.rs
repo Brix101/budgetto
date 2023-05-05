@@ -142,13 +142,13 @@ impl ApplicationController {
             };
         let new_token = auth_result.unwrap();
 
-        headers.insert("user", "test".parse().unwrap());
         if !new_token.is_empty() {
             headers.insert(
                 AUTHORIZATION,
                 format!("Bearer {}", new_token.clone()).parse().unwrap(),
             );
         }
+
         let mut response = next.run(request).await;
 
         if !new_token.is_empty() {
