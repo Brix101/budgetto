@@ -111,7 +111,7 @@ impl ApplicationController {
         mut request: Request<B>,
         next: Next<B>,
     ) -> impl IntoResponse {
-        let headers = request.headers_mut();
+        let headers = request.headers();
         let header_cookie = headers.get(COOKIE);
         let header_auth = headers.get(AUTHORIZATION);
 
@@ -131,15 +131,20 @@ impl ApplicationController {
                 refresh_token: Some(refresh_token_value.to_string()),
             };
 
+            let extensions_mut = request.extensions_mut();
+
+
             if verified_user.is_ok() {
-                request.extensions_mut().insert(verified_user.unwrap());
+                extensions_mut.insert(verified_user.unwrap());
                 Ok(token_value)
             } else {
+                info!("{:#?}",verified_user.err());
+
                 let requested_token = services.sessions.refresh_access_token(token_request).await;
 
                 if requested_token.is_ok() {
                     let token = requested_token.unwrap();
-                    request.extensions_mut().insert(token.user);
+                    extensions_mut.insert(token.user);
                     Ok(token.access_token)
                 } else {
                     Ok(String::new())
