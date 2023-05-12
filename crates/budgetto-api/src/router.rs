@@ -133,12 +133,11 @@ impl ApplicationController {
 
             let extensions_mut = request.extensions_mut();
 
-
             if verified_user.is_ok() {
                 extensions_mut.insert(verified_user.unwrap());
                 Ok(token_value)
             } else {
-                info!("{:#?}",verified_user.err());
+                info!("{:#?}", verified_user.err());
 
                 let requested_token = services.sessions.refresh_access_token(token_request).await;
 
