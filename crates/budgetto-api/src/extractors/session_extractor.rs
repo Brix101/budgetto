@@ -28,7 +28,7 @@ where
         if let Some(authorization_header) = parts.headers.get(COOKIE) {
             let header_cookie_value = authorization_header
                 .to_str()
-                .map_err(|_| Error::Unauthorized)?;
+                .map_err(|_| Error::Forbidden)?;
 
             let cookie_value = Cookie::parse(header_cookie_value).unwrap();
 
@@ -39,7 +39,7 @@ where
                 .get_session_id_from_token(String::from(refresh_token_value))
                 .map_err(|err| {
                     error!("could not validate session ID from token: {:?}", err);
-                    Error::Unauthorized
+                    Error::Forbidden
                 })?;
 
             Ok(SessionExtractor(
@@ -47,7 +47,7 @@ where
                 refresh_token_value.to_string(),
             ))
         } else {
-            Err(Error::Unauthorized)
+            Err(Error::Forbidden)
         }
     }
 }

@@ -115,7 +115,7 @@ impl ApplicationController {
         let headers_cookie = headers.get(COOKIE);
         let headers_auth = headers.get(AUTHORIZATION);
 
-        let auth_result = if let (Some(cookie_result), Some(auth_result)) =
+        let auth_result: Option<String> = if let (Some(cookie_result), Some(auth_result)) =
             (headers_cookie, headers_auth)
         {
             let header_cookie_value = cookie_result.to_str().unwrap();
@@ -132,31 +132,35 @@ impl ApplicationController {
             };
 
             let extensions_mut = request.extensions_mut();
-
             if verified_user.is_ok() {
                 extensions_mut.insert(verified_user.unwrap());
-                Ok(token_value)
-            } else {
-                info!("{:#?}", verified_user.err());
 
+                None
+            } else if verified_user
+                .err()
+                .unwrap()
+                .to_string()
+                .contains("ExpiredSignature")
+            {
                 let requested_token = services.sessions.refresh_access_token(token_request).await;
 
                 if requested_token.is_ok() {
                     let token = requested_token.unwrap();
                     extensions_mut.insert(token.user);
-                    Ok(token.access_token)
+                    Some(token.access_token)
                 } else {
-                    Ok(String::new())
+                    None
                 }
+            } else {
+                None
             }
         } else {
-            Ok(String::new())
+            None
         };
 
         let mut response = next.run(request).await;
 
-        let new_token = auth_result.unwrap();
-        if !new_token.is_empty() {
+        if let Some(new_token) = auth_result {
             response
                 .headers_mut()
                 .insert("x-access-token", HeaderValue::from_str(&new_token).unwrap());
