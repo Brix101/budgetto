@@ -40,7 +40,7 @@ impl JwtService {
 
 impl TokenService for JwtService {
     fn new_access_token(&self, sub: Uuid, user: UserDto) -> AppResult<String> {
-        let from_now = Duration::from_secs(60); //? expires every 15 min
+        let from_now = Duration::from_secs(900); //? expires every 15 min
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
         let now = OffsetDateTime::now_utc();
@@ -63,7 +63,7 @@ impl TokenService for JwtService {
     }
 
     fn new_refresh_token(&self, sub: Uuid) -> AppResult<String> {
-        let exp_time = 60 * 60 * 24 * 7 * 4; // expires in 1 month
+        let exp_time = 3600 * 24 * 7 * 4; // expires in 1 month
         let from_now = Duration::from_secs(exp_time);
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
