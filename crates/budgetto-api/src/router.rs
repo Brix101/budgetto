@@ -112,11 +112,11 @@ impl ApplicationController {
         next: Next<B>,
     ) -> impl IntoResponse {
         let headers = request.headers();
-        let header_cookie = headers.get(COOKIE);
-        let header_auth = headers.get(AUTHORIZATION);
+        let headers_cookie = headers.get(COOKIE);
+        let headers_auth = headers.get(AUTHORIZATION);
 
         let auth_result = if let (Some(cookie_result), Some(auth_result)) =
-            (header_cookie, header_auth)
+            (headers_cookie, headers_auth)
         {
             let header_cookie_value = cookie_result.to_str().unwrap();
             let header_auth_value = auth_result.to_str().unwrap();
