@@ -51,6 +51,7 @@ impl Category {
             id: self.id,
             name: self.name,
             note: self.note,
+            user_id: self.user_id,
         }
     }
 }
