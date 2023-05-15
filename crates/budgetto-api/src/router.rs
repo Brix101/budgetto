@@ -115,24 +115,14 @@ impl ApplicationController {
         let headers_cookie = headers.get(COOKIE);
         let headers_auth = headers.get(AUTHORIZATION);
 
-        let auth_result: Option<String> = if let (Some(cookie_result), Some(auth_result)) =
-            (headers_cookie, headers_auth)
-        {
-            let header_cookie_value = cookie_result.to_str().unwrap();
+        let auth_result: Option<String> = if let Some(auth_result) = headers_auth {
             let header_auth_value = auth_result.to_str().unwrap();
-
-            let cookie_value = Cookie::parse(header_cookie_value).unwrap();
-            let refresh_token_value = cookie_value.value();
 
             let token_value = header_auth_value.replace("Bearer ", "");
             let verified_user = services.token_service.verify_access_token(&token_value);
 
-            let token_request = NewAccessTokenRequest {
-                refresh_token: Some(refresh_token_value.to_string()),
-            };
-
-            let extensions_mut = request.extensions_mut();
             if verified_user.is_ok() {
+                let extensions_mut = request.extensions_mut();
                 extensions_mut.insert(verified_user.unwrap());
 
                 None
@@ -142,12 +132,25 @@ impl ApplicationController {
                 .to_string()
                 .contains("ExpiredSignature")
             {
-                let requested_token = services.sessions.refresh_access_token(token_request).await;
+                if let Some(cookie_result) = headers_cookie {
+                    let header_cookie_value = cookie_result.to_str().unwrap();
+                    let cookie_value = Cookie::parse(header_cookie_value).unwrap();
+                    let refresh_token_value = cookie_value.value();
 
-                if requested_token.is_ok() {
-                    let token = requested_token.unwrap();
-                    extensions_mut.insert(token.user);
-                    Some(token.access_token)
+                    let token_request = NewAccessTokenRequest {
+                        refresh_token: Some(refresh_token_value.to_string()),
+                    };
+                    let requested_token =
+                        services.sessions.refresh_access_token(token_request).await;
+
+                    let extensions_mut = request.extensions_mut();
+                    if requested_token.is_ok() {
+                        let token = requested_token.unwrap();
+                        extensions_mut.insert(token.user);
+                        Some(token.access_token)
+                    } else {
+                        None
+                    }
                 } else {
                     None
                 }
