@@ -51,7 +51,7 @@ impl Category {
             id: self.id,
             name: self.name,
             note: self.note,
-            user_id: self.user_id,
+            is_default: self.user_id.is_none(),
         }
     }
 }
