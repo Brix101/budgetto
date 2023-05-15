@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-// use anyhow::Context;
 use clap::Parser;
 use dotenvy::dotenv;
 use tracing::info;
