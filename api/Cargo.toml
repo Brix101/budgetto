@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "app-bin",
-    "app-core",
     # our runnable applications
     # "crates/budgetto-bin",
     # our dependent library crates
