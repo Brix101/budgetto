@@ -1,31 +1,9 @@
 import Link from "next/link";
-import { cookies, headers } from "next/headers";
+import { signInAction } from "./action";
 
 export default function Page() {
   const loading = false;
 
-  async function testClick() {
-    "use server";
-
-    const res = await fetch("http://190.160.15.197:5000/api/v1/users/signin", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: JSON.stringify({
-        email: "testuser1@gmail.com",
-        password: "password",
-      }),
-    });
-
-    res.headers.forEach((header, i) => {
-      console.log(i, header);
-    });
-
-    const body = await res.json();
-    console.log(body);
-  }
   return (
     <>
       <section className="dark:bg-gray-900 bg-slate-200">
@@ -50,7 +28,7 @@ export default function Page() {
               {/*     {error} */}
               {/*   </div> */}
               {/* ) : null} */}
-              <form action={testClick} className="space-y-4 md:space-y-6">
+              <form action={signInAction} className="space-y-4 md:space-y-6">
                 <div>
                   <label
                     htmlFor="email"
@@ -61,6 +39,7 @@ export default function Page() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     className="block p-2.5 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 sm:text-sm dark:placeholder-gray-400 dark:text-white dark:bg-gray-700 dark:border-gray-600 focus:border-blue-600 focus:ring-blue-600 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                     placeholder="name@company.com"
                     required
@@ -76,6 +55,7 @@ export default function Page() {
                   <input
                     type="password"
                     id="password"
+                    name="password"
                     placeholder="••••••••"
                     className="block p-2.5 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 sm:text-sm dark:placeholder-gray-400 dark:text-white dark:bg-gray-700 dark:border-gray-600 focus:border-blue-600 focus:ring-blue-600 dark:focus:border-blue-500 dark:focus:ring-blue-500"
                     required

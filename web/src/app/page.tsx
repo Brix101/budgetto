@@ -1,8 +1,9 @@
+import { baseApi } from "@/constant/server";
 import Image from "next/image";
 import Link from "next/link";
 
 async function getData() {
-  const res = await fetch("http://190.160.15.197:5000/api/v1/ping");
+  const res = await fetch(`${baseApi}/ping`);
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 
