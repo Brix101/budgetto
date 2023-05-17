@@ -4,7 +4,7 @@ import { baseApi } from "@/constant/server";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-export async function signInAction(formData) {
+export async function signInAction(formData: FormData) {
   const cookieStore = cookies();
 
   const email = formData.get("email");
@@ -48,13 +48,18 @@ export async function signInAction(formData) {
     }
 
     cookieStore.set({
-      name: "session",
+      name: "x-refresh",
       ...jsonObject,
     });
   }
 
   const body = await res.json();
-  console.log(body);
+  cookieStore.set({
+    name: "authorization",
+    value: body.accessToken,
+    httpOnly: true,
+    path: "/",
+  });
 
   if (res.ok) {
     redirect("/dashboard");
