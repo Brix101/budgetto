@@ -17,6 +17,8 @@ pub trait TransactionsRepository {
         name: String,
         balance: f64,
         note: Option<String>,
+        category_id: Uuid,
+        account_id: Uuid,
         user_id: Uuid,
     ) -> anyhow::Result<Transaction>;
 
@@ -56,6 +58,10 @@ pub struct Transaction {
     pub amount: f64,
     pub note: Option<String>,
     pub transaction_type: TransactionType,
+    pub category_id: Uuid,
+    pub account_id: Uuid,
+    pub user_id: Uuid,
     pub created_at: OffsetDateTime,
     pub updated_at: OffsetDateTime,
+    pub deleted_at: Option<OffsetDateTime>,
 }
