@@ -12,8 +12,6 @@ use budgetto_domain::transactions::{
 
 use crate::errors::AppResult;
 
-use super::repository::TransactionType;
-
 pub type DynTransactionsService = Arc<dyn TransactionsService + Send + Sync>;
 
 #[automock]
@@ -22,7 +20,6 @@ pub trait TransactionsService {
     async fn create_transaction(
         &self,
         user_id: Uuid,
-        transaction_type: TransactionType,
         request: CreateTransactionDto,
     ) -> AppResult<TransactionDto>;
 
@@ -34,7 +31,6 @@ pub trait TransactionsService {
         &self,
         id: Uuid,
         user_id: Uuid,
-        transaction_type: Option<TransactionType>,
         request: UpdateTransactionDto,
     ) -> AppResult<TransactionDto>;
 

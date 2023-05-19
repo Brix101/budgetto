@@ -31,7 +31,7 @@ impl CategoryController {
     ) -> AppResult<Json<CategoriesResponse>> {
         info!("received request to get current user categories");
 
-        if let Some(id) = query_params.category_id {
+        if let Some(id) = query_params.id {
             // return this function if the query params has value
             let category = services.categories.get_category_by_id(id, user.id).await?;
 

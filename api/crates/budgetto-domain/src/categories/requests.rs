@@ -17,5 +17,5 @@ pub struct UpdateCategoryDto {
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 pub struct QueryCategory {
-    pub category_id: Option<Uuid>,
+    pub id: Option<Uuid>,
 }

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use budgetto_domain::transactions::TransactionDto;
+use budgetto_domain::transactions::{TransactionDto, TransactionType};
 use mockall::automock;
 use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
@@ -43,22 +43,6 @@ pub struct UpdateTransaction {
     pub transaction_type: TransactionType,
     pub category_id: Uuid,
     pub account_id: Uuid,
-}
-
-#[warn(unused_imports)]
-#[derive(sqlx::Type, Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[sqlx(type_name = "transaction_type")]
-pub enum TransactionType {
-    Expense,
-    Income,
-    Transfer,
-    Refund,
-}
-
-impl Default for TransactionType {
-    fn default() -> Self {
-        Self::Expense
-    }
 }
 
 #[derive(FromRow, Debug)]

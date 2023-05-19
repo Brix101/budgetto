@@ -30,7 +30,7 @@ impl AccountController {
     ) -> AppResult<Json<AccountsResponse>> {
         info!("received request to get current user accounts");
 
-        if let Some(id) = query_params.account_id {
+        if let Some(id) = query_params.id {
             // return this function if the query params has value
             let account = services.accounts.get_account_by_id(id, user.id).await?;
 

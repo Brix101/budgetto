@@ -6,12 +6,12 @@ use budgetto_core::{
     errors::{AppResult, Error},
     transactions::{
         repository::{
-            CreateTransaction, DynTransactionsRepository, Transaction, TransactionType,
-            UpdateTransaction,
+            CreateTransaction, DynTransactionsRepository, Transaction, UpdateTransaction,
         },
         service::TransactionsService,
     },
 };
+use budgetto_domain::transactions::TransactionType;
 use budgetto_domain::transactions::{
     requests::{CreateTransactionDto, UpdateTransactionDto},
     responses::TransactionsResponse,
@@ -52,11 +52,11 @@ impl TransactionsService for BudgettoTransactionsService {
     async fn create_transaction(
         &self,
         user_id: Uuid,
-        transaction_type: TransactionType,
         request: CreateTransactionDto,
     ) -> AppResult<TransactionDto> {
         let amount = request.amount.unwrap();
         let note = request.note;
+        let transaction_type = request.transaction_type.unwrap();
         let category_id = request.category_id.unwrap();
         let account_id = request.account_id.unwrap();
 
@@ -104,7 +104,6 @@ impl TransactionsService for BudgettoTransactionsService {
         &self,
         id: Uuid,
         user_id: Uuid,
-        transaction_type: Option<TransactionType>,
         request: UpdateTransactionDto,
     ) -> AppResult<TransactionDto> {
         let transaction_to_update = self.repository.get_transaction_by_id(id).await?;
@@ -123,8 +122,9 @@ impl TransactionsService for BudgettoTransactionsService {
             let updated_account_id = request
                 .account_id
                 .unwrap_or(existing_transaction.account_id);
-            let updated_transaction_type =
-                transaction_type.unwrap_or(existing_transaction.transaction_type);
+            let updated_transaction_type = request
+                .transaction_type
+                .unwrap_or(existing_transaction.transaction_type);
 
             info!("updating transaction {:?} for user {:?}", id, user_id);
             let updated_transaction = self

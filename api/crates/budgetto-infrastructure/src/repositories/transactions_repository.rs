@@ -3,10 +3,11 @@ use async_trait::async_trait;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
+use budgetto_core::transactions::repository::UpdateTransaction;
 use budgetto_core::transactions::repository::{
     CreateTransaction, Transaction, TransactionsRepository,
 };
-use budgetto_core::transactions::repository::{TransactionType, UpdateTransaction};
+use budgetto_domain::transactions::TransactionType;
 
 use crate::connection_pool::ConnectionPool;
 

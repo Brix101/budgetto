@@ -20,5 +20,5 @@ pub struct UpdateAccountDto {
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 pub struct QueryAccount {
-    pub account_id: Option<Uuid>,
+    pub id: Option<Uuid>,
 }
