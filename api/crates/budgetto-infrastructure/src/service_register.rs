@@ -7,6 +7,7 @@ use budgetto_core::{
     categories::{repository::DynCategoriesRepository, service::DynCategoriesService},
     config::AppConfig,
     sessions::{repository::DynSessionsRepository, service::DynSessionsService},
+    transactions::{repository::DynTransactionsRepository, service::DynTransactionsService},
     users::{repository::DynUsersRepository, service::DynUsersService},
     utils::{security_service::DynSecurityService, token_service::DynTokenService},
 };
@@ -16,12 +17,15 @@ use crate::{
     repositories::{
         accounts_repository::PostgresAccountsRepository,
         categories_repository::PostgresCategoriesRepository,
-        sessions_repository::PostgresSessionsRepository, users_repository::PostgresUsersRepository,
+        sessions_repository::PostgresSessionsRepository,
+        transactions_repository::PostgresTransactionsRepository,
+        users_repository::PostgresUsersRepository,
     },
     services::{
         accounts_service::BudgettoAccountsService,
         categories_service::BudgettoCategoriesService,
         sessions_service::BudgettoSessionsService,
+        transactions_service::BudgettoTransactionsService,
         users_service::BudgettoUsersService,
         utils::{argon_security_service::ArgonSecurityService, jwt_utils::JwtService},
     },
@@ -34,6 +38,7 @@ pub struct ServiceRegister {
     pub sessions: DynSessionsService,
     pub categories: DynCategoriesService,
     pub accounts: DynAccountsService,
+    pub transactions: DynTransactionsService,
 }
 
 /// A simple service container responsible for managing the various services our API endpoints will pull from through axum extensions.
@@ -74,6 +79,12 @@ impl ServiceRegister {
         let accounts =
             Arc::new(BudgettoAccountsService::new(accounts_repository)) as DynAccountsService;
 
+        let transactions_repository = Arc::new(PostgresTransactionsRepository::new(pool.clone()))
+            as DynTransactionsRepository;
+
+        let transactions = Arc::new(BudgettoTransactionsService::new(transactions_repository))
+            as DynTransactionsService;
+
         info!("feature services successfully initialized!");
         ServiceRegister {
             token_service,
@@ -81,6 +92,7 @@ impl ServiceRegister {
             sessions,
             categories,
             accounts,
+            transactions,
         }
     }
 }

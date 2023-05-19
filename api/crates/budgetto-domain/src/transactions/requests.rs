@@ -1,22 +1,22 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, Validate)]
 pub struct CreateTransactionDto {
-    pub amount: f64,
+    #[validate(required)]
+    pub amount: Option<f64>,
     pub note: Option<String>,
-    // pub transaction_type: TransactionType,
-    pub category_id: Uuid,
-    pub account_id: Uuid,
-    pub user_id: Uuid,
+    #[validate(required)]
+    pub category_id: Option<Uuid>,
+    #[validate(required)]
+    pub account_id: Option<Uuid>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct UpdateTransactionDto {
-    pub id: Uuid,
-    pub amount: f64,
+    pub amount: Option<f64>,
     pub note: Option<String>,
-    // pub transaction_type: TransactionType,
-    pub category_id: Uuid,
-    pub account_id: Uuid,
+    pub category_id: Option<Uuid>,
+    pub account_id: Option<Uuid>,
 }
