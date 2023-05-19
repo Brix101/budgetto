@@ -11,7 +11,6 @@ use budgetto_core::{
         service::TransactionsService,
     },
 };
-use budgetto_domain::transactions::TransactionType;
 use budgetto_domain::transactions::{
     requests::{CreateTransactionDto, UpdateTransactionDto},
     responses::TransactionsResponse,
