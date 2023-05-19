@@ -65,6 +65,7 @@ impl Transaction {
             id: self.id,
             amount: self.amount,
             note: self.note,
+            transaction_type: self.transaction_type,
             created_at: self.created_at.format(&Rfc3339).unwrap(),
             updated_at: self.updated_at.format(&Rfc3339).unwrap(),
         }

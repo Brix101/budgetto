@@ -5,14 +5,15 @@ pub mod requests;
 pub mod responses;
 
 #[derive(Serialize, Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct AccountDto {
     #[serde(skip_serializing, skip_deserializing)]
     pub id: Uuid,
     pub name: String,
     pub balance: f64,
     pub note: Option<String>,
-    #[serde(rename = "createdAt")]
+    // #[serde(rename = "createdAt")]
     pub created_at: String,
-    #[serde(rename = "updatedAt")]
+    // #[serde(rename = "updatedAt")]
     pub updated_at: String,
 }
