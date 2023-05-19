@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 export async function signInAction(formData: FormData) {
-  const cookieStore = cookies();
+  const _cookieStore = cookies();
 
   const email = formData.get("email");
   const password = formData.get("password");
@@ -47,19 +47,19 @@ export async function signInAction(formData: FormData) {
       }
     }
 
-    cookieStore.set({
-      name: "x-refresh",
-      ...jsonObject,
-    });
+    // cookieStore.set({
+    //   name: "x-refresh",
+    //   ...jsonObject,
+    // });
   }
 
   const body = await res.json();
-  cookieStore.set({
-    name: "authorization",
-    value: body.accessToken,
-    httpOnly: true,
-    path: "/",
-  });
+  // cookieStore.set({
+  //   name: "authorization",
+  //   value: body.accessToken,
+  //   httpOnly: true,
+  //   path: "/",
+  // });
 
   if (res.ok) {
     redirect("/dashboard");
