@@ -8,8 +8,7 @@ pub mod responses;
 pub struct TransactionDto {
     #[serde(skip_serializing, skip_deserializing)]
     pub id: Uuid,
-    pub name: String,
-    pub balance: f64,
+    pub amount: f64,
     pub note: Option<String>,
     #[serde(rename = "createdAt")]
     pub created_at: String,

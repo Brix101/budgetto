@@ -130,6 +130,109 @@
     },
     "query": "\n        select *\n        from users\n        where id = $1\n            "
   },
+  "314c9c7c5c07034fd51fa7022ef702665d820f5dfeea180c395efaf8af1228b9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "transaction_type: TransactionType",
+          "ordinal": 3,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          }
+        },
+        {
+          "name": "account_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Text",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          },
+          "Uuid",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update transactions\n        set\n            amount = $1,\n            note = $2,\n            transaction_type = $3,\n            account_id = $4,\n            category_id = $5,\n            updated_at = current_timestamp\n        where id = $6\n        RETURNING id, amount, note, transaction_type as \"transaction_type: TransactionType\", account_id, category_id, user_id, created_at, updated_at, deleted_at\n            "
+  },
   "3a6b59ec5172e666285b00f2fcf4ecc7d4ca8ddd2805f30c5afa5723c2753512": {
     "describe": {
       "columns": [
@@ -238,6 +341,92 @@
     },
     "query": "\n        insert into sessions (user_id,user_agent,exp)\n        values ($1,$2,$3)\n        returning *\n            "
   },
+  "5f5612dbc5d58f5fcb76517fe7616e80fa1d268cc0636d13465a2b68061c6f98": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "transaction_type: TransactionType",
+          "ordinal": 3,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          }
+        },
+        {
+          "name": "account_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT id, amount, note, transaction_type as \"transaction_type: TransactionType\", account_id, category_id, user_id, created_at, updated_at, deleted_at\n        FROM \"transactions\"\n        WHERE \"user_id\" IS NULL OR \"user_id\" = $1 AND \"deleted_at\" IS NULL\n        ORDER BY created_at ASC\n            "
+  },
   "5fed5333897fb5cb66915ee62d7400032b2b7cee72346baef36248e585779138": {
     "describe": {
       "columns": [
@@ -311,6 +500,109 @@
     },
     "query": "\n        update users\n        set\n            name = $1::varchar,\n            email = $2::varchar,\n            password = $3::varchar,\n            bio = $4::varchar,\n            image = $5::varchar,\n            updated_at = current_timestamp\n        where id = $6\n        returning *\n            "
   },
+  "60263d410610bb155543ee014103cba04a727b2b45b6a25fcb0aa7394b4f9a7d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "transaction_type: TransactionType",
+          "ordinal": 3,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          }
+        },
+        {
+          "name": "account_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Text",
+          {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          },
+          "Uuid",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO \"transactions\" (\"amount\", \"note\", \"transaction_type\", \"account_id\", \"category_id\", \"user_id\", \"created_at\", \"updated_at\", \"deleted_at\")\n        VALUES ($1, $2, $3, $4, $5, $6, current_timestamp, current_timestamp, NULL)\n        RETURNING id, amount, note, transaction_type as \"transaction_type: TransactionType\", account_id, category_id, user_id, created_at, updated_at, deleted_at\n            "
+  },
   "66027461db778b12099b5d67425a603c0aabc903d34d9385ed1c4c77b9a000c9": {
     "describe": {
       "columns": [
@@ -381,6 +673,18 @@
     },
     "query": "\n        insert into users (created_at, updated_at, name, email, password, image)\n        values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '')\n        returning *\n            "
   },
+  "6853a7b2d298a770fa0b5d41b07e45f42f0371b35717ac3fb12c5d1d1c335f7e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update transactions\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
+  },
   "6ab4b2a7a2cd4272cf8411d42f254e1de5c0cb7cde7f2904aa94faa0d18e82d5": {
     "describe": {
       "columns": [
@@ -436,6 +740,92 @@
       }
     },
     "query": "\n        SELECT * \n        FROM \"categories\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
+  },
+  "70348de44e7d12b0e00fd6f127e9be1fa072be8a1f8563e2f1aef35bb5adf540": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "note",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "transaction_type: TransactionType",
+          "ordinal": 3,
+          "type_info": {
+            "Custom": {
+              "kind": {
+                "Enum": [
+                  "Expense",
+                  "Income",
+                  "Transfer",
+                  "Refund"
+                ]
+              },
+              "name": "transaction_type"
+            }
+          }
+        },
+        {
+          "name": "account_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 8,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 9,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT id, amount, note, transaction_type as \"transaction_type: TransactionType\", account_id, category_id, user_id, created_at, updated_at, deleted_at\n        FROM \"transactions\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
   },
   "92c28068c7226809a740ba4f55405e916eeac79448ce5f5032851296d075fdcf": {
     "describe": {
