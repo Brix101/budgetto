@@ -11,11 +11,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex w-full h-screen">
+    <section className="flex overflow-hidden w-full h-screen">
       <DashboardSideBar />
       <div className="flex-1">
         <header>Dashboard</header>
-        <main>{children}</main>
+        <main className="overflow-y-scroll h-full">{children}</main>
       </div>
     </section>
   );

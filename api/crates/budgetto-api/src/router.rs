@@ -115,6 +115,9 @@ impl ApplicationController {
         let headers_cookie = headers.get(COOKIE);
         let headers_auth = headers.get(AUTHORIZATION);
 
+        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        println!("{:#?}", headers);
+        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         let auth_result: Option<String> = if let Some(auth_result) = headers_auth {
             let header_auth_value = auth_result.to_str().unwrap();
 

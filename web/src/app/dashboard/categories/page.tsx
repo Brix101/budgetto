@@ -5,6 +5,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function getData() {
   const session = await getServerSession(authOptions);
+
+  console.log({ session });
   const res = await fetch(`${baseApi}/categories`, {
     credentials: "include",
     headers: {
@@ -13,10 +15,7 @@ async function getData() {
     },
   });
   // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
-
-  // const xAccessToken = res.headers.get("x-access-token");
-  // console.log({ xAccessToken });
+  // You can return Date, Map, Set,
   // Recommendation: handle errors
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary

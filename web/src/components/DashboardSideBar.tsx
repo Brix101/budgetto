@@ -30,7 +30,13 @@ export function DashboardSideBar() {
           <Link href="/dashboard/accounts">Accounts</Link>
         </li>
         <li>
+          <Link href="/dashboard/budgets">Budgets</Link>
+        </li>
+        <li>
           <Link href="/dashboard/categories">Categories</Link>
+        </li>
+        <li>
+          <Link href="/dashboard/transactions">Transactions</Link>
         </li>
       </ul>
     </div>
