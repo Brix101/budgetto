@@ -1,22 +1,22 @@
 import { baseApi } from "@/constant/server";
 import { categoriesSchema } from "@/schema/categories.schema";
-import { cookies } from "next/headers";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 async function getData() {
-  const cookieStore = cookies();
+  const session = await getServerSession(authOptions);
   const res = await fetch(`${baseApi}/categories`, {
     credentials: "include",
     headers: {
-      Authorization: `Bearer ${cookieStore.get("authorization")?.value}`,
-      cookie: `x-refresh=${cookieStore.get("x-refresh")?.value}`,
+      Authorization: `Bearer ${session?.user.accessToken}`,
+      cookie: `x-refresh=${session?.user.refreshToken}`,
     },
   });
   // The return value is *not* serialized
   // You can return Date, Map, Set, etc.
 
-  const xAccessToken = res.headers.get("x-access-token");
-
-  console.log({ xAccessToken });
+  // const xAccessToken = res.headers.get("x-access-token");
+  // console.log({ xAccessToken });
   // Recommendation: handle errors
   if (!res.ok) {
     // This will activate the closest `error.js` Error Boundary
