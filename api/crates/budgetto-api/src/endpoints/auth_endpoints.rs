@@ -1,5 +1,5 @@
 use axum::extract::Json;
-use axum::routing::{get, post, put};
+use axum::routing::{get, post};
 use axum::{Extension, Router};
 use axum_extra::extract::cookie::Cookie;
 use axum_extra::extract::CookieJar;
@@ -7,7 +7,7 @@ use budgetto_domain::sessions::responses::SessionResponse;
 use tracing::info;
 
 use budgetto_core::errors::AppResult;
-use budgetto_domain::users::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
+use budgetto_domain::users::requests::SignInUserDto;
 use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationResponse};
 use budgetto_infrastructure::service_register::ServiceRegister;
 
@@ -21,28 +21,12 @@ pub struct AuthRouter;
 impl AuthRouter {
     pub fn app() -> Router {
         Router::new()
-            .route("/signup", post(Self::signup_user_endpoint))
-            .route("/signin", post(Self::signin_user_endpoint))
+            .route("/sign-in", post(Self::signin_user_endpoint))
             .route("/whoami", get(Self::get_current_user_endpoint))
-            .route("/", put(Self::update_user_endpoint))
-            .route("/reAuth", post(Self::re_auth_endpoint))
-            .route("/signout", post(Self::signout_user_endpoint))
+            .route("/re-auth", post(Self::re_auth_endpoint))
+            .route("/sign-out", post(Self::signout_user_endpoint))
     }
 
-    pub async fn signup_user_endpoint(
-        Extension(services): Extension<ServiceRegister>,
-        ValidationExtractor(request): ValidationExtractor<SignUpUserDto>,
-    ) -> AppResult<Json<UserAuthenicationResponse>> {
-        info!(
-            "recieved request to create user {:?}/{:?}",
-            request.email.as_ref().unwrap(),
-            request.name.as_ref().unwrap()
-        );
-
-        let created_user = services.users.signup_user(request).await?;
-
-        Ok(Json(UserAuthenicationResponse { user: created_user }))
-    }
     pub async fn signin_user_endpoint(
         jar: CookieJar,
         Extension(services): Extension<ServiceRegister>,
@@ -73,18 +57,6 @@ impl AuthRouter {
         info!("recieved request to retrieve current user");
 
         Ok(Json(UserAuthenicationResponse { user }))
-    }
-
-    pub async fn update_user_endpoint(
-        RequiredAuthentication(user): RequiredAuthentication,
-        Extension(services): Extension<ServiceRegister>,
-        Json(request): Json<UpdateUserDto>,
-    ) -> AppResult<Json<UserAuthenicationResponse>> {
-        info!("recieved request to update user {:?}", user.id);
-
-        let updated_user = services.users.updated_user(user.id, request).await?;
-
-        Ok(Json(UserAuthenicationResponse { user: updated_user }))
     }
 
     pub async fn re_auth_endpoint(
