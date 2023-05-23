@@ -22,6 +22,7 @@ impl TransactionController {
         Router::new()
             .route("/", get(Self::get_transactions))
             .route("/", post(Self::create_transaction))
+            .route("/:id", get(Self::get_transaction))
             .route("/:id", put(Self::update_transaction))
             .route("/:id", delete(Self::delete_transaction))
     }
@@ -48,6 +49,20 @@ impl TransactionController {
         let transactions = services.transactions.get_transactions(user.id).await?;
 
         Ok(Json(transactions))
+    }
+    pub async fn get_transaction(
+        Path(id): Path<Uuid>,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
+    ) -> AppResult<Json<TransactionDto>> {
+        info!("recieved request to update transaction {:?}", id);
+
+        let transaction = services
+            .transactions
+            .get_transaction_by_id(id, user.id)
+            .await?;
+
+        Ok(Json(transaction))
     }
 
     pub async fn create_transaction(
