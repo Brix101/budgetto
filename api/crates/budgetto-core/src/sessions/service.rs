@@ -4,10 +4,7 @@ use async_trait::async_trait;
 use mockall::automock;
 
 use budgetto_domain::{
-    sessions::{
-        requests::{NewAccessTokenRequest, NewSessionDto},
-        responses::SessionResponse,
-    },
+    sessions::{requests::NewSessionDto, responses::SessionResponse},
     users::responses::ReAuthResponse,
 };
 
@@ -20,8 +17,5 @@ pub type DynSessionsService = Arc<dyn SessionsService + Send + Sync>;
 pub trait SessionsService {
     async fn new_session(&self, request: NewSessionDto) -> AppResult<SessionResponse>;
 
-    async fn refresh_access_token(
-        &self,
-        request: NewAccessTokenRequest,
-    ) -> AppResult<ReAuthResponse>;
+    async fn refresh_access_token(&self, refresh_token: &str) -> AppResult<ReAuthResponse>;
 }

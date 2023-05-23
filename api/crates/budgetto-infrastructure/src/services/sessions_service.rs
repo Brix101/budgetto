@@ -9,7 +9,7 @@ use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::sessions::repository::DynSessionsRepository;
 use budgetto_core::sessions::service::SessionsService;
 use budgetto_core::utils::token_service::DynTokenService;
-use budgetto_domain::sessions::requests::{NewAccessTokenRequest, NewSessionDto};
+use budgetto_domain::sessions::requests::NewSessionDto;
 
 #[derive(Clone)]
 pub struct BudgettoSessionsService {
@@ -74,15 +74,10 @@ impl SessionsService for BudgettoSessionsService {
         }
     }
 
-    async fn refresh_access_token(
-        &self,
-        request: NewAccessTokenRequest,
-    ) -> AppResult<ReAuthResponse> {
-        let refresh_token = request.refresh_token.unwrap();
-
+    async fn refresh_access_token(&self, refresh_token: &str) -> AppResult<ReAuthResponse> {
         let session_id = self
             .token_service
-            .get_session_id_from_token(refresh_token)
+            .get_session_id_from_token(refresh_token.to_string())
             .map_err(|err| {
                 info!("could not validate session ID from token: {:?}", err);
                 Error::Unauthorized
@@ -98,8 +93,8 @@ impl SessionsService for BudgettoSessionsService {
                 .new_access_token(session_id, user_dto.clone())?;
 
             return Ok(ReAuthResponse {
-                user: Some(user_dto),
-                access_token: Some(access_token),
+                user: user_dto,
+                access_token,
             });
         }
 

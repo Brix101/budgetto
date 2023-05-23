@@ -31,18 +31,9 @@ impl UserAuthenicationResponse {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Default, Debug, Clone)]
 pub struct ReAuthResponse {
-    pub user: Option<UserDto>,
+    pub user: UserDto,
     #[serde(rename = "accessToken")]
-    pub access_token: Option<String>,
-}
-
-impl Default for ReAuthResponse {
-    fn default() -> Self {
-        Self {
-            user: None,
-            access_token: None,
-        }
-    }
+    pub access_token: String,
 }

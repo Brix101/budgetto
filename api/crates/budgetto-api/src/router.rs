@@ -76,9 +76,9 @@ impl ApplicationController {
             .layer(TraceLayer::new_for_http())
             .layer(HandleErrorLayer::new(Self::handle_timeout_error))
             .layer(BufferLayer::new(1024))
-            .layer(Extension(service_register.clone()))
             .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
             .layer(AuthenticationLayer::from(service_register.clone()))
+            .layer(Extension(service_register.clone()))
             .timeout(Duration::from_secs(*HTTP_TIMEOUT));
 
         let router = Router::new()

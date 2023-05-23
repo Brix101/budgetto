@@ -3,7 +3,6 @@ use axum::routing::{get, post, put};
 use axum::{Extension, Router};
 use axum_extra::extract::cookie::Cookie;
 use axum_extra::extract::CookieJar;
-use budgetto_domain::sessions::requests::NewAccessTokenRequest;
 use budgetto_domain::sessions::responses::SessionResponse;
 use tracing::info;
 
@@ -94,12 +93,9 @@ impl UserRouter {
     ) -> AppResult<Json<ReAuthResponse>> {
         info!("recieved request to refresh access token");
 
-        let token_request = NewAccessTokenRequest {
-            refresh_token: Some(refresh_token),
-        };
         let new_token = services
             .sessions
-            .refresh_access_token(token_request)
+            .refresh_access_token(&refresh_token)
             .await?;
 
         Ok(Json(new_token))
