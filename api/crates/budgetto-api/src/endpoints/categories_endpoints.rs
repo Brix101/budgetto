@@ -20,6 +20,7 @@ impl CategoryController {
         Router::new()
             .route("/", get(Self::get_categories))
             .route("/", post(Self::create_category))
+            .route("/:id", get(Self::get_category))
             .route("/:id", put(Self::update_category))
             .route("/:id", delete(Self::delete_category))
     }
@@ -45,6 +46,17 @@ impl CategoryController {
         Ok(Json(categories))
     }
 
+    pub async fn get_category(
+        Path(id): Path<Uuid>,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
+    ) -> AppResult<Json<CategoryDto>> {
+        info!("recieved request to get category {:?}", id);
+
+        let category = services.categories.get_category_by_id(id, user.id).await?;
+
+        Ok(Json(category))
+    }
     pub async fn create_category(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
