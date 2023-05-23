@@ -98,8 +98,8 @@ impl SessionsService for BudgettoSessionsService {
                 .new_access_token(session_id, user_dto.clone())?;
 
             return Ok(ReAuthResponse {
-                user: user_dto,
-                access_token,
+                user: Some(user_dto),
+                access_token: Some(access_token),
             });
         }
 

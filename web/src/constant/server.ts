@@ -4,4 +4,5 @@ export const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
-export const baseApi = "http://190.160.15.197:5000/api/v1";
+// export const baseApi = "http://190.160.15.197:5000/api/v1";
+export const baseApi = "http://localhost:5000/api/v1";

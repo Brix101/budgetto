@@ -6,26 +6,26 @@ import { env } from "process";
 export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        return { user };
-      }
-
-      const res = await fetch(`${baseApi}/users/whoami`, {
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-          cookie: `x-refresh=${token.refreshToken}`,
-        },
-      });
-      let accessToken = token.accessToken;
-      const xAccessToken = res.headers.get("x-access-token");
-
-      if (xAccessToken) {
-        accessToken = xAccessToken;
-      }
-
-      const body = await res.json();
-      return { ...token, ...body.user, accessToken };
+      // if (user) {
+      //   return { user };
+      // }
+      //
+      // const res = await fetch(`${baseApi}/users/whoami`, {
+      //   credentials: "include",
+      //   headers: {
+      //     Authorization: `Bearer ${token.accessToken}`,
+      //     cookie: `x-refresh=${token.refreshToken}`,
+      //   },
+      // });
+      // let accessToken = token.accessToken;
+      // const xAccessToken = res.headers.get("x-access-token");
+      //
+      // if (xAccessToken) {
+      //   accessToken = xAccessToken;
+      // }
+      //
+      // const body = await res.json();
+      return { ...token, ...user };
     },
     session: ({ session, token }) => ({
       ...session,

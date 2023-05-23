@@ -4,15 +4,12 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Ok};
 use axum::extract::MatchedPath;
-use axum::http::header::{AUTHORIZATION, COOKIE};
 use axum::http::{header, HeaderName, HeaderValue, Method, Request};
 use axum::middleware::{self, Next};
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Extension;
 use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError, Json, Router};
-use axum_extra::extract::cookie::Cookie;
-use budgetto_domain::sessions::requests::NewAccessTokenRequest;
 use lazy_static::lazy_static;
 use metrics_exporter_prometheus::{Matcher, PrometheusBuilder};
 use serde_json::json;
@@ -24,6 +21,7 @@ use budgetto_domain::PingResponse;
 use budgetto_infrastructure::service_register::ServiceRegister;
 
 use crate::endpoints;
+use crate::middleware::auth::{token_refresher, AuthenticationLayer};
 
 lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
@@ -80,17 +78,17 @@ impl ApplicationController {
             .layer(BufferLayer::new(1024))
             .layer(Extension(service_register.clone()))
             .layer(RateLimitLayer::new(5, Duration::from_secs(1)))
+            .layer(AuthenticationLayer::from(service_register.clone()))
             .timeout(Duration::from_secs(*HTTP_TIMEOUT));
 
         let router = Router::new()
             .nest("/api/v1", endpoints::app())
             .route("/api/v1/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
-            .layer(service_builder)
-            .layer(cors_layer)
-            .route_layer(middleware::from_fn(Self::deserialize_auth_user))
+            .route_layer(middleware::from_fn(token_refresher))
             .route_layer(middleware::from_fn(Self::track_metrics))
-            .layer(Extension(service_register.clone()));
+            .layer(service_builder)
+            .layer(cors_layer);
 
         let router = router.fallback(Self::handle_404);
         let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, port));
@@ -106,73 +104,6 @@ impl ApplicationController {
         Ok(())
     }
 
-    async fn deserialize_auth_user<B>(
-        Extension(services): Extension<ServiceRegister>,
-        mut request: Request<B>,
-        next: Next<B>,
-    ) -> impl IntoResponse {
-        let headers = request.headers();
-        let headers_cookie = headers.get(COOKIE);
-        let headers_auth = headers.get(AUTHORIZATION);
-
-        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        println!("{:#?}", headers);
-        println!("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        let auth_result: Option<String> = if let Some(auth_result) = headers_auth {
-            let header_auth_value = auth_result.to_str().unwrap();
-
-            let token_value = header_auth_value.replace("Bearer ", "");
-            let verified_user = services.token_service.verify_access_token(&token_value);
-
-            if verified_user.is_ok() {
-                let extensions_mut = request.extensions_mut();
-                extensions_mut.insert(verified_user.unwrap());
-
-                None
-            } else if verified_user
-                .err()
-                .unwrap()
-                .to_string()
-                .contains("ExpiredSignature")
-            {
-                if let Some(cookie_result) = headers_cookie {
-                    let header_cookie_value = cookie_result.to_str().unwrap();
-                    let cookie_value = Cookie::parse(header_cookie_value).unwrap();
-                    let refresh_token_value = cookie_value.value();
-
-                    let token_request = NewAccessTokenRequest {
-                        refresh_token: Some(refresh_token_value.to_string()),
-                    };
-                    let requested_token =
-                        services.sessions.refresh_access_token(token_request).await;
-
-                    let extensions_mut = request.extensions_mut();
-                    if requested_token.is_ok() {
-                        let token = requested_token.unwrap();
-                        extensions_mut.insert(token.user);
-                        Some(token.access_token)
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        };
-
-        let mut response = next.run(request).await;
-
-        if let Some(new_token) = auth_result {
-            response
-                .headers_mut()
-                .insert("x-access-token", HeaderValue::from_str(&new_token).unwrap());
-        }
-        response
-    }
     /// Adds a custom handler for tower's `TimeoutLayer`, see https://docs.rs/axum/latest/axum/middleware/index.html#commonly-used-middleware.
     async fn handle_timeout_error(err: BoxError) -> (StatusCode, Json<serde_json::Value>) {
         if err.is::<tower::timeout::error::Elapsed>() {
