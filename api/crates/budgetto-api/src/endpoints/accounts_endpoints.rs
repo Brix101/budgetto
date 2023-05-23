@@ -19,6 +19,7 @@ impl AccountController {
         Router::new()
             .route("/", get(Self::get_accounts))
             .route("/", post(Self::create_account))
+            .route("/:id", get(Self::get_account))
             .route("/:id", put(Self::update_account))
             .route("/:id", delete(Self::delete_account))
     }
@@ -43,7 +44,17 @@ impl AccountController {
 
         Ok(Json(accounts))
     }
+    pub async fn get_account(
+        Path(id): Path<Uuid>,
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
+    ) -> AppResult<Json<AccountDto>> {
+        info!("recieved request to get account {:?}", id);
 
+        let account = services.accounts.get_account_by_id(id, user.id).await?;
+
+        Ok(Json(account))
+    }
     pub async fn create_account(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
