@@ -1,14 +1,16 @@
 use axum::routing::*;
 
 use self::{
-    accounts_endpoints::AccountController, categories_endpoints::CategoryController,
-    transactions_endpoints::TransactionController, users_endpoints::UserRouter,
+    account_endpoints::AccountController, auth_endpoints::AuthRouter,
+    category_endpoints::CategoryController, transaction_endpoints::TransactionController,
+    user_endpoints::UserRouter,
 };
 
-pub mod accounts_endpoints;
-pub mod categories_endpoints;
-pub mod transactions_endpoints;
-pub mod users_endpoints;
+pub mod account_endpoints;
+pub mod auth_endpoints;
+pub mod category_endpoints;
+pub mod transaction_endpoints;
+pub mod user_endpoints;
 
 pub fn app() -> Router {
     Router::new()
@@ -16,4 +18,5 @@ pub fn app() -> Router {
         .nest("/categories", CategoryController::app())
         .nest("/accounts", AccountController::app())
         .nest("/transactions", TransactionController::app())
+        .nest("/auth", AuthRouter::app())
 }
