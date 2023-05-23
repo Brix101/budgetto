@@ -61,7 +61,7 @@ impl AuthRouter {
 
     pub async fn re_auth_endpoint(
         Extension(services): Extension<ServiceRegister>,
-        SessionExtractor(_session_id, refresh_token): SessionExtractor,
+        SessionExtractor(_, refresh_token): SessionExtractor,
     ) -> AppResult<Json<ReAuthResponse>> {
         info!("recieved request to refresh access token");
 
@@ -75,13 +75,18 @@ impl AuthRouter {
 
     pub async fn signout_user_endpoint(
         jar: CookieJar,
-        // Extension(_services): Extension<ServiceRegister>,
-        // SessionExtractor(session_id, _refresh_token): SessionExtractor,
-    ) -> AppResult<CookieJar> {
+        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
+        SessionExtractor(session_id, _): SessionExtractor,
+    ) -> AppResult<(CookieJar, Json<SessionResponse>)> {
         info!("recieved request to signout session");
-        // services.sessions.refresh_access_token(session_id).await?;
+        services
+            .sessions
+            .delete_session(session_id, user.id)
+            .await?;
 
         let cookie_jar = jar.remove(Cookie::named("x-refresh"));
-        Ok(cookie_jar)
+
+        Ok((cookie_jar, Json(SessionResponse::default())))
     }
 }

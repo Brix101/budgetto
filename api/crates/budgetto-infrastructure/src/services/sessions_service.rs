@@ -4,6 +4,7 @@ use budgetto_domain::users::responses::ReAuthResponse;
 use sqlx::types::time::OffsetDateTime;
 use std::time::{Duration, SystemTime};
 use tracing::info;
+use uuid::Uuid;
 
 use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::sessions::repository::DynSessionsRepository;
@@ -96,6 +97,24 @@ impl SessionsService for BudgettoSessionsService {
                 user: user_dto,
                 access_token,
             });
+        }
+
+        Err(Error::Unauthorized)
+    }
+
+    async fn delete_session(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
+        let user_session = self.repository.get_user_by_session_id(id).await?;
+
+        if let Some(user) = user_session {
+            // verify the user IDs match on the request and the session
+            if user.id != user_id {
+                return Err(Error::Forbidden);
+            }
+
+            info!("deleting session {:?} for user {:?}", id, user_id);
+            self.repository.delete_session(id).await?;
+
+            return Ok(());
         }
 
         Err(Error::Unauthorized)

@@ -2,8 +2,8 @@ use anyhow::Context;
 use async_trait::async_trait;
 use budgetto_core::sessions::repository::{Session, SessionsRepository};
 use budgetto_core::users::repository::User;
-use sqlx::query_as;
 use sqlx::types::time::OffsetDateTime;
+use sqlx::{query, query_as};
 use uuid::Uuid;
 
 use crate::connection_pool::ConnectionPool;
@@ -57,5 +57,20 @@ impl SessionsRepository for PostgresSessionsRepository {
         .fetch_optional(&self.pool)
         .await
         .context("user was not found")
+    }
+
+    async fn delete_session(&self, id: Uuid) -> anyhow::Result<()> {
+        query!(
+            r#"
+        DELETE FROM "sessions"
+        WHERE (("id" = $1));
+            "#,
+            id
+        )
+        .execute(&self.pool)
+        .await
+        .context("an unexpected error occurred deleting category")?;
+
+        Ok(())
     }
 }

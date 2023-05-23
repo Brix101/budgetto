@@ -1203,6 +1203,18 @@
     },
     "query": "\n        SELECT *\n        FROM \"categories\"\n        WHERE \"user_id\" IS NULL OR \"user_id\" = $1 AND \"deleted_at\" IS NULL\n        ORDER BY name ASC\n            "
   },
+  "e38d7f26d64c428642c01c9756bc7a4a270c065847fe8fb450062bd93b89be8b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        DELETE FROM \"sessions\"\n        WHERE ((\"id\" = $1));\n            "
+  },
   "e742c1a6b6b055b46344fd5ddfa4a1e9755d61d2f9cd5c78d399a1afd962ce43": {
     "describe": {
       "columns": [

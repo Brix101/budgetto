@@ -20,6 +20,8 @@ pub trait SessionsRepository {
     ) -> anyhow::Result<Session>;
 
     async fn get_user_by_session_id(&self, id: Uuid) -> anyhow::Result<Option<User>>;
+
+    async fn delete_session(&self, id: Uuid) -> anyhow::Result<()>;
 }
 
 #[derive(FromRow, Debug)]
