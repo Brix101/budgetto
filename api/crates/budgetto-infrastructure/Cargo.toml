@@ -1,6 +1,5 @@
 [package]
 name = "budgetto-infrastructure"
-author = { workspace = true }
 version = { workspace = true }
 edition = { workspace = true }
 

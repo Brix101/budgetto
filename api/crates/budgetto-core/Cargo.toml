@@ -1,6 +1,5 @@
 [package]
 name = "budgetto-core"
-author = { workspace = true }
 version = { workspace = true }
 edition = { workspace = true }
 
