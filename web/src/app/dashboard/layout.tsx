@@ -1,3 +1,4 @@
+import { DashboardHeader } from "@/components/DashboardHeader";
 import { DashboardSideBar } from "@/components/DashboardSideBar";
 
 export const metadata = {
@@ -14,7 +15,7 @@ export default function DashboardLayout({
     <section className="flex overflow-hidden w-full h-screen">
       <DashboardSideBar />
       <div className="flex-1">
-        <header>Dashboard</header>
+        <DashboardHeader />
         <main className="overflow-y-scroll h-full">{children}</main>
       </div>
     </section>

@@ -9,23 +9,26 @@ export const authOptions: NextAuthOptions = {
       // if (user) {
       //   return { user };
       // }
-      //
-      // const res = await fetch(`${baseApi}/users/whoami`, {
-      //   credentials: "include",
-      //   headers: {
-      //     Authorization: `Bearer ${token.accessToken}`,
-      //     cookie: `x-refresh=${token.refreshToken}`,
-      //   },
-      // });
-      // let accessToken = token.accessToken;
-      // const xAccessToken = res.headers.get("x-access-token");
-      //
-      // if (xAccessToken) {
-      //   accessToken = xAccessToken;
-      // }
-      //
-      // const body = await res.json();
-      return { ...token, ...user };
+
+      console.log({ token });
+
+      const res = await fetch(`${baseApi}/auth/re-auth`, {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
+          cookie: `x-refresh=${token.refreshToken}`,
+        },
+      });
+      let accessToken = token.accessToken;
+      const xAccessToken = res.headers.get("x-access-token");
+
+      if (xAccessToken) {
+        accessToken = xAccessToken;
+      }
+
+      const body = await res.json();
+
+      console.log({ whoami: body, accessToken, xAccessToken });
+      return { ...token, ...user, accessToken, ...body.user };
     },
     session: ({ session, token }) => ({
       ...session,
@@ -52,7 +55,7 @@ export const authOptions: NextAuthOptions = {
           if (!email || !password) {
             throw new Error("Missing username or password");
           }
-          const res = await fetch(`${baseApi}/users/signin`, {
+          const res = await fetch(`${baseApi}/auth/sign-in`, {
             headers: {
               Accept: "application/json",
               "Content-Type": "application/json",
@@ -63,6 +66,7 @@ export const authOptions: NextAuthOptions = {
               password,
             }),
           });
+
           const xRefresh = res.headers.get("set-cookie");
           // Create an empty JSON object
           const jsonObject: { [key: string]: string | boolean } = {};
@@ -93,6 +97,13 @@ export const authOptions: NextAuthOptions = {
 
           if (res.ok) {
             const body = await res.json();
+            console.log(
+              "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            );
+            console.log({ body });
+            console.log(
+              "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+            );
             return {
               ...body.user,
               accessToken: body.accessToken,
@@ -106,6 +117,13 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  events: {
+    async signOut() {
+      console.log(
+        "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+      );
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
