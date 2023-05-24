@@ -88,7 +88,7 @@ where
 
                 match user {
                     Ok(user) => AuthenticationDto::into_auth(user),
-                    Err(err) => err,
+                    Err(mapped_err) => mapped_err,
                 }
             }
             None => AuthenticationDto::default(),
@@ -104,7 +104,7 @@ pub async fn token_refresher<B>(mut req: Request<B>, next: Next<B>) -> impl Into
     let extensions_mut = req.extensions_mut();
 
     let auth_extension = extensions_mut.get::<AuthenticationDto>().clone();
-    let services_extension = extensions_mut.get::<ServiceRegister>().unwrap().clone();
+    let services = extensions_mut.get::<ServiceRegister>().unwrap().clone();
 
     let x_access_token: Option<String> = match auth_extension {
         Some(auth) => {
@@ -116,10 +116,8 @@ pub async fn token_refresher<B>(mut req: Request<B>, next: Next<B>) -> impl Into
                         let cookie_value = Cookie::parse(cookie_result).unwrap();
                         let token_value = cookie_value.value();
 
-                        let requested_token = services_extension
-                            .sessions
-                            .refresh_access_token(token_value)
-                            .await;
+                        let requested_token =
+                            services.sessions.refresh_access_token(token_value).await;
 
                         match requested_token {
                             Ok(res) => {
