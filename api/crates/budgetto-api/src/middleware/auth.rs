@@ -66,7 +66,7 @@ where
             .get(AUTHORIZATION)
             .and_then(|header| header.to_str().ok());
 
-        let re_auth: AuthenticationDto = match authorization_header.as_deref() {
+        let auth: AuthenticationDto = match authorization_header.as_deref() {
             Some(auth_header) => {
                 let tokenized_value: Vec<_> = auth_header.split(' ').collect();
 
@@ -88,13 +88,13 @@ where
 
                 match user {
                     Ok(user) => AuthenticationDto::into_auth(user),
-                    Err(_) => AuthenticationDto::default(),
+                    Err(err) => err,
                 }
             }
             None => AuthenticationDto::default(),
         };
 
-        req.extensions_mut().insert(re_auth);
+        req.extensions_mut().insert(auth);
         self.inner.call(req)
     }
 }
