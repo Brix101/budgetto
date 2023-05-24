@@ -71,9 +71,9 @@ where
             Some(auth_header) => {
                 let tokenized_value: Vec<_> = auth_header.split(' ').collect();
 
-                if tokenized_value.len() != 2 || tokenized_value.get(1).is_none() {
-                    AuthClaims::default();
-                }
+                // if tokenized_value.len() != 2 || tokenized_value.get(1).is_none() {
+                //     AuthClaims::default();
+                // }
 
                 let token_value = tokenized_value.into_iter().nth(1).unwrap();
                 let user = services
