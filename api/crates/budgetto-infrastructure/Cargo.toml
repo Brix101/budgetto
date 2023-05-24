@@ -1,23 +1,30 @@
 [package]
 name = "budgetto-infrastructure"
-version = "0.1.0"
-edition = "2021"
+author = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-budgetto-core = { path = "../budgetto-core" }
-budgetto-domain = { path = "../budgetto-domain" }
+budgetto-core = { workspace = true }
+budgetto-domain = { workspace = true }
 
-anyhow = "1.0.70"
+anyhow = { workspace = true }
 async-trait = "0.1.68"
 jsonwebtoken = "8.3.0"
 lazy_static = "1.4.0"
 mockall = "0.11.4"
 rust-argon2 = "1.0.0"
 serde = { version = "1.0.160", features = ["derive"] }
-sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "postgres", "uuid", "time", "offline"] }
+sqlx = { version = "0.6.3", features = [
+  "runtime-tokio-rustls",
+  "postgres",
+  "uuid",
+  "time",
+  "offline",
+] }
 time = "0.3.20"
-tokio = { version = "1.27.0", features = ["full"] }
-tracing = "0.1.37"
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
 uuid = { version = "1.3.1", features = ["serde", "v4"] }
