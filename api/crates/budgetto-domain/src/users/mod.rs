@@ -15,12 +15,12 @@ pub struct UserDto {
 }
 
 #[derive(Debug, Clone)]
-pub struct AuthenticationDto {
+pub struct AuthClaims {
     pub user: Option<UserDto>,
     pub is_expired: bool,
 }
 
-impl AuthenticationDto {
+impl AuthClaims {
     pub fn into_auth(user: UserDto) -> Self {
         Self {
             user: Some(user),
@@ -36,7 +36,7 @@ impl AuthenticationDto {
     }
 }
 
-impl Default for AuthenticationDto {
+impl Default for AuthClaims {
     fn default() -> Self {
         Self {
             user: None,

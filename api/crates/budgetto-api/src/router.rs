@@ -21,7 +21,7 @@ use budgetto_domain::PingResponse;
 use budgetto_infrastructure::service_register::ServiceRegister;
 
 use crate::endpoints;
-use crate::middleware::auth::{token_refresher, AuthenticationLayer};
+use crate::middleware::auth::{AuthenticationLayer, TokenMiddleware};
 
 lazy_static! {
     static ref HTTP_TIMEOUT: u64 = 30;
@@ -85,7 +85,7 @@ impl ApplicationController {
             .nest("/api/v1", endpoints::app())
             .route("/api/v1/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
-            .route_layer(middleware::from_fn(token_refresher))
+            .route_layer(middleware::from_fn(TokenMiddleware::token_refresher))
             .route_layer(middleware::from_fn(Self::track_metrics))
             .layer(service_builder)
             .layer(cors_layer);

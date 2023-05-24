@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum::Extension;
-use budgetto_domain::users::{AuthenticationDto, UserDto};
+use budgetto_domain::users::{AuthClaims, UserDto};
 
 use budgetto_core::errors::Error;
 
@@ -16,7 +16,7 @@ where
 {
     type Rejection = Error;
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Extension(authentication): Extension<AuthenticationDto> =
+        let Extension(authentication): Extension<AuthClaims> =
             Extension::from_request_parts(parts, state)
                 .await
                 .map_err(|_err| Error::Unauthorized)?;

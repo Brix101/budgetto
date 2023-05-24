@@ -9,9 +9,10 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::extract::cookie::Cookie;
-use budgetto_domain::users::AuthenticationDto;
-use budgetto_infrastructure::service_register::ServiceRegister;
 use tower::{Layer, Service};
+
+use budgetto_domain::users::AuthClaims;
+use budgetto_infrastructure::service_register::ServiceRegister;
 
 #[derive(Clone)]
 pub struct AuthenticationLayer {
@@ -66,12 +67,12 @@ where
             .get(AUTHORIZATION)
             .and_then(|header| header.to_str().ok());
 
-        let auth: AuthenticationDto = match authorization_header.as_deref() {
+        let auth: AuthClaims = match authorization_header.as_deref() {
             Some(auth_header) => {
                 let tokenized_value: Vec<_> = auth_header.split(' ').collect();
 
                 if tokenized_value.len() != 2 || tokenized_value.get(1).is_none() {
-                    AuthenticationDto::default();
+                    AuthClaims::default();
                 }
 
                 let token_value = tokenized_value.into_iter().nth(1).unwrap();
@@ -80,18 +81,18 @@ where
                     .verify_access_token(token_value)
                     .map_err(|err| {
                         if err.to_string().contains("ExpiredSignature") {
-                            AuthenticationDto::expired()
+                            AuthClaims::expired()
                         } else {
-                            AuthenticationDto::default()
+                            AuthClaims::default()
                         }
                     });
 
                 match user {
-                    Ok(user) => AuthenticationDto::into_auth(user),
+                    Ok(user) => AuthClaims::into_auth(user),
                     Err(mapped_err) => mapped_err,
                 }
             }
-            None => AuthenticationDto::default(),
+            None => AuthClaims::default(),
         };
 
         req.extensions_mut().insert(auth);
@@ -99,51 +100,56 @@ where
     }
 }
 
-pub async fn token_refresher<B>(mut req: Request<B>, next: Next<B>) -> impl IntoResponse {
-    let headers = req.headers().clone();
-    let extensions_mut = req.extensions_mut();
+#[derive(Clone)]
+pub struct TokenMiddleware {}
 
-    let auth_extension = extensions_mut.get::<AuthenticationDto>().clone();
-    let services = extensions_mut.get::<ServiceRegister>().unwrap().clone();
+impl TokenMiddleware {
+    pub async fn token_refresher<B>(mut req: Request<B>, next: Next<B>) -> impl IntoResponse {
+        let headers = req.headers().clone();
+        let extensions_mut = req.extensions_mut();
 
-    let x_access_token: Option<String> = match auth_extension {
-        Some(auth) => {
-            if auth.is_expired {
-                let cookie_header = headers.get(COOKIE).and_then(|header| header.to_str().ok());
+        let auth_extension = extensions_mut.get::<AuthClaims>().clone();
+        let services = extensions_mut.get::<ServiceRegister>().unwrap().clone();
 
-                match cookie_header {
-                    Some(cookie_result) => {
-                        let cookie_value = Cookie::parse(cookie_result).unwrap();
-                        let token_value = cookie_value.value();
+        let x_access_token: Option<String> = match auth_extension {
+            Some(auth) => {
+                if auth.is_expired {
+                    let cookie_header = headers.get(COOKIE).and_then(|header| header.to_str().ok());
 
-                        let requested_token =
-                            services.sessions.refresh_access_token(token_value).await;
+                    match cookie_header {
+                        Some(cookie_result) => {
+                            let cookie_value = Cookie::parse(cookie_result).unwrap();
+                            let token_value = cookie_value.value();
 
-                        match requested_token {
-                            Ok(res) => {
-                                extensions_mut.insert(AuthenticationDto::into_auth(res.user));
+                            let requested_token =
+                                services.sessions.refresh_access_token(token_value).await;
 
-                                Some(res.access_token)
+                            match requested_token {
+                                Ok(res) => {
+                                    extensions_mut.insert(AuthClaims::into_auth(res.user));
+
+                                    Some(res.access_token)
+                                }
+                                Err(_) => None,
                             }
-                            Err(_) => None,
                         }
+                        None => None,
                     }
-                    None => None,
+                } else {
+                    None
                 }
-            } else {
-                None
             }
+            None => None,
+        };
+
+        let mut response = next.run(req).await;
+
+        if x_access_token.is_some() {
+            response.headers_mut().insert(
+                "x-access-token",
+                HeaderValue::from_str(&x_access_token.unwrap()).unwrap(),
+            );
         }
-        None => None,
-    };
-
-    let mut response = next.run(req).await;
-
-    if x_access_token.is_some() {
-        response.headers_mut().insert(
-            "x-access-token",
-            HeaderValue::from_str(&x_access_token.unwrap()).unwrap(),
-        );
+        response
     }
-    response
 }
