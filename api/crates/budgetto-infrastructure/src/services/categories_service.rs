@@ -40,13 +40,10 @@ impl BudgettoCategoriesService {
 
 #[async_trait]
 impl CategoriesService for BudgettoCategoriesService {
-    async fn create(
-        &self,
-        user_id: Option<Uuid>,
-        request: CreateCategoryDto,
-    ) -> AppResult<CategoryDto> {
+    async fn create(&self, request: CreateCategoryDto) -> AppResult<CategoryDto> {
         let name = request.name.unwrap();
         let note = request.note;
+        let user_id = request.user_id;
 
         let created_category = self
             .repository
@@ -70,13 +67,15 @@ impl CategoriesService for BudgettoCategoriesService {
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
             if let Some(category_user_id) = existing_category.user_id {
-                if category_user_id != user_id {
+                if category_user_id == user_id {
+                    info!("retrieving category {:?} for user {:?}", id, user_id);
+                    return Ok(existing_category.into_dto());
+                } else {
                     return Err(Error::Forbidden);
                 }
             }
 
-            info!("retrieving category {:?} for user {:?}", id, user_id);
-            return Ok(existing_category.into_dto());
+            return Err(Error::Forbidden);
         }
 
         Err(Error::NotFound(String::from("category was not found")))
@@ -89,36 +88,38 @@ impl CategoriesService for BudgettoCategoriesService {
         self.map_to_categories(categories).await
     }
 
-    async fn updated(
-        &self,
-        id: Uuid,
-        user_id: Uuid,
-        request: UpdateCategoryDto,
-    ) -> AppResult<CategoryDto> {
+    async fn updated(&self, request: UpdateCategoryDto) -> AppResult<CategoryDto> {
+        let id = request.id.unwrap();
+        let user_id = request.user_id.unwrap();
         let category_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_category) = category_to_update {
             // verify the user IDs match on the request and the category
             if let Some(category_user_id) = existing_category.user_id {
-                if category_user_id != user_id {
+                if category_user_id == user_id {
+                    let updated_name = request.name.unwrap_or(existing_category.name);
+                    let update_note = match request.note {
+                        Some(note) => note,
+                        None => existing_category.note.unwrap_or(String::new()),
+                    };
+
+                    info!("updating category {:?} for user {:?}", id, user_id);
+                    let updated_category = self
+                        .repository
+                        .update(UpdateCategory {
+                            id,
+                            name: updated_name,
+                            note: Some(update_note),
+                        })
+                        .await?;
+
+                    return Ok(updated_category.into_dto());
+                } else {
                     return Err(Error::Forbidden);
                 }
             }
 
-            let updated_name = request.name.unwrap_or(existing_category.name);
-            let update_note = request.note.unwrap_or(existing_category.note.unwrap());
-
-            info!("updating category {:?} for user {:?}", id, user_id);
-            let updated_category = self
-                .repository
-                .update(UpdateCategory {
-                    id,
-                    name: updated_name,
-                    note: Some(update_note),
-                })
-                .await?;
-
-            return Ok(updated_category.into_dto());
+            return Err(Error::Forbidden);
         }
 
         Err(Error::NotFound(String::from("category was not found")))
@@ -130,15 +131,17 @@ impl CategoriesService for BudgettoCategoriesService {
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
             if let Some(category_user_id) = existing_category.user_id {
-                if category_user_id != user_id {
+                if category_user_id == user_id {
+                    info!("deleting category {:?} for user {:?}", id, user_id);
+                    self.repository.delete(existing_category.id).await?;
+
+                    return Ok(());
+                } else {
                     return Err(Error::Forbidden);
                 }
             }
 
-            info!("deleting category {:?} for user {:?}", id, user_id);
-            self.repository.delete(existing_category.id).await?;
-
-            return Ok(());
+            return Err(Error::Forbidden);
         }
 
         Err(Error::NotFound(String::from("category was not found")))

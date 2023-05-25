@@ -71,92 +71,90 @@ impl SeedService {
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Housing")),
                     note: Some(String::from("This category can include mortgage or rent payments, property taxes, homeowners or renters insurance, repairs and maintenance, and utilities.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Transportation")),
                     note: Some(String::from("This category can include car payments, gas, car insurance, maintenance and repairs, and public transportation expenses.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
-            .create(
-                None,
-                CreateCategoryDto {
-                    name: Some(String::from("Food")),
-                    note: Some(String::from(
-                        "This category can include groceries, dining out, and snacks.",
-                    )),
-                },
-            )
+            .create(CreateCategoryDto {
+                name: Some(String::from("Food")),
+                note: Some(String::from(
+                    "This category can include groceries, dining out, and snacks.",
+                )),
+                user_id: None,
+            })
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Personal Care")),
                     note: Some(String::from("This category can include items such as haircuts, personal grooming products, and gym memberships.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Entertainment")),
                     note: Some(String::from("This category can include expenses for movies, concerts, hobbies, and vacations.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Debt Payments")),
                     note: Some(String::from("This category can include payments towards credit card debt, student loans, or other debts.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Savings")),
                     note: Some(String::from("This category can include savings towards retirement, emergency funds, or other financial goals.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Utilities")),
                     note: Some(String::from("This category can include expenses for electricity, gas, water, internet, and phone.")),
+                    user_id:None
                 },
             )
             .await?;
 
         self.category_services
             .create(
-                None,
                 CreateCategoryDto {
                     name: Some(String::from("Health Care")),
                     note: Some(String::from("This category can include expenses for health insurance, doctor visits, prescriptions, and other medical expenses.")),
+                    user_id:None
                 },
             )
             .await?;

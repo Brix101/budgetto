@@ -60,11 +60,12 @@ impl CategoryController {
     pub async fn create_category(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        ValidationExtractor(request): ValidationExtractor<CreateCategoryDto>,
+        ValidationExtractor(mut request): ValidationExtractor<CreateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("received request to create category");
 
-        let new_category = services.categories.create(Some(user.id), request).await?;
+        request.user_id = Some(user.id);
+        let new_category = services.categories.create(request).await?;
 
         Ok(Json(new_category))
     }
@@ -73,11 +74,14 @@ impl CategoryController {
         Path(id): Path<Uuid>,
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        Json(request): Json<UpdateCategoryDto>,
+        Json(mut request): Json<UpdateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to update category {:?}", id);
 
-        let updated_category = services.categories.updated(id, user.id, request).await?;
+        request.id = Some(id);
+        request.user_id = Some(user.id);
+
+        let updated_category = services.categories.updated(request).await?;
 
         Ok(Json(updated_category))
     }
