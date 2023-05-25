@@ -27,7 +27,7 @@ pub trait UsersService {
 
     async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto>;
 
-    async fn updated_user(&self, user_id: Uuid, request: UpdateUserDto) -> AppResult<UserDto>;
+    async fn updated_user(&self, request: UpdateUserDto) -> AppResult<UserDto>;
 
     async fn get_user_by_email(&self, email: String) -> AppResult<UserDto>;
 }

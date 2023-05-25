@@ -38,11 +38,12 @@ impl UserRouter {
     pub async fn update_user_endpoint(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        Json(request): Json<UpdateUserDto>,
+        Json(mut request): Json<UpdateUserDto>,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to update user {:?}", user.id);
 
-        let updated_user = services.users.updated_user(user.id, request).await?;
+        request.id = Some(user.id);
+        let updated_user = services.users.updated_user(request).await?;
 
         Ok(Json(UserAuthenicationResponse { user: updated_user }))
     }

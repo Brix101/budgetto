@@ -11,7 +11,10 @@ use tracing::{error, info};
 use budgetto_core::{
     errors::{AppResult, Error},
     sessions::service::DynSessionsService,
-    users::{repository::DynUsersRepository, service::UsersService},
+    users::{
+        repository::{CreateUser, DynUsersRepository, UpdateUser},
+        service::UsersService,
+    },
     utils::security_service::DynSecurityService,
 };
 use uuid::Uuid;
@@ -42,9 +45,9 @@ impl UsersService for BudgettoUsersService {
     async fn signup_user(&self, request: SignUpUserDto) -> AppResult<UserDto> {
         let email = request.email.unwrap();
         let name = request.name.unwrap();
-        let password = request.password.unwrap();
+        let req_password = request.password.unwrap();
 
-        let existing_user = self.repository.get_user_by_email(&email).await?;
+        let existing_user = self.repository.find_by_email(&email).await?;
 
         if existing_user.is_some() {
             error!("user {:?} already exists", email);
@@ -52,12 +55,16 @@ impl UsersService for BudgettoUsersService {
         }
 
         info!("creating password hash for user {:?}", email);
-        let hashed_password = self.security_service.hash_password(&password)?;
+        let password = self.security_service.hash_password(&req_password)?;
 
         info!("password hashed successfully, creating user {:?}", email);
         let created_user = self
             .repository
-            .create_user(&email, &name, &hashed_password)
+            .create(CreateUser {
+                email,
+                name,
+                password,
+            })
             .await?;
 
         Ok(created_user.into_dto())
@@ -72,7 +79,7 @@ impl UsersService for BudgettoUsersService {
         let attempted_password = request.password.unwrap();
 
         info!("searching for existing user {:?}", email);
-        let existing_user = self.repository.get_user_by_email(&email).await?;
+        let existing_user = self.repository.find_by_email(&email).await?;
 
         if existing_user.is_none() {
             return Err(Error::NotFound(String::from("user email does not exist")));
@@ -108,7 +115,7 @@ impl UsersService for BudgettoUsersService {
 
     async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto> {
         info!("retrieving user {:?}", user_id);
-        let user = self.repository.get_user_by_id(user_id).await?;
+        let user = self.repository.find_by_id(user_id).await?;
 
         info!(
             "user found with email {:?}, generating new token",
@@ -118,38 +125,32 @@ impl UsersService for BudgettoUsersService {
         Ok(user.into_dto())
     }
 
-    async fn updated_user(&self, user_id: Uuid, request: UpdateUserDto) -> AppResult<UserDto> {
+    async fn updated_user(&self, request: UpdateUserDto) -> AppResult<UserDto> {
+        let user_id = request.id.unwrap();
+
         info!("retrieving user {:?}", user_id);
-        let user = self.repository.get_user_by_id(user_id).await?;
+        let user = self.repository.find_by_id(user_id).await?;
 
         let updated_email = request.email.unwrap_or(user.email);
         let updated_name = request.name.unwrap_or(user.name);
         let updated_bio = request.bio.unwrap_or(user.bio);
         let updated_image = request.image.unwrap_or(user.image);
-        let mut updated_hashed_password = user.password;
-
-        // if the password is included on the request, hash it and update the stored password
-        if request.password.is_some() && !request.password.as_ref().unwrap().is_empty() {
-            info!(
-                "new password found for user {:?}, hashing password",
-                user_id
-            );
-            updated_hashed_password = self
-                .security_service
-                .hash_password(request.password.unwrap().as_str())?;
-        }
+        let updated_password = match request.password {
+            Some(password) => self.security_service.hash_password(&password).unwrap(),
+            None => user.password,
+        };
 
         info!("updating user {:?}", user_id);
         let updated_user = self
             .repository
-            .update_user(
-                user_id,
-                updated_email.clone(),
-                updated_name,
-                updated_hashed_password,
-                updated_bio,
-                updated_image,
-            )
+            .update(UpdateUser {
+                id: user_id,
+                email: updated_email,
+                name: updated_name,
+                password: updated_password,
+                bio: updated_bio,
+                image: updated_image,
+            })
             .await?;
 
         Ok(updated_user.into_dto())
@@ -157,7 +158,7 @@ impl UsersService for BudgettoUsersService {
 
     async fn get_user_by_email(&self, email: String) -> AppResult<UserDto> {
         info!("retrieving user {:?}", email);
-        let user = self.repository.get_user_by_email(&email).await?;
+        let user = self.repository.find_by_email(&email).await?;
 
         if user.is_some() {
             info!("user found with email {:?}", email);

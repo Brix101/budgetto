@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use sqlx::query_as;
 use uuid::Uuid;
 
-use budgetto_core::users::repository::{User, UsersRepository};
+use budgetto_core::users::repository::{CreateUser, UpdateUser, User, UsersRepository};
 
 use crate::connection_pool::ConnectionPool;
 
@@ -20,12 +20,7 @@ impl PostgresUsersRepository {
 
 #[async_trait]
 impl UsersRepository for PostgresUsersRepository {
-    async fn create_user(
-        &self,
-        email: &str,
-        name: &str,
-        hash_password: &str,
-    ) -> anyhow::Result<User> {
+    async fn create(&self, args: CreateUser) -> anyhow::Result<User> {
         query_as!(
             User,
             r#"
@@ -33,16 +28,16 @@ impl UsersRepository for PostgresUsersRepository {
         values (current_timestamp, current_timestamp, $1::varchar, $2::varchar, $3::varchar, '')
         returning *
             "#,
-            name,
-            email,
-            hash_password
+            args.name,
+            args.email,
+            args.password
         )
         .fetch_one(&self.pool)
         .await
         .context("an unexpected error occured while creating the user")
     }
 
-    async fn get_user_by_email(&self, email: &str) -> anyhow::Result<Option<User>> {
+    async fn find_by_email(&self, email: &str) -> anyhow::Result<Option<User>> {
         query_as!(
             User,
             r#"
@@ -57,7 +52,7 @@ impl UsersRepository for PostgresUsersRepository {
         .context("unexpected error while querying for user by email")
     }
 
-    async fn get_user_by_id(&self, id: Uuid) -> anyhow::Result<User> {
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<User> {
         query_as!(
             User,
             r#"
@@ -72,15 +67,7 @@ impl UsersRepository for PostgresUsersRepository {
         .context("user was not found")
     }
 
-    async fn update_user(
-        &self,
-        id: Uuid,
-        email: String,
-        name: String,
-        hash_password: String,
-        bio: String,
-        image: String,
-    ) -> anyhow::Result<User> {
+    async fn update(&self, args: UpdateUser) -> anyhow::Result<User> {
         query_as!(
             User,
             r#"
@@ -95,12 +82,12 @@ impl UsersRepository for PostgresUsersRepository {
         where id = $6
         returning *
             "#,
-            name,
-            email,
-            hash_password,
-            bio,
-            image,
-            id
+            args.name,
+            args.email,
+            args.password,
+            args.bio,
+            args.image,
+            args.id
         )
         .fetch_one(&self.pool)
         .await

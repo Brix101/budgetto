@@ -14,26 +14,30 @@ pub type DynUsersRepository = Arc<dyn UsersRepository + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait UsersRepository {
-    async fn create_user(
-        &self,
-        email: &str,
-        name: &str,
-        hash_password: &str,
-    ) -> anyhow::Result<User>;
+    async fn create(&self, args: CreateUser) -> anyhow::Result<User>;
 
-    async fn get_user_by_email(&self, email: &str) -> anyhow::Result<Option<User>>;
+    async fn find_by_email(&self, email: &str) -> anyhow::Result<Option<User>>;
 
-    async fn get_user_by_id(&self, id: Uuid) -> anyhow::Result<User>;
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<User>;
 
-    async fn update_user(
-        &self,
-        id: Uuid,
-        email: String,
-        name: String,
-        hash_password: String,
-        bio: String,
-        image: String,
-    ) -> anyhow::Result<User>;
+    async fn update(&self, args: UpdateUser) -> anyhow::Result<User>;
+}
+
+#[derive(Debug)]
+pub struct CreateUser {
+    pub email: String,
+    pub name: String,
+    pub password: String,
+}
+
+#[derive(Debug)]
+pub struct UpdateUser {
+    pub id: Uuid,
+    pub email: String,
+    pub name: String,
+    pub password: String,
+    pub bio: String,
+    pub image: String,
 }
 
 #[derive(FromRow, Debug, Clone)]
