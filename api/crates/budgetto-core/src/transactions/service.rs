@@ -16,22 +16,13 @@ pub type DynTransactionsService = Arc<dyn TransactionsService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait TransactionsService {
-    async fn create(
-        &self,
-        user_id: Uuid,
-        request: CreateTransactionDto,
-    ) -> AppResult<TransactionDto>;
+    async fn create(&self, request: CreateTransactionDto) -> AppResult<TransactionDto>;
 
     async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<TransactionDto>;
 
     async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<TransactionDto>>;
 
-    async fn updated(
-        &self,
-        id: Uuid,
-        user_id: Uuid,
-        request: UpdateTransactionDto,
-    ) -> AppResult<TransactionDto>;
+    async fn updated(&self, request: UpdateTransactionDto) -> AppResult<TransactionDto>;
 
     async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
 }

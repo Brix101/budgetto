@@ -15,6 +15,7 @@ pub struct CreateTransactionDto {
     pub category_id: Option<Uuid>,
     #[validate(required)]
     pub account_id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
@@ -24,6 +25,8 @@ pub struct UpdateTransactionDto {
     pub category_id: Option<Uuid>,
     pub account_id: Option<Uuid>,
     pub transaction_type: Option<TransactionType>,
+    pub id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Default)]

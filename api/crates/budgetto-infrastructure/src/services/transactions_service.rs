@@ -45,16 +45,13 @@ impl BudgettoTransactionsService {
 
 #[async_trait]
 impl TransactionsService for BudgettoTransactionsService {
-    async fn create(
-        &self,
-        user_id: Uuid,
-        request: CreateTransactionDto,
-    ) -> AppResult<TransactionDto> {
+    async fn create(&self, request: CreateTransactionDto) -> AppResult<TransactionDto> {
         let amount = request.amount.unwrap();
         let note = request.note;
         let transaction_type = request.transaction_type.unwrap();
         let category_id = request.category_id.unwrap();
         let account_id = request.account_id.unwrap();
+        let user_id = request.user_id.unwrap();
 
         let created_transaction = self
             .repository
@@ -96,12 +93,9 @@ impl TransactionsService for BudgettoTransactionsService {
         self.map_to_transactions(transactions).await
     }
 
-    async fn updated(
-        &self,
-        id: Uuid,
-        user_id: Uuid,
-        request: UpdateTransactionDto,
-    ) -> AppResult<TransactionDto> {
+    async fn updated(&self, request: UpdateTransactionDto) -> AppResult<TransactionDto> {
+        let id = request.id.unwrap();
+        let user_id = request.user_id.unwrap();
         let transaction_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_transaction) = transaction_to_update {
@@ -111,7 +105,7 @@ impl TransactionsService for BudgettoTransactionsService {
             }
 
             let updated_amount = request.amount.unwrap_or(existing_transaction.amount);
-            let updated_note = request.note.unwrap_or(existing_transaction.note.unwrap());
+            let updated_note = request.note.xor(existing_transaction.note);
             let updated_category_id = request
                 .category_id
                 .unwrap_or(existing_transaction.category_id);
@@ -128,7 +122,7 @@ impl TransactionsService for BudgettoTransactionsService {
                 .update(UpdateTransaction {
                     id: existing_transaction.id,
                     amount: updated_amount,
-                    note: Some(updated_note),
+                    note: updated_note,
                     category_id: updated_category_id,
                     account_id: updated_account_id,
                     transaction_type: updated_transaction_type,

@@ -62,11 +62,12 @@ impl TransactionController {
     pub async fn create_transaction(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        ValidationExtractor(request): ValidationExtractor<CreateTransactionDto>,
+        ValidationExtractor(mut request): ValidationExtractor<CreateTransactionDto>,
     ) -> AppResult<Json<TransactionDto>> {
         info!("received request to create transaction");
 
-        let new_transaction = services.transactions.create(user.id, request).await?;
+        request.user_id = Some(user.id);
+        let new_transaction = services.transactions.create(request).await?;
 
         Ok(Json(new_transaction))
     }
@@ -75,11 +76,13 @@ impl TransactionController {
         Path(id): Path<Uuid>,
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        Json(request): Json<UpdateTransactionDto>,
+        Json(mut request): Json<UpdateTransactionDto>,
     ) -> AppResult<Json<TransactionDto>> {
         info!("recieved request to update transaction {:?}", id);
 
-        let updated_transaction = services.transactions.updated(id, user.id, request).await?;
+        request.id = Some(id);
+        request.user_id = Some(user.id);
+        let updated_transaction = services.transactions.updated(request).await?;
 
         Ok(Json(updated_transaction))
     }
