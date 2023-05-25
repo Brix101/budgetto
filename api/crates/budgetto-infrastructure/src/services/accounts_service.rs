@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use budgetto_core::{
     accounts::{
-        repository::{Account, DynAccountsRepository},
+        repository::{Account, CreateAccount, DynAccountsRepository, UpdateAccount},
         service::AccountsService,
     },
     errors::{AppResult, Error},
@@ -45,7 +45,15 @@ impl AccountsService for BudgettoAccountsService {
         let balance = request.balance.unwrap();
         let note = request.note;
 
-        let created_account = self.repository.create(name, balance, note, user_id).await?;
+        let created_account = self
+            .repository
+            .create(CreateAccount {
+                name,
+                balance,
+                note,
+                user_id,
+            })
+            .await?;
 
         info!("user {:?} created account successfully", user_id);
 
@@ -95,7 +103,12 @@ impl AccountsService for BudgettoAccountsService {
             info!("updating account {:?} for user {:?}", id, user_id);
             let updated_account = self
                 .repository
-                .update(id, updated_name, updated_balance, Some(update_note))
+                .update(UpdateAccount {
+                    id,
+                    name: updated_name,
+                    balance: updated_balance,
+                    note: Some(update_note),
+                })
                 .await?;
 
             return Ok(updated_account.into_dto());

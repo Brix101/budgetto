@@ -24,7 +24,7 @@ impl PostgresTransactionsRepository {
 
 #[async_trait]
 impl TransactionsRepository for PostgresTransactionsRepository {
-    async fn create(&self, request: CreateTransaction) -> anyhow::Result<Transaction> {
+    async fn create(&self, args: CreateTransaction) -> anyhow::Result<Transaction> {
         query_as!(
             Transaction,
             r#"
@@ -32,12 +32,12 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         VALUES ($1, $2, $3, $4, $5, $6, current_timestamp, current_timestamp, NULL)
         RETURNING id, amount, note, transaction_type as "transaction_type: TransactionType", account_id, category_id, user_id, created_at, updated_at, deleted_at
             "#,
-            request.amount,
-            request.note,
-            request.transaction_type as _,
-            request.account_id,
-            request.category_id,
-            request.user_id
+            args.amount,
+            args.note,
+            args.transaction_type as _,
+            args.account_id,
+            args.category_id,
+            args.user_id
         )
         .fetch_one(&self.pool)
         .await
@@ -76,7 +76,7 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         .context("transaction was not found")
     }
 
-    async fn update(&self, request: UpdateTransaction) -> anyhow::Result<Transaction> {
+    async fn update(&self, args: UpdateTransaction) -> anyhow::Result<Transaction> {
         query_as!(
             Transaction,
             r#"
@@ -91,12 +91,12 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         where id = $6
         RETURNING id, amount, note, transaction_type as "transaction_type: TransactionType", account_id, category_id, user_id, created_at, updated_at, deleted_at
             "#,
-            request.amount,
-            request.note,
-            request.transaction_type as _,
-            request.account_id,
-            request.category_id,
-            request.id
+            args.amount,
+            args.note,
+            args.transaction_type as _,
+            args.account_id,
+            args.category_id,
+            args.id
         )
         .fetch_one(&self.pool)
         .await

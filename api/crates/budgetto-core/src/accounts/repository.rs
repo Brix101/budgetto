@@ -14,27 +14,31 @@ pub type DynAccountsRepository = Arc<dyn AccountsRepository + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait AccountsRepository {
-    async fn create(
-        &self,
-        name: String,
-        balance: f64,
-        note: Option<String>,
-        user_id: Uuid,
-    ) -> anyhow::Result<Account>;
+    async fn create(&self, args: CreateAccount) -> anyhow::Result<Account>;
 
     async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Account>>;
 
     async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Account>>;
 
-    async fn update(
-        &self,
-        id: Uuid,
-        name: String,
-        balance: f64,
-        note: Option<String>,
-    ) -> anyhow::Result<Account>;
+    async fn update(&self, args: UpdateAccount) -> anyhow::Result<Account>;
 
     async fn delete(&self, id: Uuid) -> anyhow::Result<()>;
+}
+
+#[derive(Debug)]
+pub struct CreateAccount {
+    pub name: String,
+    pub balance: f64,
+    pub note: Option<String>,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug)]
+pub struct UpdateAccount {
+    pub id: Uuid,
+    pub name: String,
+    pub balance: f64,
+    pub note: Option<String>,
 }
 
 #[derive(FromRow, Debug)]

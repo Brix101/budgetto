@@ -3,7 +3,9 @@ use async_trait::async_trait;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use budgetto_core::accounts::repository::{Account, AccountsRepository};
+use budgetto_core::accounts::repository::{
+    Account, AccountsRepository, CreateAccount, UpdateAccount,
+};
 
 use crate::connection_pool::ConnectionPool;
 
@@ -20,13 +22,7 @@ impl PostgresAccountsRepository {
 
 #[async_trait]
 impl AccountsRepository for PostgresAccountsRepository {
-    async fn create(
-        &self,
-        name: String,
-        balance: f64,
-        note: Option<String>,
-        user_id: Uuid,
-    ) -> anyhow::Result<Account> {
+    async fn create(&self, args: CreateAccount) -> anyhow::Result<Account> {
         query_as!(
             Account,
             r#"
@@ -34,10 +30,10 @@ impl AccountsRepository for PostgresAccountsRepository {
         VALUES ($1, $2, $3, $4, current_timestamp, current_timestamp)
         RETURNING * 
             "#,
-            name,
-            balance,
-            note,
-            user_id
+            args.name,
+            args.balance,
+            args.note,
+            args.user_id
         )
         .fetch_one(&self.pool)
         .await
@@ -76,13 +72,7 @@ impl AccountsRepository for PostgresAccountsRepository {
         .context("account was not found")
     }
 
-    async fn update(
-        &self,
-        id: Uuid,
-        name: String,
-        balance: f64,
-        note: Option<String>,
-    ) -> anyhow::Result<Account> {
+    async fn update(&self, args: UpdateAccount) -> anyhow::Result<Account> {
         query_as!(
             Account,
             r#"
@@ -95,10 +85,10 @@ impl AccountsRepository for PostgresAccountsRepository {
         where id = $4
         returning *
             "#,
-            name,
-            balance,
-            note,
-            id
+            args.name,
+            args.balance,
+            args.note,
+            args.id
         )
         .fetch_one(&self.pool)
         .await
