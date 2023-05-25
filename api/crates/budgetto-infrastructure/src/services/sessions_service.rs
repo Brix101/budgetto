@@ -117,6 +117,7 @@ impl SessionsService for BudgettoSessionsService {
 
             info!("deleting session {:?} for user {:?}", id, user_id);
             self.repository.delete(id).await?;
+            self.token_service.add_blacklist(id);
 
             return Ok(());
         }

@@ -1,5 +1,6 @@
 use std::ops::Add;
 use std::sync::Arc;
+use std::sync::Mutex;
 use std::time::{Duration, SystemTime};
 
 use budgetto_core::config::AppConfig;
@@ -8,8 +9,13 @@ use budgetto_core::utils::token_service::TokenService;
 use budgetto_domain::users::UserDto;
 use budgetto_domain::utils::token::{AccessTokenClaims, RefreshTokenClaims};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use lazy_static::lazy_static;
 use sqlx::types::time::OffsetDateTime;
 use uuid::Uuid;
+
+lazy_static! {
+    static ref TOKEN_BLACKLIST: Mutex<Vec<String>> = Mutex::new(vec![]);
+}
 
 pub struct JwtService {
     config: Arc<AppConfig>,
@@ -76,7 +82,15 @@ impl TokenService for JwtService {
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
-        Ok(decoded_token.claims)
+        let blacklist = TOKEN_BLACKLIST.lock().unwrap().to_vec();
+
+        if blacklist.contains(&decoded_token.claims.sub.to_string()) {
+            Err(Error::InternalServerErrorWithContext(
+                "Blacklisted Token".to_string(),
+            ))
+        } else {
+            Ok(decoded_token.claims)
+        }
     }
 
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid> {
@@ -88,5 +102,9 @@ impl TokenService for JwtService {
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
         Ok(decoded_token.claims.sub)
+    }
+
+    fn add_blacklist(&self, id: Uuid) {
+        TOKEN_BLACKLIST.lock().unwrap().push(id.to_string());
     }
 }

@@ -53,6 +53,8 @@ impl ServiceRegister {
             Arc::new(ArgonSecurityService::new(config.clone())) as DynSecurityService;
         let token_service = Arc::new(JwtService::new(config)) as DynTokenService;
 
+        // token_service.clone().refresh_blacklist();
+
         info!("utility services initialized, building feature services...");
         let sessions_repository =
             Arc::new(PostgresSessionsRepository::new(pool.clone())) as DynSessionsRepository;
