@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use budgetto_core::{
     categories::{
-        repository::{Category, CreateCategory, DynCategoriesRepository, UpdateCategory},
+        repository::{CategoryEntity, CreateCategory, DynCategoriesRepository, UpdateCategory},
         service::CategoriesService,
     },
     errors::{AppResult, Error},
@@ -23,7 +23,10 @@ impl BudgettoCategoriesService {
     pub fn new(repository: DynCategoriesRepository) -> Self {
         Self { repository }
     }
-    async fn map_to_categories(&self, categories: Vec<Category>) -> AppResult<Vec<CategoryDto>> {
+    async fn map_to_categories(
+        &self,
+        categories: Vec<CategoryEntity>,
+    ) -> AppResult<Vec<CategoryDto>> {
         info!("found {} categories", categories.len());
 
         let mut mapped_categories: Vec<CategoryDto> = Vec::new();

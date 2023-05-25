@@ -4,7 +4,7 @@ use sqlx::{query, query_as};
 use uuid::Uuid;
 
 use budgetto_core::categories::repository::{
-    CategoriesRepository, Category, CreateCategory, UpdateCategory,
+    CategoriesRepository, CategoryEntity, CreateCategory, UpdateCategory,
 };
 
 use crate::connection_pool::ConnectionPool;
@@ -22,9 +22,9 @@ impl PostgresCategoriesRepository {
 
 #[async_trait]
 impl CategoriesRepository for PostgresCategoriesRepository {
-    async fn create(&self, args: CreateCategory) -> anyhow::Result<Category> {
+    async fn create(&self, args: CreateCategory) -> anyhow::Result<CategoryEntity> {
         query_as!(
-            Category,
+            CategoryEntity,
             r#"
         insert into categories (name, note, user_id,created_at, updated_at)
         values ($1::varchar, $2, $3, current_timestamp, current_timestamp)
@@ -39,9 +39,9 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("an unexpected error occured while creating the category")
     }
 
-    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>> {
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<CategoryEntity>> {
         query_as!(
-            Category,
+            CategoryEntity,
             r#"
         SELECT * 
         FROM "categories" 
@@ -55,9 +55,9 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("category was not found")
     }
 
-    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>> {
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<CategoryEntity>> {
         query_as!(
-            Category,
+            CategoryEntity,
             r#"
         SELECT *
         FROM "categories"
@@ -71,9 +71,9 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("category was not found")
     }
 
-    async fn update(&self, args: UpdateCategory) -> anyhow::Result<Category> {
+    async fn update(&self, args: UpdateCategory) -> anyhow::Result<CategoryEntity> {
         query_as!(
-            Category,
+            CategoryEntity,
             r#"
         update categories
         set
