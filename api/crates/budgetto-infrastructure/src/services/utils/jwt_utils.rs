@@ -6,27 +6,10 @@ use budgetto_core::config::AppConfig;
 use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::utils::token_service::TokenService;
 use budgetto_domain::users::UserDto;
+use budgetto_domain::utils::token::{AccessTokenClaims, RefreshTokenClaims};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
-use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 use uuid::Uuid;
-
-/// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
-#[derive(Debug, Serialize, Deserialize)]
-struct AccessTokenClaims {
-    sub: Uuid,
-    user: UserDto,
-    exp: usize,
-    iat: usize,
-}
-
-/// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
-#[derive(Debug, Serialize, Deserialize)]
-struct RefreshTokenClaims {
-    sub: Uuid,
-    exp: usize,
-    iat: usize,
-}
 
 pub struct JwtService {
     config: Arc<AppConfig>,
@@ -85,14 +68,15 @@ impl TokenService for JwtService {
         Ok(token)
     }
 
-    fn verify_access_token(&self, token: &str) -> AppResult<UserDto> {
+    fn verify_access_token(&self, token: &str) -> AppResult<AccessTokenClaims> {
         let decoded_token = decode::<AccessTokenClaims>(
             token,
             &DecodingKey::from_secret(self.config.access_token_secret.as_bytes()),
             &Validation::new(Algorithm::HS256),
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
-        Ok(decoded_token.claims.user)
+
+        Ok(decoded_token.claims)
     }
 
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid> {

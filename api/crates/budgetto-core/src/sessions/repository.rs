@@ -12,16 +12,18 @@ pub type DynSessionsRepository = Arc<dyn SessionsRepository + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait SessionsRepository {
-    async fn new_session(
-        &self,
-        user_id: Uuid,
-        user_agent: &str,
-        exp: &OffsetDateTime,
-    ) -> anyhow::Result<Session>;
+    async fn create(&self, args: CreateSession) -> anyhow::Result<Session>;
 
     async fn get_user_by_session_id(&self, id: Uuid) -> anyhow::Result<Option<User>>;
 
-    async fn delete_session(&self, id: Uuid) -> anyhow::Result<()>;
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()>;
+}
+
+#[derive(Debug)]
+pub struct CreateSession {
+    pub user_id: Uuid,
+    pub user_agent: String,
+    pub exp: OffsetDateTime,
 }
 
 #[derive(FromRow, Debug)]

@@ -1,8 +1,7 @@
 use anyhow::Context;
 use async_trait::async_trait;
-use budgetto_core::sessions::repository::{Session, SessionsRepository};
+use budgetto_core::sessions::repository::{CreateSession, Session, SessionsRepository};
 use budgetto_core::users::repository::User;
-use sqlx::types::time::OffsetDateTime;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
@@ -21,12 +20,7 @@ impl PostgresSessionsRepository {
 
 #[async_trait]
 impl SessionsRepository for PostgresSessionsRepository {
-    async fn new_session(
-        &self,
-        user_id: Uuid,
-        user_agent: &str,
-        exp: &OffsetDateTime,
-    ) -> anyhow::Result<Session> {
+    async fn create(&self, args: CreateSession) -> anyhow::Result<Session> {
         query_as!(
             Session,
             r#"
@@ -34,9 +28,9 @@ impl SessionsRepository for PostgresSessionsRepository {
         values ($1,$2,$3)
         returning *
             "#,
-            user_id,
-            user_agent,
-            exp
+            args.user_id,
+            args.user_agent,
+            args.exp
         )
         .fetch_one(&self.pool)
         .await
@@ -59,7 +53,7 @@ impl SessionsRepository for PostgresSessionsRepository {
         .context("user was not found")
     }
 
-    async fn delete_session(&self, id: Uuid) -> anyhow::Result<()> {
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         DELETE FROM "sessions"

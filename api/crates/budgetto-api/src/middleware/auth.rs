@@ -76,7 +76,7 @@ where
                 // }
 
                 let token_value = tokenized_value.into_iter().nth(1).unwrap();
-                let user = services
+                let token_claims = services
                     .token_service
                     .verify_access_token(token_value)
                     .map_err(|err| {
@@ -87,8 +87,8 @@ where
                         }
                     });
 
-                match user {
-                    Ok(user) => AuthClaims::into_auth(user),
+                match token_claims {
+                    Ok(claims) => AuthClaims::into_auth(claims.user),
                     Err(mapped_err) => mapped_err,
                 }
             }
@@ -122,7 +122,7 @@ impl TokenMiddleware {
                             let token_value = cookie_value.value();
 
                             let requested_token =
-                                services.sessions.refresh_access_token(token_value).await;
+                                services.sessions.create_access_token(token_value).await;
 
                             match requested_token {
                                 Ok(res) => {

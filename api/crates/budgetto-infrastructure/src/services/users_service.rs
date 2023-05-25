@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use budgetto_domain::{
-    sessions::{requests::NewSessionDto, responses::SessionResponse},
+    sessions::{requests::CreateSessionDto, responses::SessionResponse},
     users::{
         requests::{SignInUserDto, SignUpUserDto, UpdateUserDto},
         UserDto,
@@ -103,7 +103,7 @@ impl UsersService for BudgettoUsersService {
 
         let tokens = self
             .session_service
-            .new_session(NewSessionDto {
+            .create(CreateSessionDto {
                 user_id: Some(user.id),
                 user_agent,
             })

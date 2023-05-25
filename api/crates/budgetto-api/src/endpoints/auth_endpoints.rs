@@ -1,4 +1,5 @@
 use axum::extract::Json;
+use axum::http::{HeaderMap, HeaderValue};
 use axum::routing::{get, post};
 use axum::{Extension, Router};
 use axum_extra::extract::cookie::Cookie;
@@ -67,7 +68,7 @@ impl AuthRouter {
 
         let new_token = services
             .sessions
-            .refresh_access_token(&refresh_token)
+            .create_access_token(&refresh_token)
             .await?;
 
         Ok(Json(new_token))
@@ -78,15 +79,14 @@ impl AuthRouter {
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         SessionExtractor(session_id, _): SessionExtractor,
-    ) -> AppResult<(CookieJar, Json<SessionResponse>)> {
+    ) -> AppResult<(CookieJar, HeaderMap, Json<SessionResponse>)> {
         info!("recieved request to signout session");
-        services
-            .sessions
-            .delete_session(session_id, user.id)
-            .await?;
+        services.sessions.delete(session_id, user.id).await?;
 
         let cookie_jar = jar.remove(Cookie::named("x-refresh"));
+        let mut headers = HeaderMap::new();
+        headers.insert("x-access-token", HeaderValue::from_str("").unwrap());
 
-        Ok((cookie_jar, Json(SessionResponse::default())))
+        Ok((cookie_jar, headers, Json(SessionResponse::default())))
     }
 }

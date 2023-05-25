@@ -8,6 +8,7 @@ pub mod categories;
 pub mod sessions;
 pub mod transactions;
 pub mod users;
+pub mod utils;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ApiError {

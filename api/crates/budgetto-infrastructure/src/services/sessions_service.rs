@@ -7,10 +7,10 @@ use tracing::info;
 use uuid::Uuid;
 
 use budgetto_core::errors::{AppResult, Error};
-use budgetto_core::sessions::repository::DynSessionsRepository;
+use budgetto_core::sessions::repository::{CreateSession, DynSessionsRepository};
 use budgetto_core::sessions::service::SessionsService;
 use budgetto_core::utils::token_service::DynTokenService;
-use budgetto_domain::sessions::requests::NewSessionDto;
+use budgetto_domain::sessions::requests::CreateSessionDto;
 
 #[derive(Clone)]
 pub struct BudgettoSessionsService {
@@ -29,7 +29,7 @@ impl BudgettoSessionsService {
 
 #[async_trait]
 impl SessionsService for BudgettoSessionsService {
-    async fn new_session(&self, request: NewSessionDto) -> AppResult<SessionResponse> {
+    async fn create(&self, request: CreateSessionDto) -> AppResult<SessionResponse> {
         let user_id = request.user_id.unwrap();
         let user_agent = request.user_agent;
         let from_now = Duration::from_secs(604800);
@@ -44,7 +44,11 @@ impl SessionsService for BudgettoSessionsService {
             Some(user_agent) => {
                 let new_session = self
                     .repository
-                    .new_session(user_id, user_agent.as_str(), &exp)
+                    .create(CreateSession {
+                        user_id,
+                        user_agent,
+                        exp,
+                    })
                     .await?;
 
                 let user_in_session = self
@@ -75,7 +79,7 @@ impl SessionsService for BudgettoSessionsService {
         }
     }
 
-    async fn refresh_access_token(&self, refresh_token: &str) -> AppResult<ReAuthResponse> {
+    async fn create_access_token(&self, refresh_token: &str) -> AppResult<ReAuthResponse> {
         let session_id = self
             .token_service
             .get_session_id_from_token(refresh_token.to_string())
@@ -102,7 +106,7 @@ impl SessionsService for BudgettoSessionsService {
         Err(Error::Unauthorized)
     }
 
-    async fn delete_session(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
         let user_session = self.repository.get_user_by_session_id(id).await?;
 
         if let Some(user) = user_session {
@@ -112,7 +116,7 @@ impl SessionsService for BudgettoSessionsService {
             }
 
             info!("deleting session {:?} for user {:?}", id, user_id);
-            self.repository.delete_session(id).await?;
+            self.repository.delete(id).await?;
 
             return Ok(());
         }
