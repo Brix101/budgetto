@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use budgetto_core::{
     categories::{
-        repository::{Category, DynCategoriesRepository},
+        repository::{Category, CreateCategory, DynCategoriesRepository, UpdateCategory},
         service::CategoriesService,
     },
     errors::{AppResult, Error},
@@ -48,7 +48,14 @@ impl CategoriesService for BudgettoCategoriesService {
         let name = request.name.unwrap();
         let note = request.note;
 
-        let created_category = self.repository.create(name, note, user_id).await?;
+        let created_category = self
+            .repository
+            .create(CreateCategory {
+                name,
+                note,
+                user_id,
+            })
+            .await?;
 
         if user_id.is_some() {
             info!("user {:?} created category successfully", user_id);
@@ -104,7 +111,11 @@ impl CategoriesService for BudgettoCategoriesService {
             info!("updating category {:?} for user {:?}", id, user_id);
             let updated_category = self
                 .repository
-                .update(id, updated_name, Some(update_note))
+                .update(UpdateCategory {
+                    id,
+                    name: updated_name,
+                    note: Some(update_note),
+                })
                 .await?;
 
             return Ok(updated_category.into_dto());

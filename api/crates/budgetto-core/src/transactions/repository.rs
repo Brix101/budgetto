@@ -3,7 +3,6 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use budgetto_domain::transactions::{TransactionDto, TransactionType};
 use mockall::automock;
-use serde::{Deserialize, Serialize};
 use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 use time::format_description::well_known::Rfc3339;

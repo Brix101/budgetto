@@ -3,7 +3,9 @@ use async_trait::async_trait;
 use sqlx::{query, query_as};
 use uuid::Uuid;
 
-use budgetto_core::categories::repository::{CategoriesRepository, Category};
+use budgetto_core::categories::repository::{
+    CategoriesRepository, Category, CreateCategory, UpdateCategory,
+};
 
 use crate::connection_pool::ConnectionPool;
 
@@ -20,12 +22,7 @@ impl PostgresCategoriesRepository {
 
 #[async_trait]
 impl CategoriesRepository for PostgresCategoriesRepository {
-    async fn create(
-        &self,
-        name: String,
-        note: Option<String>,
-        user_id: Option<Uuid>,
-    ) -> anyhow::Result<Category> {
+    async fn create(&self, args: CreateCategory) -> anyhow::Result<Category> {
         query_as!(
             Category,
             r#"
@@ -33,9 +30,9 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         values ($1::varchar, $2, $3, current_timestamp, current_timestamp)
         returning * 
             "#,
-            name,
-            note,
-            user_id
+            args.name,
+            args.note,
+            args.user_id
         )
         .fetch_one(&self.pool)
         .await
@@ -74,12 +71,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("category was not found")
     }
 
-    async fn update(
-        &self,
-        id: Uuid,
-        name: String,
-        note: Option<String>,
-    ) -> anyhow::Result<Category> {
+    async fn update(&self, args: UpdateCategory) -> anyhow::Result<Category> {
         query_as!(
             Category,
             r#"
@@ -91,9 +83,9 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         where id = $3
         returning *
             "#,
-            name,
-            note,
-            id
+            args.name,
+            args.note,
+            args.id
         )
         .fetch_one(&self.pool)
         .await
