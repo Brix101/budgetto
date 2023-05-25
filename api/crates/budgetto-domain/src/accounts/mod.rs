@@ -7,7 +7,7 @@ pub mod responses;
 #[derive(Serialize, Deserialize, Default, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountDto {
-    #[serde(skip_serializing, skip_deserializing)]
+    // #[serde(skip_serializing, skip_deserializing)]
     pub id: Uuid,
     pub name: String,
     pub balance: f64,

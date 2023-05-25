@@ -98,10 +98,7 @@ impl CategoriesService for BudgettoCategoriesService {
             if let Some(category_user_id) = existing_category.user_id {
                 if category_user_id == user_id {
                     let updated_name = request.name.unwrap_or(existing_category.name);
-                    let update_note = match request.note {
-                        Some(note) => note,
-                        None => existing_category.note.unwrap_or(String::new()),
-                    };
+                    let updated_note = request.note.xor(existing_category.note);
 
                     info!("updating category {:?} for user {:?}", id, user_id);
                     let updated_category = self
@@ -109,7 +106,7 @@ impl CategoriesService for BudgettoCategoriesService {
                         .update(UpdateCategory {
                             id,
                             name: updated_name,
-                            note: Some(update_note),
+                            note: updated_note,
                         })
                         .await?;
 

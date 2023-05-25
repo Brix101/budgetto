@@ -91,7 +91,7 @@ impl AccountController {
     ) -> AppResult<()> {
         info!("recieved request to remove account {:?}", id);
 
-        services.categories.delete(id, user.id).await?;
+        services.accounts.delete(id, user.id).await?;
 
         Ok(())
     }

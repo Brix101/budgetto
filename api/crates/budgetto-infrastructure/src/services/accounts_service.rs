@@ -96,10 +96,7 @@ impl AccountsService for BudgettoAccountsService {
 
             let updated_name = request.name.unwrap_or(existing_account.name);
             let updated_balance = request.balance.unwrap_or(existing_account.balance);
-            let update_note = match request.note {
-                Some(note) => note,
-                None => existing_account.note.unwrap_or(String::new()),
-            };
+            let updated_note = request.note.xor(existing_account.note);
 
             info!("updating account {:?} for user {:?}", id, user_id);
             let updated_account = self
@@ -108,7 +105,7 @@ impl AccountsService for BudgettoAccountsService {
                     id,
                     name: updated_name,
                     balance: updated_balance,
-                    note: Some(update_note),
+                    note: updated_note,
                 })
                 .await?;
 
