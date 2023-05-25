@@ -4,23 +4,22 @@ use async_trait::async_trait;
 use mockall::automock;
 use uuid::Uuid;
 
-// use domain::accounts::requests::{SignInUserDto, SignUpUserDto, UpdateUserDto};
 use budgetto_domain::budgets::BudgetDto;
 
 use crate::errors::AppResult;
 
-pub type DynUsersService = Arc<dyn UsersService + Send + Sync>;
+pub type DynBudgetsService = Arc<dyn BudgetsService + Send + Sync>;
 
 #[automock]
 #[async_trait]
-pub trait UsersService {
-    async fn create_account(&self) -> AppResult<BudgetDto>;
+pub trait BudgetsService {
+    async fn create(&self) -> AppResult<BudgetDto>;
 
-    async fn get_account_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<BudgetDto>;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<BudgetDto>;
 
-    async fn get_accounts(&self, user_id: Uuid) -> AppResult<Vec<BudgetDto>>;
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<BudgetDto>>;
 
-    async fn updated_account(&self) -> AppResult<BudgetDto>;
+    async fn updated(&self) -> AppResult<BudgetDto>;
 
-    async fn delete_account(&self, id: Uuid) -> AppResult<()>;
+    async fn delete(&self, id: Uuid) -> AppResult<()>;
 }

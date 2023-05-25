@@ -34,16 +34,16 @@ impl CategoryController {
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let category = services.categories.get_category_by_id(id, user.id).await?;
+            let category = services.categories.find_by_id(id, user.id).await?;
 
             return Ok(Json(CategoriesResponse {
                 categories: vec![category],
             }));
         }
 
-        let categories = services.categories.get_categories(user.id).await?;
+        let categories = services.categories.find_many(user.id).await?;
 
-        Ok(Json(categories))
+        Ok(Json(CategoriesResponse { categories }))
     }
 
     pub async fn get_category(
@@ -53,7 +53,7 @@ impl CategoryController {
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to get category {:?}", id);
 
-        let category = services.categories.get_category_by_id(id, user.id).await?;
+        let category = services.categories.find_by_id(id, user.id).await?;
 
         Ok(Json(category))
     }
@@ -64,10 +64,7 @@ impl CategoryController {
     ) -> AppResult<Json<CategoryDto>> {
         info!("received request to create category");
 
-        let new_category = services
-            .categories
-            .create_category(Some(user.id), request)
-            .await?;
+        let new_category = services.categories.create(Some(user.id), request).await?;
 
         Ok(Json(new_category))
     }
@@ -80,10 +77,7 @@ impl CategoryController {
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to update category {:?}", id);
 
-        let updated_category = services
-            .categories
-            .updated_category(id, user.id, request)
-            .await?;
+        let updated_category = services.categories.updated(id, user.id, request).await?;
 
         Ok(Json(updated_category))
     }
@@ -95,7 +89,7 @@ impl CategoryController {
     ) -> AppResult<()> {
         info!("recieved request to remove category {:?}", id);
 
-        services.categories.delete_category(id, user.id).await?;
+        services.categories.delete(id, user.id).await?;
 
         Ok(())
     }

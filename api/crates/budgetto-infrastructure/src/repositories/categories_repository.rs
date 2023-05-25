@@ -20,7 +20,7 @@ impl PostgresCategoriesRepository {
 
 #[async_trait]
 impl CategoriesRepository for PostgresCategoriesRepository {
-    async fn create_category(
+    async fn create(
         &self,
         name: String,
         note: Option<String>,
@@ -42,7 +42,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("an unexpected error occured while creating the category")
     }
 
-    async fn get_category_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>> {
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>> {
         query_as!(
             Category,
             r#"
@@ -58,7 +58,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("category was not found")
     }
 
-    async fn get_categories(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>> {
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>> {
         query_as!(
             Category,
             r#"
@@ -74,7 +74,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("category was not found")
     }
 
-    async fn update_category(
+    async fn update(
         &self,
         id: Uuid,
         name: String,
@@ -100,7 +100,7 @@ impl CategoriesRepository for PostgresCategoriesRepository {
         .context("could not update the category")
     }
 
-    async fn delete_category(&self, id: Uuid) -> anyhow::Result<()> {
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         update categories

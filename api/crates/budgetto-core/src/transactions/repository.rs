@@ -14,15 +14,15 @@ pub type DynTransactionsRepository = Arc<dyn TransactionsRepository + Send + Syn
 #[automock]
 #[async_trait]
 pub trait TransactionsRepository {
-    async fn create_transaction(&self, request: CreateTransaction) -> anyhow::Result<Transaction>;
+    async fn create(&self, request: CreateTransaction) -> anyhow::Result<Transaction>;
 
-    async fn get_transactions(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>>;
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>>;
 
-    async fn get_transaction_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>>;
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>>;
 
-    async fn update_transaction(&self, request: UpdateTransaction) -> anyhow::Result<Transaction>;
+    async fn update(&self, request: UpdateTransaction) -> anyhow::Result<Transaction>;
 
-    async fn delete_transaction(&self, id: Uuid) -> anyhow::Result<()>;
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()>;
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]

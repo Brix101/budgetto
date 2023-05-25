@@ -20,7 +20,7 @@ impl PostgresAccountsRepository {
 
 #[async_trait]
 impl AccountsRepository for PostgresAccountsRepository {
-    async fn create_account(
+    async fn create(
         &self,
         name: String,
         balance: f64,
@@ -44,7 +44,7 @@ impl AccountsRepository for PostgresAccountsRepository {
         .context("an unexpected error occured while creating the account")
     }
 
-    async fn get_accounts(&self, user_id: Uuid) -> anyhow::Result<Vec<Account>> {
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Account>> {
         query_as!(
             Account,
             r#"
@@ -60,7 +60,7 @@ impl AccountsRepository for PostgresAccountsRepository {
         .context("account was not found")
     }
 
-    async fn get_account_by_id(&self, id: Uuid) -> anyhow::Result<Option<Account>> {
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Account>> {
         query_as!(
             Account,
             r#"
@@ -76,7 +76,7 @@ impl AccountsRepository for PostgresAccountsRepository {
         .context("account was not found")
     }
 
-    async fn update_account(
+    async fn update(
         &self,
         id: Uuid,
         name: String,
@@ -105,7 +105,7 @@ impl AccountsRepository for PostgresAccountsRepository {
         .context("could not update the account")
     }
 
-    async fn delete_account(&self, id: Uuid) -> anyhow::Result<()> {
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         update accounts

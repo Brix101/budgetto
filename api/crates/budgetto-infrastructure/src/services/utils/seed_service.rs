@@ -70,7 +70,7 @@ impl SeedService {
         info!("users created, seeding categories...");
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Housing")),
@@ -80,7 +80,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Transportation")),
@@ -90,7 +90,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Food")),
@@ -102,7 +102,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Personal Care")),
@@ -112,7 +112,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Entertainment")),
@@ -122,7 +122,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Debt Payments")),
@@ -132,7 +132,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Savings")),
@@ -142,7 +142,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Utilities")),
@@ -152,7 +152,7 @@ impl SeedService {
             .await?;
 
         self.category_services
-            .create_category(
+            .create(
                 None,
                 CreateCategoryDto {
                     name: Some(String::from("Health Care")),

@@ -11,7 +11,6 @@ use budgetto_core::{
 };
 use budgetto_domain::accounts::{
     requests::{CreateAccountDto, UpdateAccountDto},
-    responses::AccountsResponse,
     AccountDto,
 };
 
@@ -24,7 +23,7 @@ impl BudgettoAccountsService {
     pub fn new(repository: DynAccountsRepository) -> Self {
         Self { repository }
     }
-    async fn map_to_accounts(&self, accounts: Vec<Account>) -> AppResult<AccountsResponse> {
+    async fn map_to_accounts(&self, accounts: Vec<Account>) -> AppResult<Vec<AccountDto>> {
         info!("found {} accounts", accounts.len());
 
         let mut mapped_accounts: Vec<AccountDto> = Vec::new();
@@ -35,36 +34,27 @@ impl BudgettoAccountsService {
             }
         }
 
-        Ok(AccountsResponse {
-            accounts: mapped_accounts,
-        })
+        Ok(mapped_accounts)
     }
 }
 
 #[async_trait]
 impl AccountsService for BudgettoAccountsService {
-    async fn create_account(
-        &self,
-        user_id: Uuid,
-        request: CreateAccountDto,
-    ) -> AppResult<AccountDto> {
+    async fn create(&self, user_id: Uuid, request: CreateAccountDto) -> AppResult<AccountDto> {
         let name = request.name.unwrap();
         let balance = request.balance.unwrap();
         let note = request.note;
 
-        let created_account = self
-            .repository
-            .create_account(name, balance, note, user_id)
-            .await?;
+        let created_account = self.repository.create(name, balance, note, user_id).await?;
 
         info!("user {:?} created account successfully", user_id);
 
         Ok(created_account.into_dto())
     }
 
-    async fn get_account_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<AccountDto> {
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<AccountDto> {
         info!("searching for existing account {:?}", id);
-        let account = self.repository.get_account_by_id(id).await?;
+        let account = self.repository.find_by_id(id).await?;
 
         if let Some(existing_account) = account {
             // verify the user IDs match on the request and the account
@@ -77,20 +67,20 @@ impl AccountsService for BudgettoAccountsService {
         Err(Error::NotFound(String::from("account was not found")))
     }
 
-    async fn get_accounts(&self, user_id: Uuid) -> AppResult<AccountsResponse> {
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<AccountDto>> {
         info!("searching accounts for user {:?}", user_id);
-        let accounts = self.repository.get_accounts(user_id).await?;
+        let accounts = self.repository.find_many(user_id).await?;
 
         self.map_to_accounts(accounts).await
     }
 
-    async fn updated_account(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateAccountDto,
     ) -> AppResult<AccountDto> {
-        let account_to_update = self.repository.get_account_by_id(id).await?;
+        let account_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_account) = account_to_update {
             // verify the user IDs match on the request and the account
@@ -105,7 +95,7 @@ impl AccountsService for BudgettoAccountsService {
             info!("updating account {:?} for user {:?}", id, user_id);
             let updated_account = self
                 .repository
-                .update_account(id, updated_name, updated_balance, Some(update_note))
+                .update(id, updated_name, updated_balance, Some(update_note))
                 .await?;
 
             return Ok(updated_account.into_dto());
@@ -114,8 +104,8 @@ impl AccountsService for BudgettoAccountsService {
         Err(Error::NotFound(String::from("account was not found")))
     }
 
-    async fn delete_account(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
-        let account = self.repository.get_account_by_id(id).await?;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
+        let account = self.repository.find_by_id(id).await?;
 
         if let Some(existing_acount) = account {
             // verify the user IDs match on the request and the account
@@ -123,7 +113,7 @@ impl AccountsService for BudgettoAccountsService {
                 return Err(Error::Forbidden);
             }
 
-            self.repository.delete_account(existing_acount.id).await?;
+            self.repository.delete(existing_acount.id).await?;
 
             return Ok(());
         }

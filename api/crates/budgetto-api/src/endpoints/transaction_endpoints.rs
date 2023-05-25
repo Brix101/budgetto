@@ -36,19 +36,16 @@ impl TransactionController {
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let transaction = services
-                .transactions
-                .get_transaction_by_id(id, user.id)
-                .await?;
+            let transaction = services.transactions.find_by_id(id, user.id).await?;
 
             return Ok(Json(TransactionsResponse {
                 transactions: vec![transaction],
             }));
         }
 
-        let transactions = services.transactions.get_transactions(user.id).await?;
+        let transactions = services.transactions.find_many(user.id).await?;
 
-        Ok(Json(transactions))
+        Ok(Json(TransactionsResponse { transactions }))
     }
     pub async fn get_transaction(
         Path(id): Path<Uuid>,
@@ -57,10 +54,7 @@ impl TransactionController {
     ) -> AppResult<Json<TransactionDto>> {
         info!("recieved request to update transaction {:?}", id);
 
-        let transaction = services
-            .transactions
-            .get_transaction_by_id(id, user.id)
-            .await?;
+        let transaction = services.transactions.find_by_id(id, user.id).await?;
 
         Ok(Json(transaction))
     }
@@ -72,10 +66,7 @@ impl TransactionController {
     ) -> AppResult<Json<TransactionDto>> {
         info!("received request to create transaction");
 
-        let new_transaction = services
-            .transactions
-            .create_transaction(user.id, request)
-            .await?;
+        let new_transaction = services.transactions.create(user.id, request).await?;
 
         Ok(Json(new_transaction))
     }
@@ -88,10 +79,7 @@ impl TransactionController {
     ) -> AppResult<Json<TransactionDto>> {
         info!("recieved request to update transaction {:?}", id);
 
-        let updated_transaction = services
-            .transactions
-            .updated_transaction(id, user.id, request)
-            .await?;
+        let updated_transaction = services.transactions.updated(id, user.id, request).await?;
 
         Ok(Json(updated_transaction))
     }
@@ -103,10 +91,7 @@ impl TransactionController {
     ) -> AppResult<()> {
         info!("recieved request to remove transaction {:?}", id);
 
-        services
-            .transactions
-            .delete_transaction(id, user.id)
-            .await?;
+        services.transactions.delete(id, user.id).await?;
 
         Ok(())
     }

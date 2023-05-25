@@ -13,7 +13,6 @@ use budgetto_core::{
 };
 use budgetto_domain::transactions::{
     requests::{CreateTransactionDto, UpdateTransactionDto},
-    responses::TransactionsResponse,
     TransactionDto,
 };
 
@@ -29,7 +28,7 @@ impl BudgettoTransactionsService {
     async fn map_to_transactions(
         &self,
         categories: Vec<Transaction>,
-    ) -> AppResult<TransactionsResponse> {
+    ) -> AppResult<Vec<TransactionDto>> {
         info!("found {} categories", categories.len());
 
         let mut mapped_transactions: Vec<TransactionDto> = Vec::new();
@@ -40,15 +39,13 @@ impl BudgettoTransactionsService {
             }
         }
 
-        Ok(TransactionsResponse {
-            transactions: mapped_transactions,
-        })
+        Ok(mapped_transactions)
     }
 }
 
 #[async_trait]
 impl TransactionsService for BudgettoTransactionsService {
-    async fn create_transaction(
+    async fn create(
         &self,
         user_id: Uuid,
         request: CreateTransactionDto,
@@ -61,7 +58,7 @@ impl TransactionsService for BudgettoTransactionsService {
 
         let created_transaction = self
             .repository
-            .create_transaction(CreateTransaction {
+            .create(CreateTransaction {
                 amount,
                 note,
                 transaction_type,
@@ -76,8 +73,8 @@ impl TransactionsService for BudgettoTransactionsService {
         Ok(created_transaction.into_dto())
     }
 
-    async fn get_transaction_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<TransactionDto> {
-        let transaction = self.repository.get_transaction_by_id(id).await?;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<TransactionDto> {
+        let transaction = self.repository.find_by_id(id).await?;
 
         if let Some(existing_transaction) = transaction {
             // verify the user IDs match on the request and the transaction
@@ -92,20 +89,20 @@ impl TransactionsService for BudgettoTransactionsService {
         Err(Error::NotFound(String::from("transaction was not found")))
     }
 
-    async fn get_transactions(&self, user_id: Uuid) -> AppResult<TransactionsResponse> {
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<TransactionDto>> {
         info!("retrieving transactions for user {:?}", user_id);
-        let transactions = self.repository.get_transactions(user_id).await?;
+        let transactions = self.repository.find_many(user_id).await?;
 
         self.map_to_transactions(transactions).await
     }
 
-    async fn updated_transaction(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateTransactionDto,
     ) -> AppResult<TransactionDto> {
-        let transaction_to_update = self.repository.get_transaction_by_id(id).await?;
+        let transaction_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_transaction) = transaction_to_update {
             // verify the user IDs match on the request and the transaction
@@ -128,7 +125,7 @@ impl TransactionsService for BudgettoTransactionsService {
             info!("updating transaction {:?} for user {:?}", id, user_id);
             let updated_transaction = self
                 .repository
-                .update_transaction(UpdateTransaction {
+                .update(UpdateTransaction {
                     id: existing_transaction.id,
                     amount: updated_amount,
                     note: Some(updated_note),
@@ -144,8 +141,8 @@ impl TransactionsService for BudgettoTransactionsService {
         Err(Error::NotFound(String::from("transaction was not found")))
     }
 
-    async fn delete_transaction(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
-        let transaction = self.repository.get_transaction_by_id(id).await?;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
+        let transaction = self.repository.find_by_id(id).await?;
 
         if let Some(existing_transaction) = transaction {
             // verify the user IDs match on the request and the transaction
@@ -154,9 +151,7 @@ impl TransactionsService for BudgettoTransactionsService {
             }
 
             info!("deleting transaction {:?} for user {:?}", id, user_id);
-            self.repository
-                .delete_transaction(existing_transaction.id)
-                .await?;
+            self.repository.delete(existing_transaction.id).await?;
 
             return Ok(());
         }

@@ -6,7 +6,6 @@ use uuid::Uuid;
 
 use budgetto_domain::transactions::{
     requests::{CreateTransactionDto, UpdateTransactionDto},
-    responses::TransactionsResponse,
     TransactionDto,
 };
 
@@ -17,22 +16,22 @@ pub type DynTransactionsService = Arc<dyn TransactionsService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait TransactionsService {
-    async fn create_transaction(
+    async fn create(
         &self,
         user_id: Uuid,
         request: CreateTransactionDto,
     ) -> AppResult<TransactionDto>;
 
-    async fn get_transaction_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<TransactionDto>;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<TransactionDto>;
 
-    async fn get_transactions(&self, user_id: Uuid) -> AppResult<TransactionsResponse>;
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<TransactionDto>>;
 
-    async fn updated_transaction(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateTransactionDto,
     ) -> AppResult<TransactionDto>;
 
-    async fn delete_transaction(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
 }

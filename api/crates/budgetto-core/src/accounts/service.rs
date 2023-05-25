@@ -6,7 +6,6 @@ use uuid::Uuid;
 
 use budgetto_domain::accounts::{
     requests::{CreateAccountDto, UpdateAccountDto},
-    responses::AccountsResponse,
     AccountDto,
 };
 
@@ -17,22 +16,18 @@ pub type DynAccountsService = Arc<dyn AccountsService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait AccountsService {
-    async fn create_account(
-        &self,
-        user_id: Uuid,
-        request: CreateAccountDto,
-    ) -> AppResult<AccountDto>;
+    async fn create(&self, user_id: Uuid, request: CreateAccountDto) -> AppResult<AccountDto>;
 
-    async fn get_account_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<AccountDto>;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<AccountDto>;
 
-    async fn get_accounts(&self, user_id: Uuid) -> AppResult<AccountsResponse>;
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<AccountDto>>;
 
-    async fn updated_account(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateAccountDto,
     ) -> AppResult<AccountDto>;
 
-    async fn delete_account(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
 }

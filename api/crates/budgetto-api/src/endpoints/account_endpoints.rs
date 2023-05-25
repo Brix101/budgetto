@@ -33,16 +33,16 @@ impl AccountController {
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let account = services.accounts.get_account_by_id(id, user.id).await?;
+            let account = services.accounts.find_by_id(id, user.id).await?;
 
             return Ok(Json(AccountsResponse {
                 accounts: vec![account],
             }));
         }
 
-        let accounts = services.accounts.get_accounts(user.id).await?;
+        let accounts = services.accounts.find_many(user.id).await?;
 
-        Ok(Json(accounts))
+        Ok(Json(AccountsResponse { accounts }))
     }
     pub async fn get_account(
         Path(id): Path<Uuid>,
@@ -51,7 +51,7 @@ impl AccountController {
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to get account {:?}", id);
 
-        let account = services.accounts.get_account_by_id(id, user.id).await?;
+        let account = services.accounts.find_by_id(id, user.id).await?;
 
         Ok(Json(account))
     }
@@ -62,7 +62,7 @@ impl AccountController {
     ) -> AppResult<Json<AccountDto>> {
         info!("received request to create account");
 
-        let new_account = services.accounts.create_account(user.id, request).await?;
+        let new_account = services.accounts.create(user.id, request).await?;
 
         Ok(Json(new_account))
     }
@@ -75,10 +75,7 @@ impl AccountController {
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to update account {:?}", id);
 
-        let updated_account = services
-            .accounts
-            .updated_account(id, user.id, request)
-            .await?;
+        let updated_account = services.accounts.updated(id, user.id, request).await?;
 
         Ok(Json(updated_account))
     }
@@ -90,7 +87,7 @@ impl AccountController {
     ) -> AppResult<()> {
         info!("recieved request to remove account {:?}", id);
 
-        services.categories.delete_category(id, user.id).await?;
+        services.categories.delete(id, user.id).await?;
 
         Ok(())
     }

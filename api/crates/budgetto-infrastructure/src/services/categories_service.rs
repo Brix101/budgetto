@@ -11,7 +11,6 @@ use budgetto_core::{
 };
 use budgetto_domain::categories::{
     requests::{CreateCategoryDto, UpdateCategoryDto},
-    responses::CategoriesResponse,
     CategoryDto,
 };
 
@@ -24,7 +23,7 @@ impl BudgettoCategoriesService {
     pub fn new(repository: DynCategoriesRepository) -> Self {
         Self { repository }
     }
-    async fn map_to_categories(&self, categories: Vec<Category>) -> AppResult<CategoriesResponse> {
+    async fn map_to_categories(&self, categories: Vec<Category>) -> AppResult<Vec<CategoryDto>> {
         info!("found {} categories", categories.len());
 
         let mut mapped_categories: Vec<CategoryDto> = Vec::new();
@@ -35,15 +34,13 @@ impl BudgettoCategoriesService {
             }
         }
 
-        Ok(CategoriesResponse {
-            categories: mapped_categories,
-        })
+        Ok(mapped_categories)
     }
 }
 
 #[async_trait]
 impl CategoriesService for BudgettoCategoriesService {
-    async fn create_category(
+    async fn create(
         &self,
         user_id: Option<Uuid>,
         request: CreateCategoryDto,
@@ -51,7 +48,7 @@ impl CategoriesService for BudgettoCategoriesService {
         let name = request.name.unwrap();
         let note = request.note;
 
-        let created_category = self.repository.create_category(name, note, user_id).await?;
+        let created_category = self.repository.create(name, note, user_id).await?;
 
         if user_id.is_some() {
             info!("user {:?} created category successfully", user_id);
@@ -60,8 +57,8 @@ impl CategoriesService for BudgettoCategoriesService {
         Ok(created_category.into_dto())
     }
 
-    async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto> {
-        let category = self.repository.get_category_by_id(id).await?;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto> {
+        let category = self.repository.find_by_id(id).await?;
 
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
@@ -78,20 +75,20 @@ impl CategoriesService for BudgettoCategoriesService {
         Err(Error::NotFound(String::from("category was not found")))
     }
 
-    async fn get_categories(&self, user_id: Uuid) -> AppResult<CategoriesResponse> {
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>> {
         info!("retrieving categories for user {:?}", user_id);
-        let categories = self.repository.get_categories(user_id).await?;
+        let categories = self.repository.find_many(user_id).await?;
 
         self.map_to_categories(categories).await
     }
 
-    async fn updated_category(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateCategoryDto,
     ) -> AppResult<CategoryDto> {
-        let category_to_update = self.repository.get_category_by_id(id).await?;
+        let category_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_category) = category_to_update {
             // verify the user IDs match on the request and the category
@@ -107,7 +104,7 @@ impl CategoriesService for BudgettoCategoriesService {
             info!("updating category {:?} for user {:?}", id, user_id);
             let updated_category = self
                 .repository
-                .update_category(id, updated_name, Some(update_note))
+                .update(id, updated_name, Some(update_note))
                 .await?;
 
             return Ok(updated_category.into_dto());
@@ -116,8 +113,8 @@ impl CategoriesService for BudgettoCategoriesService {
         Err(Error::NotFound(String::from("category was not found")))
     }
 
-    async fn delete_category(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
-        let category = self.repository.get_category_by_id(id).await?;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
+        let category = self.repository.find_by_id(id).await?;
 
         if let Some(existing_category) = category {
             // verify the user IDs match on the request and the category
@@ -128,9 +125,7 @@ impl CategoriesService for BudgettoCategoriesService {
             }
 
             info!("deleting category {:?} for user {:?}", id, user_id);
-            self.repository
-                .delete_category(existing_category.id)
-                .await?;
+            self.repository.delete(existing_category.id).await?;
 
             return Ok(());
         }

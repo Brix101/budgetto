@@ -13,25 +13,25 @@ pub type DynCategoriesRepository = Arc<dyn CategoriesRepository + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait CategoriesRepository {
-    async fn create_category(
+    async fn create(
         &self,
         name: String,
         note: Option<String>,
         user_id: Option<Uuid>,
     ) -> anyhow::Result<Category>;
 
-    async fn get_categories(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>>;
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Category>>;
 
-    async fn get_category_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>>;
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Category>>;
 
-    async fn update_category(
+    async fn update(
         &self,
         id: Uuid,
         name: String,
         note: Option<String>,
     ) -> anyhow::Result<Category>;
 
-    async fn delete_category(&self, id: Uuid) -> anyhow::Result<()>;
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()>;
 }
 
 #[derive(FromRow, Debug)]

@@ -15,7 +15,7 @@ pub type DynbudgetsRepository = Arc<dyn BudgetsRepository + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait BudgetsRepository {
-    async fn create_budget(
+    async fn create(
         &self,
         name: String,
         balance: f64,
@@ -23,11 +23,11 @@ pub trait BudgetsRepository {
         user_id: Uuid,
     ) -> anyhow::Result<Budget>;
 
-    async fn get_budgets(&self, user_id: Uuid) -> anyhow::Result<Vec<Budget>>;
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Budget>>;
 
-    async fn get_budget_by_id(&self, id: Uuid) -> anyhow::Result<Option<Budget>>;
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Budget>>;
 
-    async fn update_budget(
+    async fn update(
         &self,
         id: Uuid,
         name: String,
@@ -35,7 +35,7 @@ pub trait BudgetsRepository {
         note: Option<String>,
     ) -> anyhow::Result<Budget>;
 
-    async fn delete_budget(&self, id: Uuid) -> anyhow::Result<()>;
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()>;
 }
 
 #[derive(FromRow, Debug)]

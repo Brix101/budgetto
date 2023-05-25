@@ -6,7 +6,6 @@ use uuid::Uuid;
 
 use budgetto_domain::categories::{
     requests::{CreateCategoryDto, UpdateCategoryDto},
-    responses::CategoriesResponse,
     CategoryDto,
 };
 
@@ -17,22 +16,22 @@ pub type DynCategoriesService = Arc<dyn CategoriesService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait CategoriesService {
-    async fn create_category(
+    async fn create(
         &self,
         user_id: Option<Uuid>,
         request: CreateCategoryDto,
     ) -> AppResult<CategoryDto>;
 
-    async fn get_category_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
+    async fn find_by_id(&self, id: Uuid, user_id: Uuid) -> AppResult<CategoryDto>;
 
-    async fn get_categories(&self, user_id: Uuid) -> AppResult<CategoriesResponse>;
+    async fn find_many(&self, user_id: Uuid) -> AppResult<Vec<CategoryDto>>;
 
-    async fn updated_category(
+    async fn updated(
         &self,
         id: Uuid,
         user_id: Uuid,
         request: UpdateCategoryDto,
     ) -> AppResult<CategoryDto>;
 
-    async fn delete_category(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
+    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()>;
 }

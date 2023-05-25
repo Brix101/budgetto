@@ -24,7 +24,7 @@ impl PostgresTransactionsRepository {
 
 #[async_trait]
 impl TransactionsRepository for PostgresTransactionsRepository {
-    async fn create_transaction(&self, request: CreateTransaction) -> anyhow::Result<Transaction> {
+    async fn create(&self, request: CreateTransaction) -> anyhow::Result<Transaction> {
         query_as!(
             Transaction,
             r#"
@@ -44,7 +44,7 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         .context("an unexpected error occured while creating the transaction")
     }
 
-    async fn get_transaction_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>> {
+    async fn find_by_id(&self, id: Uuid) -> anyhow::Result<Option<Transaction>> {
         query_as!(
             Transaction,
             r#"
@@ -60,7 +60,7 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         .context("transaction was not found")
     }
 
-    async fn get_transactions(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>> {
+    async fn find_many(&self, user_id: Uuid) -> anyhow::Result<Vec<Transaction>> {
         query_as!(
             Transaction,
             r#"
@@ -76,7 +76,7 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         .context("transaction was not found")
     }
 
-    async fn update_transaction(&self, request: UpdateTransaction) -> anyhow::Result<Transaction> {
+    async fn update(&self, request: UpdateTransaction) -> anyhow::Result<Transaction> {
         query_as!(
             Transaction,
             r#"
@@ -103,7 +103,7 @@ impl TransactionsRepository for PostgresTransactionsRepository {
         .context("could not update the transaction")
     }
 
-    async fn delete_transaction(&self, id: Uuid) -> anyhow::Result<()> {
+    async fn delete(&self, id: Uuid) -> anyhow::Result<()> {
         query!(
             r#"
         update transactions

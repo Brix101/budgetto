@@ -4,6 +4,7 @@ pub mod categories;
 pub mod config;
 pub mod errors;
 pub mod logger;
+pub mod service;
 pub mod sessions;
 pub mod transactions;
 pub mod users;
