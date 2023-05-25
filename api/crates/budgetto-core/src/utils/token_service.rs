@@ -16,5 +16,6 @@ pub trait TokenService {
     fn new_refresh_token(&self, sub: Uuid) -> AppResult<String>;
     fn verify_access_token(&self, token: &str) -> AppResult<AccessTokenClaims>;
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid>;
+    fn refresh_blacklist(&self);
     fn add_blacklist(&self, id: Uuid);
 }

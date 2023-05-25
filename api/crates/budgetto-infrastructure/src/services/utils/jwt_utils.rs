@@ -104,6 +104,10 @@ impl TokenService for JwtService {
         Ok(decoded_token.claims.sub)
     }
 
+    fn refresh_blacklist(&self) {
+        TOKEN_BLACKLIST.lock().unwrap().clear();
+    }
+
     fn add_blacklist(&self, id: Uuid) {
         TOKEN_BLACKLIST.lock().unwrap().push(id.to_string());
     }
