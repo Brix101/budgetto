@@ -5,14 +5,14 @@ pub mod requests;
 pub mod responses;
 
 #[derive(Serialize, Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct BudgetDto {
-    #[serde(skip_serializing, skip_deserializing)]
+    // #[serde(skip_serializing, skip_deserializing)]
     pub id: Uuid,
-    pub name: String,
-    pub balance: f64,
-    pub note: Option<String>,
-    #[serde(rename = "createdAt")]
+    pub amount: f64,
+    pub category_id: Uuid,
+    // #[serde(rename = "createdAt")]
     pub created_at: String,
-    #[serde(rename = "updatedAt")]
+    // #[serde(rename = "updatedAt")]
     pub updated_at: String,
 }

@@ -12,9 +12,9 @@ use uuid::Uuid;
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
 use crate::extractors::validation_extractor::ValidationExtractor;
 
-pub struct AccountController;
+pub struct AccountRouter;
 
-impl AccountController {
+impl AccountRouter {
     pub fn app() -> Router {
         Router::new()
             .route("/", get(Self::get_accounts))

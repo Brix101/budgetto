@@ -4,6 +4,7 @@ use tracing::info;
 
 use budgetto_core::{
     accounts::{repository::DynAccountsRepository, service::DynAccountsService},
+    budgets::{repository::DynBudgetsRepository, service::DynBudgetsService},
     categories::{repository::DynCategoriesRepository, service::DynCategoriesService},
     config::AppConfig,
     sessions::{repository::DynSessionsRepository, service::DynSessionsService},
@@ -16,6 +17,7 @@ use crate::{
     connection_pool::ConnectionPool,
     repositories::{
         accounts_repository::PostgresAccountsRepository,
+        budgets_repository::PostgresBudgetsRepository,
         categories_repository::PostgresCategoriesRepository,
         sessions_repository::PostgresSessionsRepository,
         transactions_repository::PostgresTransactionsRepository,
@@ -23,6 +25,7 @@ use crate::{
     },
     services::{
         accounts_service::BudgettoAccountsService,
+        budgets_service::BudgettoBudgetsService,
         categories_service::BudgettoCategoriesService,
         sessions_service::BudgettoSessionsService,
         transactions_service::BudgettoTransactionsService,
@@ -39,6 +42,7 @@ pub struct ServiceRegister {
     pub categories: DynCategoriesService,
     pub accounts: DynAccountsService,
     pub transactions: DynTransactionsService,
+    pub budgets: DynBudgetsService,
 }
 
 /// A simple service container responsible for managing the various services our API endpoints will pull from through axum extensions.
@@ -85,6 +89,12 @@ impl ServiceRegister {
         let transactions = Arc::new(BudgettoTransactionsService::new(transactions_repository))
             as DynTransactionsService;
 
+        let budgets_repository =
+            Arc::new(PostgresBudgetsRepository::new(pool.clone())) as DynBudgetsRepository;
+
+        let budgets =
+            Arc::new(BudgettoBudgetsService::new(budgets_repository)) as DynBudgetsService;
+
         info!("feature services successfully initialized!");
         ServiceRegister {
             token_service,
@@ -93,6 +103,7 @@ impl ServiceRegister {
             categories,
             accounts,
             transactions,
+            budgets,
         }
     }
 }

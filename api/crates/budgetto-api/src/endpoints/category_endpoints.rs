@@ -13,9 +13,9 @@ use budgetto_domain::categories::CategoryDto;
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
 use crate::extractors::validation_extractor::ValidationExtractor;
 
-pub struct CategoryController;
+pub struct CategoryRouter;
 
-impl CategoryController {
+impl CategoryRouter {
     pub fn app() -> Router {
         Router::new()
             .route("/", get(Self::get_categories))

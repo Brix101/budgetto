@@ -1,5 +1,17 @@
 {
   "db": "PostgreSQL",
+  "01790320f8352e56369fedaaee1192fad7e8e9dc75474f6a804d00dc73f80003": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update budgets\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
+  },
   "16283b2a3bb5d690747545d541d42d3dad0871fdc71eef678c97238fb1a3aaf7": {
     "describe": {
       "columns": [
@@ -827,6 +839,64 @@
     },
     "query": "\n        SELECT id, amount, note, transaction_type as \"transaction_type: TransactionType\", account_id, category_id, user_id, created_at, updated_at, deleted_at\n        FROM \"transactions\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
   },
+  "8e4ad4fb0963c2169d3d4abe559f440d474fdc0405fb6f36c28dd72c2ee5080a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        update budgets\n        set\n            amount = $1,\n            category_id = $2,\n            updated_at = current_timestamp\n        where id = $3\n        RETURNING * \n            "
+  },
   "92c28068c7226809a740ba4f55405e916eeac79448ce5f5032851296d075fdcf": {
     "describe": {
       "columns": [
@@ -1023,6 +1093,62 @@
       }
     },
     "query": "\n        update categories\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
+  },
+  "c13708ace09e643d331d9e5587aa18908a4b6e291ac85e72fc9ba6cc29b665a2": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT *\n        FROM \"budgets\"\n        WHERE \"user_id\" IS NULL OR \"user_id\" = $1 AND \"deleted_at\" IS NULL\n        ORDER BY created_at ASC\n            "
   },
   "cc2875a273aee24cd62163979b3e51f4aad2a09693edd3e3aaa663474d38bf55": {
     "describe": {
@@ -1294,5 +1420,119 @@
       }
     },
     "query": "\n        update accounts\n        set\n            deleted_at = current_timestamp,\n            updated_at = current_timestamp\n        where id = $1\n        "
+  },
+  "eeb1e49581ad9ef25fe2b91b68ca38f78c66ccafef98eb81c3657dc41c49e865": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Float8",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO \"budgets\" (\"amount\", \"category_id\", \"user_id\", \"created_at\", \"updated_at\", \"deleted_at\")\n        VALUES ($1, $2, $3, current_timestamp, current_timestamp, NULL)\n        RETURNING *\n            "
+  },
+  "f4969b25479e56ea330ed7d5bf23816c394198f9071c6909eeed2ee30b41804a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "amount",
+          "ordinal": 1,
+          "type_info": "Float8"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 3,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "updated_at",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "deleted_at",
+          "ordinal": 6,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n        SELECT *\n        FROM \"budgets\" \n        WHERE \"id\" = $1 \n        AND \"deleted_at\" IS NULL\n            "
   }
 }

@@ -15,9 +15,9 @@ use budgetto_infrastructure::service_register::ServiceRegister;
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
 use crate::extractors::validation_extractor::ValidationExtractor;
 
-pub struct TransactionController;
+pub struct TransactionRouter;
 
-impl TransactionController {
+impl TransactionRouter {
     pub fn app() -> Router {
         Router::new()
             .route("/", get(Self::get_transactions))
