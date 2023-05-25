@@ -40,10 +40,11 @@ impl BudgettoAccountsService {
 
 #[async_trait]
 impl AccountsService for BudgettoAccountsService {
-    async fn create(&self, user_id: Uuid, request: CreateAccountDto) -> AppResult<AccountDto> {
-        let name = request.name.unwrap();
-        let balance = request.balance.unwrap();
-        let note = request.note;
+    async fn create(&self, args: CreateAccountDto) -> AppResult<AccountDto> {
+        let name = args.name.unwrap();
+        let balance = args.balance.unwrap();
+        let note = args.note;
+        let user_id = args.user_id.unwrap();
 
         let created_account = self
             .repository
@@ -82,12 +83,9 @@ impl AccountsService for BudgettoAccountsService {
         self.map_to_accounts(accounts).await
     }
 
-    async fn updated(
-        &self,
-        id: Uuid,
-        user_id: Uuid,
-        request: UpdateAccountDto,
-    ) -> AppResult<AccountDto> {
+    async fn updated(&self, request: UpdateAccountDto) -> AppResult<AccountDto> {
+        let id = request.id.unwrap();
+        let user_id = request.user_id.unwrap();
         let account_to_update = self.repository.find_by_id(id).await?;
 
         if let Some(existing_account) = account_to_update {
@@ -98,7 +96,10 @@ impl AccountsService for BudgettoAccountsService {
 
             let updated_name = request.name.unwrap_or(existing_account.name);
             let updated_balance = request.balance.unwrap_or(existing_account.balance);
-            let update_note = request.note.unwrap_or(existing_account.note.unwrap());
+            let update_note = match request.note {
+                Some(note) => note,
+                None => existing_account.note.unwrap_or(String::new()),
+            };
 
             info!("updating account {:?} for user {:?}", id, user_id);
             let updated_account = self

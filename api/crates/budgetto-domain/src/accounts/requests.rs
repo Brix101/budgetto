@@ -9,10 +9,13 @@ pub struct CreateAccountDto {
     #[validate(required)]
     pub balance: Option<f64>,
     pub note: Option<String>,
+    pub user_id: Option<Uuid>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct UpdateAccountDto {
+    pub id: Option<Uuid>,
+    pub user_id: Option<Uuid>,
     pub name: Option<String>,
     pub balance: Option<f64>,
     pub note: Option<String>,

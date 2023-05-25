@@ -58,11 +58,13 @@ impl AccountController {
     pub async fn create_account(
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        ValidationExtractor(request): ValidationExtractor<CreateAccountDto>,
+        ValidationExtractor(mut request): ValidationExtractor<CreateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("received request to create account");
 
-        let new_account = services.accounts.create(user.id, request).await?;
+        request.user_id = Some(user.id);
+
+        let new_account = services.accounts.create(request).await?;
 
         Ok(Json(new_account))
     }
@@ -71,11 +73,13 @@ impl AccountController {
         Path(id): Path<Uuid>,
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        Json(request): Json<UpdateAccountDto>,
+        Json(mut request): Json<UpdateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to update account {:?}", id);
 
-        let updated_account = services.accounts.updated(id, user.id, request).await?;
+        request.id = Some(id);
+        request.user_id = Some(user.id);
+        let updated_account = services.accounts.updated(request).await?;
 
         Ok(Json(updated_account))
     }
