@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 
 async function getData() {
   const session = await getServerSession(authOptions);
-  const res = await fetch(`${baseApi}/categories`, {
+  const res = await fetch(`${baseApi}/transactions`, {
     credentials: "include",
     headers: {
       Authorization: `Bearer ${session?.user.accessToken}`,
@@ -20,7 +20,7 @@ async function getData() {
     throw new Error("Failed to fetch data");
   }
 
-  return res.json().then((data) => categoriesSchema.parse(data));
+  return res.json().then((data) => data);
 }
 
 export default async function Page() {
