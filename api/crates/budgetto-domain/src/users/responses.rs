@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::users::UserDto;
+use crate::{
+    accounts::AccountDto, budgets::BudgetDto, categories::CategoryDto,
+    transactions::TransactionDto, users::UserDto,
+};
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct UserAuthenicationResponse {
@@ -36,4 +39,13 @@ pub struct ReAuthResponse {
     pub user: UserDto,
     #[serde(rename = "accessToken")]
     pub access_token: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UserDataResponse {
+    pub user: UserDto,
+    pub accounts: Vec<AccountDto>,
+    pub budgets: Vec<BudgetDto>,
+    pub categories: Vec<CategoryDto>,
+    pub transactions: Vec<TransactionDto>,
 }
