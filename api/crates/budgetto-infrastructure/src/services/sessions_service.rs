@@ -52,7 +52,7 @@ impl SessionsService for BudgettoSessionsService {
                     })
                     .await?;
 
-                let user_in_session = self
+                let user = self
                     .repository
                     .get_user_by_session_id(new_session.id)
                     .await?
@@ -62,12 +62,12 @@ impl SessionsService for BudgettoSessionsService {
 
                 let access_token = self
                     .token_service
-                    .new_access_token(new_session.id, user_in_session.clone().into_dto())?;
+                    .new_access_token(new_session.id, user.id)?;
 
                 let refresh_token = self.token_service.new_refresh_token(new_session.id)?;
 
                 Ok(SessionResponse {
-                    user: Some(user_in_session.into_dto()),
+                    user: Some(user.into_dto()),
                     access_token: Some(access_token),
                     refresh_token: Some(refresh_token),
                 })
@@ -93,13 +93,10 @@ impl SessionsService for BudgettoSessionsService {
 
         if let Some(user) = user_in_session {
             info!("existing session found, generating access token");
-            let user_dto = user.into_dto();
-            let access_token = self
-                .token_service
-                .new_access_token(session_id, user_dto.clone())?;
+            let access_token = self.token_service.new_access_token(session_id, user.id)?;
 
             return Ok(ReAuthResponse {
-                user: user_dto,
+                user: user.into_dto(),
                 access_token,
             });
         }

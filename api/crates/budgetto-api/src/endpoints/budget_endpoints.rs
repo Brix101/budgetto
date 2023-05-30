@@ -26,43 +26,43 @@ impl BudgetRouter {
 
     pub async fn get_budgets(
         query_params: Query<QueryBudget>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<BudgetsResponse>> {
         info!("received request to get current user budgets");
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let budget = services.budgets.find_by_id(id, user.id).await?;
+            let budget = services.budgets.find_by_id(id, user_id).await?;
 
             return Ok(Json(BudgetsResponse {
                 budgets: vec![budget],
             }));
         }
 
-        let budgets = services.budgets.find_many(user.id).await?;
+        let budgets = services.budgets.find_many(user_id).await?;
 
         Ok(Json(BudgetsResponse { budgets }))
     }
     pub async fn get_budget(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<BudgetDto>> {
         info!("recieved request to get budget {:?}", id);
 
-        let budget = services.budgets.find_by_id(id, user.id).await?;
+        let budget = services.budgets.find_by_id(id, user_id).await?;
 
         Ok(Json(budget))
     }
     pub async fn create_budget(
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(mut request): ValidationExtractor<CreateBudgetDto>,
     ) -> AppResult<Json<BudgetDto>> {
         info!("received request to create budget");
 
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
 
         let new_budget = services.budgets.create(request).await?;
 
@@ -71,14 +71,14 @@ impl BudgetRouter {
 
     pub async fn update_budget(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         Json(mut request): Json<UpdateBudgetDto>,
     ) -> AppResult<Json<BudgetDto>> {
         info!("recieved request to update budget {:?}", id);
 
         request.id = Some(id);
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
         let updated_budget = services.budgets.updated(request).await?;
 
         Ok(Json(updated_budget))
@@ -86,12 +86,12 @@ impl BudgetRouter {
 
     pub async fn delete_budget(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove budget {:?}", id);
 
-        services.budgets.delete(id, user.id).await?;
+        services.budgets.delete(id, user_id).await?;
 
         Ok(())
     }

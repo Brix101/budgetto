@@ -69,9 +69,12 @@ impl AuthRouter {
     }
 
     pub async fn who_am_i(
-        RequiredAuthentication(user): RequiredAuthentication,
+        Extension(services): Extension<ServiceRegister>,
+        RequiredAuthentication(user_id): RequiredAuthentication,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
-        info!("recieved request to retrieve current user");
+        info!("recieved request to retrieve current user {:?}", user_id);
+
+        let user = services.users.find_by_id(user_id).await?;
 
         Ok(Json(UserAuthenicationResponse { user }))
     }
@@ -92,12 +95,12 @@ impl AuthRouter {
 
     pub async fn signout_user(
         jar: CookieJar,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         SessionExtractor(session_id, _): SessionExtractor,
     ) -> AppResult<CookieJar> {
         info!("recieved request to signout session");
-        services.sessions.delete(session_id, user.id).await?;
+        services.sessions.delete(session_id, user_id).await?;
 
         let cookie_jar = jar.remove(Cookie::named("x-refresh"));
 

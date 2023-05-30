@@ -6,7 +6,6 @@ use std::time::{Duration, SystemTime};
 use budgetto_core::config::AppConfig;
 use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::utils::token_service::TokenService;
-use budgetto_domain::users::UserDto;
 use budgetto_domain::utils::token::{AccessTokenClaims, RefreshTokenClaims};
 use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use lazy_static::lazy_static;
@@ -28,7 +27,7 @@ impl JwtService {
 }
 
 impl TokenService for JwtService {
-    fn new_access_token(&self, sub: Uuid, user: UserDto) -> AppResult<String> {
+    fn new_access_token(&self, sub: Uuid, user_id: Uuid) -> AppResult<String> {
         let from_now = Duration::from_secs(900); //? expires every 15 min
         let expired_future_time = SystemTime::now().add(from_now);
         let exp = OffsetDateTime::from(expired_future_time);
@@ -36,7 +35,7 @@ impl TokenService for JwtService {
 
         let claims = AccessTokenClaims {
             sub,
-            user,
+            user_id,
             exp: exp.unix_timestamp() as usize,
             iat: now.unix_timestamp() as usize,
         };
@@ -82,16 +81,18 @@ impl TokenService for JwtService {
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
-        // let blacklist = TOKEN_BLACKLIST.lock().unwrap().to_vec();
-        //
-        // if blacklist.contains(&decoded_token.claims.sub.to_string()) {
-        //     Err(Error::InternalServerErrorWithContext(
-        //         "Blacklisted Token".to_string(),
-        //     ))
-        // } else {
-        //     Ok(decoded_token.claims)
-        // }
-        Ok(decoded_token.claims)
+        let blacklist = TOKEN_BLACKLIST.lock().unwrap().to_vec();
+
+        println!("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        println!("{:#?}", blacklist);
+        if blacklist.contains(&decoded_token.claims.sub.to_string()) {
+            println!("*********************************************************");
+            Err(Error::InternalServerErrorWithContext(
+                "Blacklisted Token".to_string(),
+            ))
+        } else {
+            Ok(decoded_token.claims)
+        }
     }
 
     fn verify_refresh_token(&self, token: &str) -> AppResult<RefreshTokenClaims> {

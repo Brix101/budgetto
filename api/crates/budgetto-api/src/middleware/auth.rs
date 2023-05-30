@@ -94,7 +94,7 @@ where
                     });
 
                 match token_claims {
-                    Ok(claims) => claims.user.into_auth_claims(Some(claims.sub)),
+                    Ok(claims) => claims.into_auth_claims(),
                     Err(mapped_err) => mapped_err,
                 }
             }

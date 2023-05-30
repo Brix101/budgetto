@@ -29,44 +29,44 @@ impl TransactionRouter {
 
     pub async fn get_transactions(
         query_params: Query<QueryTransaction>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<TransactionsResponse>> {
         info!("received request to get current user transactions");
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let transaction = services.transactions.find_by_id(id, user.id).await?;
+            let transaction = services.transactions.find_by_id(id, user_id).await?;
 
             return Ok(Json(TransactionsResponse {
                 transactions: vec![transaction],
             }));
         }
 
-        let transactions = services.transactions.find_many(user.id).await?;
+        let transactions = services.transactions.find_many(user_id).await?;
 
         Ok(Json(TransactionsResponse { transactions }))
     }
     pub async fn get_transaction(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<TransactionDto>> {
         info!("recieved request to update transaction {:?}", id);
 
-        let transaction = services.transactions.find_by_id(id, user.id).await?;
+        let transaction = services.transactions.find_by_id(id, user_id).await?;
 
         Ok(Json(transaction))
     }
 
     pub async fn create_transaction(
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(mut request): ValidationExtractor<CreateTransactionDto>,
     ) -> AppResult<Json<TransactionDto>> {
         info!("received request to create transaction");
 
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
         let new_transaction = services.transactions.create(request).await?;
 
         Ok(Json(new_transaction))
@@ -74,14 +74,14 @@ impl TransactionRouter {
 
     pub async fn update_transaction(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         Json(mut request): Json<UpdateTransactionDto>,
     ) -> AppResult<Json<TransactionDto>> {
         info!("recieved request to update transaction {:?}", id);
 
         request.id = Some(id);
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
         let updated_transaction = services.transactions.updated(request).await?;
 
         Ok(Json(updated_transaction))
@@ -89,12 +89,12 @@ impl TransactionRouter {
 
     pub async fn delete_transaction(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove transaction {:?}", id);
 
-        services.transactions.delete(id, user.id).await?;
+        services.transactions.delete(id, user_id).await?;
 
         Ok(())
     }

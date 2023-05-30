@@ -27,44 +27,44 @@ impl CategoryRouter {
 
     pub async fn get_categories(
         query_params: Query<QueryCategory>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<CategoriesResponse>> {
         info!("received request to get current user categories");
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let category = services.categories.find_by_id(id, user.id).await?;
+            let category = services.categories.find_by_id(id, user_id).await?;
 
             return Ok(Json(CategoriesResponse {
                 categories: vec![category],
             }));
         }
 
-        let categories = services.categories.find_many(user.id).await?;
+        let categories = services.categories.find_many(user_id).await?;
 
         Ok(Json(CategoriesResponse { categories }))
     }
 
     pub async fn get_category(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to get category {:?}", id);
 
-        let category = services.categories.find_by_id(id, user.id).await?;
+        let category = services.categories.find_by_id(id, user_id).await?;
 
         Ok(Json(category))
     }
     pub async fn create_category(
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(mut request): ValidationExtractor<CreateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("received request to create category");
 
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
         let new_category = services.categories.create(request).await?;
 
         Ok(Json(new_category))
@@ -72,14 +72,14 @@ impl CategoryRouter {
 
     pub async fn update_category(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         Json(mut request): Json<UpdateCategoryDto>,
     ) -> AppResult<Json<CategoryDto>> {
         info!("recieved request to update category {:?}", id);
 
         request.id = Some(id);
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
 
         let updated_category = services.categories.updated(request).await?;
 
@@ -88,12 +88,12 @@ impl CategoryRouter {
 
     pub async fn delete_category(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove category {:?}", id);
 
-        services.categories.delete(id, user.id).await?;
+        services.categories.delete(id, user_id).await?;
 
         Ok(())
     }

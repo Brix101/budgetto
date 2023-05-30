@@ -2,14 +2,13 @@ use async_trait::async_trait;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum::Extension;
-use tracing::error;
 
 use budgetto_core::errors::Error;
-use budgetto_domain::users::{AuthClaims, UserDto};
-use budgetto_infrastructure::service_register::ServiceRegister;
+use budgetto_domain::users::AuthClaims;
+use uuid::Uuid;
 
 /// Extracts the JWT from the Authorization token header.
-pub struct RequiredAuthentication(pub UserDto);
+pub struct RequiredAuthentication(pub Uuid);
 
 #[async_trait]
 impl<S> FromRequestParts<S> for RequiredAuthentication
@@ -23,27 +22,8 @@ where
                 .await
                 .map_err(|_err| Error::Unauthorized)?;
 
-        if let Some(auth_user) = auth_claims.user {
-            let Extension(services): Extension<ServiceRegister> =
-                Extension::from_request_parts(parts, state)
-                    .await
-                    .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
-
-            services
-                .sessions
-                .get_user(auth_claims.session_id.unwrap())
-                .await?;
-
-            let user = services
-                .users
-                .find_by_id(auth_user.id)
-                .await
-                .map_err(|err| {
-                    error!("invalid user ID from token: {:?}", err);
-                    Error::Unauthorized
-                })?;
-
-            return Ok(RequiredAuthentication(user));
+        if let Some(user_id) = auth_claims.user_id {
+            return Ok(RequiredAuthentication(user_id));
         }
 
         Err(Error::Unauthorized)

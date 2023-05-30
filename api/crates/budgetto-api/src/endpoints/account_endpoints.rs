@@ -26,43 +26,43 @@ impl AccountRouter {
 
     pub async fn get_accounts(
         query_params: Query<QueryAccount>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<AccountsResponse>> {
         info!("received request to get current user accounts");
 
         if let Some(id) = query_params.id {
             // return this function if the query params has value
-            let account = services.accounts.find_by_id(id, user.id).await?;
+            let account = services.accounts.find_by_id(id, user_id).await?;
 
             return Ok(Json(AccountsResponse {
                 accounts: vec![account],
             }));
         }
 
-        let accounts = services.accounts.find_many(user.id).await?;
+        let accounts = services.accounts.find_many(user_id).await?;
 
         Ok(Json(AccountsResponse { accounts }))
     }
     pub async fn get_account(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to get account {:?}", id);
 
-        let account = services.accounts.find_by_id(id, user.id).await?;
+        let account = services.accounts.find_by_id(id, user_id).await?;
 
         Ok(Json(account))
     }
     pub async fn create_account(
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         ValidationExtractor(mut request): ValidationExtractor<CreateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("received request to create account");
 
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
 
         let new_account = services.accounts.create(request).await?;
 
@@ -71,14 +71,14 @@ impl AccountRouter {
 
     pub async fn update_account(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         Json(mut request): Json<UpdateAccountDto>,
     ) -> AppResult<Json<AccountDto>> {
         info!("recieved request to update account {:?}", id);
 
         request.id = Some(id);
-        request.user_id = Some(user.id);
+        request.user_id = Some(user_id);
         let updated_account = services.accounts.updated(request).await?;
 
         Ok(Json(updated_account))
@@ -86,12 +86,12 @@ impl AccountRouter {
 
     pub async fn delete_account(
         Path(id): Path<Uuid>,
-        RequiredAuthentication(user): RequiredAuthentication,
+        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
     ) -> AppResult<()> {
         info!("recieved request to remove account {:?}", id);
 
-        services.accounts.delete(id, user.id).await?;
+        services.accounts.delete(id, user_id).await?;
 
         Ok(())
     }
