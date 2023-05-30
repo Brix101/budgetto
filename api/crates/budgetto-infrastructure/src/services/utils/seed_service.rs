@@ -43,13 +43,11 @@ impl SeedService {
         // assume that if we have an active user in the users table, data has been seeded
         let seed_data_exists = self
             .user_services
-            .signin_user(
-                SignInUserDto {
-                    email: Some(String::from(*TEST_USER_1_EMAIL)),
-                    password: Some(String::from(*TEST_USER_1_PASSWORD)),
-                },
-                None,
-            )
+            .signin(SignInUserDto {
+                email: Some(String::from(*TEST_USER_1_EMAIL)),
+                password: Some(String::from(*TEST_USER_1_PASSWORD)),
+                user_agent: None,
+            })
             .await
             .is_ok();
 
@@ -170,7 +168,7 @@ impl SeedService {
         password: &'static str,
     ) -> AppResult<UserDto> {
         self.user_services
-            .signup_user(SignUpUserDto {
+            .signup(SignUpUserDto {
                 name: Some(String::from(name)),
                 email: Some(String::from(email)),
                 password: Some(String::from(password)),

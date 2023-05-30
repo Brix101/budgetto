@@ -42,7 +42,7 @@ impl BudgettoUsersService {
 
 #[async_trait]
 impl UsersService for BudgettoUsersService {
-    async fn signup_user(&self, request: SignUpUserDto) -> AppResult<UserDto> {
+    async fn signup(&self, request: SignUpUserDto) -> AppResult<UserDto> {
         let email = request.email.unwrap();
         let name = request.name.unwrap();
         let req_password = request.password.unwrap();
@@ -70,13 +70,10 @@ impl UsersService for BudgettoUsersService {
         Ok(created_user.into_dto())
     }
 
-    async fn signin_user(
-        &self,
-        request: SignInUserDto,
-        user_agent: Option<String>,
-    ) -> AppResult<SessionResponse> {
+    async fn signin(&self, request: SignInUserDto) -> AppResult<SessionResponse> {
         let email = request.email.unwrap();
         let attempted_password = request.password.unwrap();
+        let user_agent = request.user_agent;
 
         info!("searching for existing user {:?}", email);
         let existing_user = self.repository.find_by_email(&email).await?;
@@ -113,7 +110,7 @@ impl UsersService for BudgettoUsersService {
         Ok(tokens)
     }
 
-    async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto> {
+    async fn find_by_id(&self, user_id: Uuid) -> AppResult<UserDto> {
         info!("retrieving user {:?}", user_id);
         let user = self.repository.find_by_id(user_id).await?;
 
@@ -125,7 +122,7 @@ impl UsersService for BudgettoUsersService {
         Ok(user.into_dto())
     }
 
-    async fn updated_user(&self, request: UpdateUserDto) -> AppResult<UserDto> {
+    async fn updated(&self, request: UpdateUserDto) -> AppResult<UserDto> {
         let user_id = request.id.unwrap();
 
         info!("retrieving user {:?}", user_id);
@@ -156,7 +153,7 @@ impl UsersService for BudgettoUsersService {
         Ok(updated_user.into_dto())
     }
 
-    async fn get_user_by_email(&self, email: String) -> AppResult<UserDto> {
+    async fn find_by_email(&self, email: String) -> AppResult<UserDto> {
         info!("retrieving user {:?}", email);
         let user = self.repository.find_by_email(&email).await?;
 

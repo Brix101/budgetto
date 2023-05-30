@@ -35,6 +35,7 @@ pub struct SignInUserDto {
     pub email: Option<String>,
     #[validate(required, length(min = 1))]
     pub password: Option<String>,
+    pub user_agent: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -62,6 +63,7 @@ impl SignInUserDto {
         Self {
             email: Some(String::from("stub email")),
             password: Some(String::from("stub password")),
+            user_agent: None,
         }
     }
 }

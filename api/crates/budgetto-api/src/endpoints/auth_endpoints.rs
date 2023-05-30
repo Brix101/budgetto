@@ -8,7 +8,7 @@ use budgetto_domain::sessions::responses::SessionResponse;
 use tracing::info;
 
 use budgetto_core::errors::AppResult;
-use budgetto_domain::users::requests::SignInUserDto;
+use budgetto_domain::users::requests::{SignInUserDto, SignUpUserDto};
 use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationResponse};
 use budgetto_infrastructure::service_register::ServiceRegister;
 
@@ -22,24 +22,41 @@ pub struct AuthRouter;
 impl AuthRouter {
     pub fn app() -> Router {
         Router::new()
-            .route("/sign-in", post(Self::signin_user_endpoint))
-            .route("/whoami", get(Self::get_current_user_endpoint))
-            .route("/re-auth", post(Self::re_auth_endpoint))
-            .route("/sign-out", post(Self::signout_user_endpoint))
+            .route("/sign-up", post(Self::signup_user))
+            .route("/sign-in", post(Self::signin_user))
+            .route("/whoami", get(Self::who_am_i))
+            .route("/re-auth", post(Self::re_auth))
+            .route("/sign-out", post(Self::signout_user))
     }
 
-    pub async fn signin_user_endpoint(
+    pub async fn signup_user(
+        Extension(services): Extension<ServiceRegister>,
+        ValidationExtractor(request): ValidationExtractor<SignUpUserDto>,
+    ) -> AppResult<Json<UserAuthenicationResponse>> {
+        info!(
+            "recieved request to sign up user {:?}/{:?}",
+            request.email.as_ref().unwrap(),
+            request.name.as_ref().unwrap()
+        );
+
+        let created_user = services.users.signup(request).await?;
+
+        Ok(Json(UserAuthenicationResponse { user: created_user }))
+    }
+
+    pub async fn signin_user(
         jar: CookieJar,
         Extension(services): Extension<ServiceRegister>,
         UserAgentExtractor(user_agent): UserAgentExtractor,
-        ValidationExtractor(request): ValidationExtractor<SignInUserDto>,
+        ValidationExtractor(mut request): ValidationExtractor<SignInUserDto>,
     ) -> AppResult<(CookieJar, Json<SessionResponse>)> {
         info!(
-            "recieved request to login user {:?}",
+            "recieved request to sign in user {:?}",
             request.email.as_ref().unwrap()
         );
 
-        let user = services.users.signin_user(request, user_agent).await?;
+        request.user_agent = user_agent;
+        let user = services.users.signin(request).await?;
 
         let cookie = Cookie::build("x-refresh", user.refresh_token.clone().unwrap())
             .path("/")
@@ -52,7 +69,7 @@ impl AuthRouter {
         Ok((cookie_jar, Json(user)))
     }
 
-    pub async fn get_current_user_endpoint(
+    pub async fn who_am_i(
         RequiredAuthentication(user): RequiredAuthentication,
     ) -> AppResult<Json<UserAuthenicationResponse>> {
         info!("recieved request to retrieve current user");
@@ -60,7 +77,7 @@ impl AuthRouter {
         Ok(Json(UserAuthenicationResponse { user }))
     }
 
-    pub async fn re_auth_endpoint(
+    pub async fn re_auth(
         Extension(services): Extension<ServiceRegister>,
         SessionExtractor(_, refresh_token): SessionExtractor,
     ) -> AppResult<Json<ReAuthResponse>> {
@@ -74,7 +91,7 @@ impl AuthRouter {
         Ok(Json(new_token))
     }
 
-    pub async fn signout_user_endpoint(
+    pub async fn signout_user(
         jar: CookieJar,
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,

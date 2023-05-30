@@ -17,17 +17,13 @@ pub type DynUsersService = Arc<dyn UsersService + Send + Sync>;
 #[automock]
 #[async_trait]
 pub trait UsersService {
-    async fn signup_user(&self, request: SignUpUserDto) -> AppResult<UserDto>;
+    async fn signup(&self, request: SignUpUserDto) -> AppResult<UserDto>;
 
-    async fn signin_user(
-        &self,
-        request: SignInUserDto,
-        user_agent: Option<String>,
-    ) -> AppResult<SessionResponse>;
+    async fn signin(&self, request: SignInUserDto) -> AppResult<SessionResponse>;
 
-    async fn get_current_user(&self, user_id: Uuid) -> AppResult<UserDto>;
+    async fn find_by_id(&self, id: Uuid) -> AppResult<UserDto>;
 
-    async fn updated_user(&self, request: UpdateUserDto) -> AppResult<UserDto>;
+    async fn updated(&self, request: UpdateUserDto) -> AppResult<UserDto>;
 
-    async fn get_user_by_email(&self, email: String) -> AppResult<UserDto>;
+    async fn find_by_email(&self, email: String) -> AppResult<UserDto>;
 }
