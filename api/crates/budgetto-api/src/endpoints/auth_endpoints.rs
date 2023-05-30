@@ -1,13 +1,12 @@
 use axum::extract::Json;
-use axum::http::{HeaderMap, HeaderValue};
 use axum::routing::{get, post};
 use axum::{Extension, Router};
 use axum_extra::extract::cookie::Cookie;
 use axum_extra::extract::CookieJar;
-use budgetto_domain::sessions::responses::SessionResponse;
 use tracing::info;
 
 use budgetto_core::errors::AppResult;
+use budgetto_domain::sessions::responses::SessionResponse;
 use budgetto_domain::users::requests::{SignInUserDto, SignUpUserDto};
 use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationResponse};
 use budgetto_infrastructure::service_register::ServiceRegister;
@@ -96,14 +95,12 @@ impl AuthRouter {
         RequiredAuthentication(user): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
         SessionExtractor(session_id, _): SessionExtractor,
-    ) -> AppResult<(CookieJar, HeaderMap, Json<SessionResponse>)> {
+    ) -> AppResult<CookieJar> {
         info!("recieved request to signout session");
         services.sessions.delete(session_id, user.id).await?;
 
         let cookie_jar = jar.remove(Cookie::named("x-refresh"));
-        let mut headers = HeaderMap::new();
-        headers.insert("x-access-token", HeaderValue::from_str("").unwrap());
 
-        Ok((cookie_jar, headers, Json(SessionResponse::default())))
+        Ok(cookie_jar)
     }
 }
