@@ -1,11 +1,9 @@
 use async_trait::async_trait;
 use budgetto_domain::sessions::responses::SessionResponse;
 use budgetto_domain::users::responses::ReAuthResponse;
-use budgetto_domain::users::UserDto;
 use sqlx::types::time::OffsetDateTime;
 use std::time::{Duration, SystemTime};
 use tracing::info;
-use uuid::Uuid;
 
 use budgetto_core::errors::{AppResult, Error};
 use budgetto_core::sessions::repository::{CreateSession, DynSessionsRepository};
@@ -104,32 +102,21 @@ impl SessionsService for BudgettoSessionsService {
         Err(Error::Unauthorized)
     }
 
-    async fn delete(&self, id: Uuid, user_id: Uuid) -> AppResult<()> {
-        let user_session = self.repository.get_user_by_session_id(id).await?;
+    async fn delete(&self, refresh_token: &str) -> AppResult<()> {
+        let session_id = self
+            .token_service
+            .get_session_id_from_token(refresh_token.to_string())
+            .map_err(|err| {
+                info!("could not validate session ID from token: {:?}", err);
+                Error::Unauthorized
+            })?;
 
-        if let Some(user) = user_session {
-            // verify the user IDs match on the request and the session
-            if user.id != user_id {
-                return Err(Error::Forbidden);
-            }
+        // verify the user IDs match on the request and the session
 
-            info!("deleting session {:?} for user {:?}", id, user_id);
-            self.repository.delete(id).await?;
-            self.token_service.add_blacklist(id);
+        info!("deleting session {:?}", session_id);
+        self.repository.delete(session_id).await?;
+        self.token_service.add_blacklist(session_id);
 
-            return Ok(());
-        }
-
-        Err(Error::Unauthorized)
-    }
-
-    async fn get_user(&self, id: Uuid) -> AppResult<UserDto> {
-        let user_session = self.repository.get_user_by_session_id(id).await?;
-
-        if let Some(user) = user_session {
-            return Ok(user.into_dto());
-        }
-
-        Err(Error::Unauthorized)
+        return Ok(());
     }
 }

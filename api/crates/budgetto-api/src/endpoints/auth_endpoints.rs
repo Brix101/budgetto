@@ -12,7 +12,7 @@ use budgetto_domain::users::responses::{ReAuthResponse, UserAuthenicationRespons
 use budgetto_infrastructure::service_register::ServiceRegister;
 
 use crate::extractors::required_authentication_extractor::RequiredAuthentication;
-use crate::extractors::session_extractor::SessionExtractor;
+use crate::extractors::session_extractor::RefreshTokenExtractor;
 use crate::extractors::user_agent_extractor::UserAgentExtractor;
 use crate::extractors::validation_extractor::ValidationExtractor;
 
@@ -81,26 +81,22 @@ impl AuthRouter {
 
     pub async fn re_auth(
         Extension(services): Extension<ServiceRegister>,
-        SessionExtractor(_, refresh_token): SessionExtractor,
+        RefreshTokenExtractor(token): RefreshTokenExtractor,
     ) -> AppResult<Json<ReAuthResponse>> {
         info!("recieved request to refresh access token");
 
-        let new_token = services
-            .sessions
-            .create_access_token(&refresh_token)
-            .await?;
+        let new_token = services.sessions.create_access_token(&token).await?;
 
         Ok(Json(new_token))
     }
 
     pub async fn signout_user(
         jar: CookieJar,
-        RequiredAuthentication(user_id): RequiredAuthentication,
         Extension(services): Extension<ServiceRegister>,
-        SessionExtractor(session_id, _): SessionExtractor,
+        RefreshTokenExtractor(token): RefreshTokenExtractor,
     ) -> AppResult<CookieJar> {
         info!("recieved request to signout session");
-        services.sessions.delete(session_id, user_id).await?;
+        services.sessions.delete(&token).await?;
 
         let cookie_jar = jar.remove(Cookie::named("x-refresh"));
 

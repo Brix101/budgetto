@@ -23,7 +23,7 @@ where
                 .map_err(|_err| Error::Unauthorized)?;
 
         if let Some(user_id) = auth_claims.user_id {
-            return Ok(RequiredAuthentication(user_id));
+            return Ok(Self(user_id));
         }
 
         Err(Error::Unauthorized)
