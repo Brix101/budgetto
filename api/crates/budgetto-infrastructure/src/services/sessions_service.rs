@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use budgetto_domain::sessions::responses::SessionResponse;
 use budgetto_domain::users::responses::ReAuthResponse;
+use budgetto_domain::users::UserDto;
 use sqlx::types::time::OffsetDateTime;
 use std::time::{Duration, SystemTime};
 use tracing::info;
@@ -120,6 +121,16 @@ impl SessionsService for BudgettoSessionsService {
             self.token_service.add_blacklist(id);
 
             return Ok(());
+        }
+
+        Err(Error::Unauthorized)
+    }
+
+    async fn get_user(&self, id: Uuid) -> AppResult<UserDto> {
+        let user_session = self.repository.get_user_by_session_id(id).await?;
+
+        if let Some(user) = user_session {
+            return Ok(user.into_dto());
         }
 
         Err(Error::Unauthorized)

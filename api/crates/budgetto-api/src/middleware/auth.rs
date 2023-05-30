@@ -67,13 +67,19 @@ where
             .get(AUTHORIZATION)
             .and_then(|header| header.to_str().ok());
 
+        let cookie_header = headers.get(COOKIE).and_then(|header| header.to_str().ok());
+
         let auth: AuthClaims = match authorization_header.as_deref() {
             Some(auth_header) => {
                 let tokenized_value: Vec<_> = auth_header.split(' ').collect();
 
-                // if tokenized_value.len() != 2 || tokenized_value.get(1).is_none() {
-                //     AuthClaims::default();
-                // }
+                let cookie_value: Option<String> = match cookie_header {
+                    Some(cookie_result) => {
+                        let cookie = Cookie::parse(cookie_result).unwrap();
+                        Some(cookie.value().to_string())
+                    }
+                    _ => None,
+                };
 
                 let token_value = tokenized_value.into_iter().nth(1).unwrap();
                 let token_claims = services
@@ -81,14 +87,14 @@ where
                     .verify_access_token(token_value)
                     .map_err(|err| {
                         if err.to_string().contains("ExpiredSignature") {
-                            AuthClaims::expired()
+                            AuthClaims::expired(cookie_value)
                         } else {
                             AuthClaims::default()
                         }
                     });
 
                 match token_claims {
-                    Ok(claims) => AuthClaims::into_auth(claims.user),
+                    Ok(claims) => claims.user.into_auth_claims(Some(claims.sub)),
                     Err(mapped_err) => mapped_err,
                 }
             }
@@ -105,7 +111,6 @@ pub struct TokenMiddleware {}
 
 impl TokenMiddleware {
     pub async fn token_refresher<B>(mut req: Request<B>, next: Next<B>) -> impl IntoResponse {
-        let headers = req.headers().clone();
         let extensions_mut = req.extensions_mut();
 
         let auth_extension = extensions_mut.get::<AuthClaims>().clone();
@@ -113,27 +118,19 @@ impl TokenMiddleware {
 
         let x_access_token: Option<String> = match auth_extension {
             Some(auth) => {
-                if auth.is_expired {
-                    let cookie_header = headers.get(COOKIE).and_then(|header| header.to_str().ok());
+                if auth.cookie.is_some() {
+                    let new_access_token = services
+                        .sessions
+                        .create_access_token(auth.cookie.as_ref().unwrap())
+                        .await;
 
-                    match cookie_header {
-                        Some(cookie_result) => {
-                            let cookie_value = Cookie::parse(cookie_result).unwrap();
-                            let token_value = cookie_value.value();
+                    match new_access_token {
+                        Ok(res) => {
+                            extensions_mut.insert(res.user.into_auth_claims(auth.session_id));
 
-                            let requested_token =
-                                services.sessions.create_access_token(token_value).await;
-
-                            match requested_token {
-                                Ok(res) => {
-                                    extensions_mut.insert(AuthClaims::into_auth(res.user));
-
-                                    Some(res.access_token)
-                                }
-                                Err(_) => None,
-                            }
+                            Some(res.access_token)
                         }
-                        None => None,
+                        Err(_) => None,
                     }
                 } else {
                     None

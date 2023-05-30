@@ -1,4 +1,4 @@
-use budgetto_domain::users::UserDto;
+use budgetto_domain::{users::UserDto, utils::token::RefreshTokenClaims};
 use mockall::automock;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -15,6 +15,7 @@ pub trait TokenService {
     fn new_access_token(&self, sub: Uuid, user: UserDto) -> AppResult<String>;
     fn new_refresh_token(&self, sub: Uuid) -> AppResult<String>;
     fn verify_access_token(&self, token: &str) -> AppResult<AccessTokenClaims>;
+    fn verify_refresh_token(&self, token: &str) -> AppResult<RefreshTokenClaims>;
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid>;
     fn refresh_blacklist(&self);
     fn add_blacklist(&self, id: Uuid);

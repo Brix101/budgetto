@@ -82,15 +82,27 @@ impl TokenService for JwtService {
         )
         .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
 
-        let blacklist = TOKEN_BLACKLIST.lock().unwrap().to_vec();
+        // let blacklist = TOKEN_BLACKLIST.lock().unwrap().to_vec();
+        //
+        // if blacklist.contains(&decoded_token.claims.sub.to_string()) {
+        //     Err(Error::InternalServerErrorWithContext(
+        //         "Blacklisted Token".to_string(),
+        //     ))
+        // } else {
+        //     Ok(decoded_token.claims)
+        // }
+        Ok(decoded_token.claims)
+    }
 
-        if blacklist.contains(&decoded_token.claims.sub.to_string()) {
-            Err(Error::InternalServerErrorWithContext(
-                "Blacklisted Token".to_string(),
-            ))
-        } else {
-            Ok(decoded_token.claims)
-        }
+    fn verify_refresh_token(&self, token: &str) -> AppResult<RefreshTokenClaims> {
+        let decoded_token = decode::<RefreshTokenClaims>(
+            token,
+            &DecodingKey::from_secret(self.config.refresh_token_secret.as_bytes()),
+            &Validation::new(Algorithm::HS256),
+        )
+        .map_err(|err| Error::InternalServerErrorWithContext(err.to_string()))?;
+
+        Ok(decoded_token.claims)
     }
 
     fn get_session_id_from_token(&self, token: String) -> AppResult<Uuid> {

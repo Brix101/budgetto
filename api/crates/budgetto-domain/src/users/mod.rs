@@ -16,22 +16,27 @@ pub struct UserDto {
 
 #[derive(Debug, Clone)]
 pub struct AuthClaims {
+    pub session_id: Option<Uuid>,
     pub user: Option<UserDto>,
-    pub is_expired: bool,
+    pub cookie: Option<String>,
+}
+
+impl UserDto {
+    pub fn into_auth_claims(&self, session_id: Option<Uuid>) -> AuthClaims {
+        AuthClaims {
+            session_id,
+            user: Some(self.clone()),
+            cookie: None,
+        }
+    }
 }
 
 impl AuthClaims {
-    pub fn into_auth(user: UserDto) -> Self {
+    pub fn expired(cookie: Option<String>) -> Self {
         Self {
-            user: Some(user),
-            is_expired: false,
-        }
-    }
-
-    pub fn expired() -> Self {
-        Self {
+            session_id: None,
             user: None,
-            is_expired: true,
+            cookie: Some(cookie.unwrap()),
         }
     }
 }
@@ -39,8 +44,9 @@ impl AuthClaims {
 impl Default for AuthClaims {
     fn default() -> Self {
         Self {
+            session_id: None,
             user: None,
-            is_expired: false,
+            cookie: None,
         }
     }
 }
