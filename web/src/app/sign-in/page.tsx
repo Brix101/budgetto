@@ -17,16 +17,7 @@ export default function Page() {
               <h1 className="text-xl font-bold tracking-tight leading-tight text-gray-900 md:text-2xl dark:text-white">
                 Sign in to your account
               </h1>
-              {/* {error ? ( */}
-              {/*   <div */}
-              {/*     className="p-4 mb-4 text-sm text-red-800 bg-red-50 rounded-lg dark:text-red-400 dark:bg-gray-800" */}
-              {/*     role="alert" */}
-              {/*   > */}
-              {/*     <span className="font-medium">Error alert! </span> */}
-              {/*     {error} */}
-              {/*   </div> */}
-              {/* ) : null} */}
-              <Form />{" "}
+              <Form />
             </div>
           </div>
         </div>

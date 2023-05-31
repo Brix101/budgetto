@@ -69,6 +69,7 @@ export const authOptions: NextAuthOptions = {
           });
 
           const xRefresh = res.headers.get("set-cookie");
+          const body = await res.json();
           // Create an empty JSON object
           const jsonObject: { [key: string]: string | boolean } = {};
 
@@ -97,13 +98,14 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (res.ok) {
-            const body = await res.json();
             const user = {
               ...body.user,
               accessToken: body.accessToken,
               refreshToken: jsonObject["value"] ?? "",
             };
             return user;
+          } else {
+            throw body.errors;
           }
         } catch (error: any) {
           console.error(`NextAuth authorize error: ${error.message}`);
