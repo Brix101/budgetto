@@ -36,9 +36,6 @@ where
 
             let token_value = cookie_value.value();
 
-            println!("++++++++++++++++++++++++++++++++++++++++++++++++++");
-            println!("{:#?}", header_cookie_value);
-            println!("++++++++++++++++++++++++++++++++++++++++++++++++++");
             return Ok(Self(token_value.to_string()));
         }
 
