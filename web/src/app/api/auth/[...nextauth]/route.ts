@@ -6,39 +6,34 @@ import { env } from "process";
 export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
-      if (token.user) {
-        return token;
+      if (user) {
+        return user;
       }
 
       const res = await fetch(`${baseApi}/auth/whoami`, {
         headers: {
-          Authorization: `Bearer ${token.user.accessToken}`,
-          cookie: `x-refresh=${token.user.refreshToken}`,
+          Authorization: `Bearer ${token.accessToken}`,
+          cookie: `x-refresh=${token.refreshToken}`,
         },
       });
 
       const xAccessToken = res.headers.get("x-access-token");
-      const accessToken = xAccessToken ?? token.user.accessToken;
+      const accessToken = xAccessToken ?? token.accessToken;
 
       const body = await res.json();
 
       return {
         ...token,
-        user: {
-          ...token.user,
-          ...body.user,
-          accessToken,
-        },
+        ...body.user,
+        accessToken,
       };
     },
-    session: ({ session, token }) => {
-      return {
-        ...session,
-        user: {
-          ...token.user,
-        },
-      };
-    },
+    session: ({ session, token }) => ({
+      ...session,
+      user: {
+        ...token,
+      },
+    }),
   },
   secret: env.NEXTAUTH_SECRET,
   session: {
@@ -98,12 +93,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (res.ok) {
-            const user = {
+            return {
               ...body.user,
               accessToken: body.accessToken,
               refreshToken: jsonObject["value"] ?? "",
             };
-            return user;
           } else {
             throw body.errors;
           }
@@ -119,8 +113,8 @@ export const authOptions: NextAuthOptions = {
       await fetch(`${baseApi}/auth/sign-out`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token.user.accessToken}`,
-          cookie: `x-refresh=${token.user.refreshToken}`,
+          Authorization: `Bearer ${token.accessToken}`,
+          cookie: `x-refresh=${token.refreshToken}`,
         },
       });
     },
