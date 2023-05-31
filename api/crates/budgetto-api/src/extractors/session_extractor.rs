@@ -2,11 +2,9 @@ use async_trait::async_trait;
 use axum::extract::FromRequestParts;
 use axum::http::header::COOKIE;
 use axum::http::request::Parts;
-use axum::Extension;
 use axum_extra::extract::cookie::Cookie;
 
 use budgetto_core::errors::Error;
-use budgetto_domain::users::AuthClaims;
 
 /// Extracts the JWT from the cookie token header.
 pub struct RefreshTokenExtractor(pub String);
