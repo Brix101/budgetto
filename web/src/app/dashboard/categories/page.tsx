@@ -1,10 +1,9 @@
 import { baseApi } from "@/constant/server";
 import { categoriesSchema } from "@/schema/categories.schema";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerAuthSession } from "@/utils/auth";
 
 async function getData() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
 
   console.log({ session });
   const res = await fetch(`${baseApi}/categories`, {
