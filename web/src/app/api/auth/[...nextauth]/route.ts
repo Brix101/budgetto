@@ -6,38 +6,39 @@ import { env } from "process";
 export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
-      // if (user) {
-      //   return { user };
-      // }
+      if (user) {
+        return { user };
+      }
 
-      console.log({ token });
-
-      const res = await fetch(`${baseApi}/auth/re-auth`, {
+      const res = await fetch(`${baseApi}/auth/whoami`, {
         headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-          cookie: `x-refresh=${token.refreshToken}`,
+          Authorization: `Bearer ${token.user.accessToken}`,
+          cookie: `x-refresh=${token.user.refreshToken}`,
         },
       });
-      let accessToken = token.accessToken;
-      const xAccessToken = res.headers.get("x-access-token");
 
-      if (xAccessToken) {
-        accessToken = xAccessToken;
-      }
+      const xAccessToken = res.headers.get("x-access-token");
+      const accessToken = xAccessToken ?? token.user.accessToken;
 
       const body = await res.json();
 
-      console.log({ whoami: body, accessToken, xAccessToken });
-      return { ...token, ...user, accessToken, ...body.user };
+      return {
+        ...token,
+        user: {
+          ...token.user,
+          ...body.user,
+          accessToken,
+        },
+      };
     },
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
-      },
-    }),
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...token.user,
+        },
+      };
+    },
   },
   secret: env.NEXTAUTH_SECRET,
   session: {
@@ -97,18 +98,12 @@ export const authOptions: NextAuthOptions = {
 
           if (res.ok) {
             const body = await res.json();
-            console.log(
-              "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            );
-            console.log({ body });
-            console.log(
-              "++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-            );
-            return {
+            const user = {
               ...body.user,
               accessToken: body.accessToken,
               refreshToken: jsonObject["value"] ?? "",
             };
+            return user;
           }
         } catch (error: any) {
           console.error(`NextAuth authorize error: ${error.message}`);
@@ -118,10 +113,9 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   events: {
-    async signOut() {
-      console.log(
-        "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-      );
+    async signOut(params) {
+      console.log("++++++++++++++++++++++++++++++++++++++");
+      console.log(params);
     },
   },
 };

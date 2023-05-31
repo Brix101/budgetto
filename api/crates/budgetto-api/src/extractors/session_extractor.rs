@@ -17,25 +17,28 @@ where
     S: Send + Sync,
 {
     type Rejection = Error;
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Extension(auth_claims): Extension<AuthClaims> =
-            Extension::from_request_parts(parts, state)
-                .await
-                .map_err(|_err| Error::Unauthorized)?;
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        // let Extension(auth_claims): Extension<AuthClaims> =
+        //     Extension::from_request_parts(parts, state)
+        //         .await
+        //         .map_err(|_err| Error::Unauthorized)?;
 
-        if auth_claims.user_id.is_none() {
-            return Err(Error::Unauthorized);
-        }
+        // if auth_claims.user_id.is_none() {
+        //     return Err(Error::Unauthorized);
+        // }
 
         if let Some(authorization_header) = parts.headers.get(COOKIE) {
             let header_cookie_value = authorization_header
                 .to_str()
-                .map_err(|_| Error::Forbidden)?;
+                .map_err(|_| Error::Unauthorized)?;
 
             let cookie_value = Cookie::parse(header_cookie_value).unwrap();
 
             let token_value = cookie_value.value();
 
+            println!("++++++++++++++++++++++++++++++++++++++++++++++++++");
+            println!("{:#?}", header_cookie_value);
+            println!("++++++++++++++++++++++++++++++++++++++++++++++++++");
             return Ok(Self(token_value.to_string()));
         }
 
