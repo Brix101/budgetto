@@ -113,9 +113,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   events: {
-    async signOut(params) {
-      console.log("++++++++++++++++++++++++++++++++++++++");
-      console.log(params);
+    async signOut({ token }) {
+      await fetch(`${baseApi}/auth/sign-out`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token.user.accessToken}`,
+          cookie: `x-refresh=${token.user.refreshToken}`,
+        },
+      });
     },
   },
 };
