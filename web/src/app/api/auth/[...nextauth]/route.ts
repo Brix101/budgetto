@@ -6,8 +6,8 @@ import { env } from "process";
 export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        return { user };
+      if (token.user) {
+        return token;
       }
 
       const res = await fetch(`${baseApi}/auth/whoami`, {
