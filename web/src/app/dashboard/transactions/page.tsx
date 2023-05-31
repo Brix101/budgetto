@@ -1,10 +1,9 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { baseApi } from "@/constant/server";
-import { categoriesSchema } from "@/schema/categories.schema";
-import { getServerSession } from "next-auth";
+import { transactionsSchema } from "@/schema/transactions.schema";
+import { getServerAuthSession } from "@/utils/auth";
 
 async function getData() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
   const res = await fetch(`${baseApi}/transactions`, {
     credentials: "include",
     headers: {
@@ -20,14 +19,24 @@ async function getData() {
     throw new Error("Failed to fetch data");
   }
 
-  return res.json().then((data) => data);
+  return res.json().then((data) => transactionsSchema.parse(data));
 }
 
 export default async function Page() {
-  const { categories } = await getData();
+  const { transactions } = await getData();
   return (
-    <div className="flex flex-col justify-between items-center p-24 min-h-screen">
-      Transactions
+    <div className="flex flex-col justify-between p-24 min-h-screen">
+      {transactions?.map((transaction, index) => {
+        return (
+          <div key={index}>
+            <h1 className="font-bold">{transaction.id}</h1>
+            <span>{transaction.amount}</span>
+            <p>{transaction.transactionType}</p>
+            <p>{transaction.createdAt}</p>
+            <p>{transaction.updatedAt}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }

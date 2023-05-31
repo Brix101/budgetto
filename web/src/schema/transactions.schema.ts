@@ -1,15 +1,26 @@
 import z from "zod";
 
-export const categorySchema = z.object({
+export const TransactionType = z.enum([
+  "Expense",
+  "Income",
+  "Transfer",
+  "Refund",
+]);
+
+export type TransactionType = z.infer<typeof TransactionType>;
+
+export const transactionSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  amount: z.number(),
+  transactionType: TransactionType,
   note: z.string().nullish(),
-  isDefault: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
-export const categoriesSchema = z.object({
-  categories: categorySchema.array(),
+export const transactionsSchema = z.object({
+  transactions: transactionSchema.array(),
 });
 
-export type Category = z.TypeOf<typeof categorySchema>;
-export type Categories = z.TypeOf<typeof categoriesSchema>;
+export type Transaction = z.TypeOf<typeof transactionSchema>;
+export type Transactions = z.TypeOf<typeof transactionsSchema>;
