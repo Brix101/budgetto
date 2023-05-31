@@ -1,6 +1,5 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "process";
 
 export default async function middleware(req: NextRequest) {
   // Get the pathname of the request (e.g. /, /protected)
@@ -16,8 +15,8 @@ export default async function middleware(req: NextRequest) {
   });
 
   if (!session && path.includes("/dashboard")) {
-    return NextResponse.redirect(new URL("/sign-in", req.url));
-  } else if (session && (path === "/sign-in" || path === "/register")) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  } else if (session && (path === "/signin" || path === "/register")) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
   return NextResponse.next();

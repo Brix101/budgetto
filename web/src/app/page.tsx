@@ -40,7 +40,7 @@ export default async function Home() {
             />
           </a>
         </div>
-        <Link href={"/sign-in"}>
+        <Link href={"/api/auth/signin"}>
           <p className="flex fixed top-0 left-0 justify-center pt-8 pb-6 w-full bg-gradient-to-b border-b border-gray-300 lg:static lg:p-4 lg:w-auto lg:bg-gray-200 lg:rounded-xl lg:border from-zinc-200 backdrop-blur-2xl lg:dark:bg-zinc-800/30 dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit">
             {/* Get started by editing&nbsp; */}
             {/* <code className="font-mono font-bold">src/app/page.tsx</code> */}

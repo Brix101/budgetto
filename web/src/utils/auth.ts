@@ -152,6 +152,9 @@ export const authOptions: NextAuthOptions = {
       });
     },
   },
+  pages: {
+    signIn: "/signin",
+  },
 };
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.

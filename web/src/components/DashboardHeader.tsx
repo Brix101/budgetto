@@ -1,17 +1,15 @@
-"use client";
-
-import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 export function DashboardHeader() {
   return (
     <header>
       Dashboard
-      <button
+      <Link
+        href={"/api/auth/signout"}
         className="transition-all text-stone-400 hover:text-stone-200"
-        onClick={() => signOut()}
       >
         Goddammit, sign me out!
-      </button>
+      </Link>
     </header>
   );
 }
