@@ -82,8 +82,8 @@ impl ApplicationController {
             .timeout(Duration::from_secs(*HTTP_TIMEOUT));
 
         let router = Router::new()
-            .nest("/api/v1", endpoints::app())
-            .route("/api/v1/ping", get(Self::ping))
+            .nest("/api/", endpoints::app())
+            .route("/api/ping", get(Self::ping))
             .route("/metrics", get(move || ready(recorder_handle.render())))
             .route_layer(middleware::from_fn(TokenMiddleware::token_refresher))
             .route_layer(middleware::from_fn(Self::track_metrics))
