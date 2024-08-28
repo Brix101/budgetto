@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@repo/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@repo/api": "workspace:*",
+    "@tanstack/react-query": "^5.52.2",
+    "@trpc/client": "11.0.0-rc.487",
+    "@trpc/react-query": "11.0.0-rc.487",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "superjson": "^2.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
