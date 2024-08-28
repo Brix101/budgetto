@@ -1,4 +1,3 @@
-import type { AppRouter } from "@repo/api";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import {
   createTRPCQueryUtils,
@@ -8,6 +7,7 @@ import {
   type inferReactQueryProcedureOptions,
 } from "@trpc/react-query";
 import superjson from "superjson";
+import type { AppRouter } from "../../../api/src";
 
 // infer the types for your router
 export type ReactQueryOptions = inferReactQueryProcedureOptions<AppRouter>;

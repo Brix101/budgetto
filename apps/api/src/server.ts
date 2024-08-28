@@ -2,6 +2,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import morgan from "morgan";
 import { createContext, createTrpcRouter, publicProcedure } from "./trpc";
 
 const app = express();
@@ -12,6 +13,7 @@ export const appRouter = createTrpcRouter({
 
 export type AppRouter = typeof appRouter;
 
+app.use(morgan("dev"));
 app.use(
   "/trpc",
   cors({
@@ -23,11 +25,11 @@ app.use(
   trpcExpress.createExpressMiddleware({
     router: appRouter,
     createContext,
-  }),
+  })
 );
 
 export const startServer = async () => {
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 4000;
 
   const server = app.listen(port, () => {
     console.log(`server started on http://localhost:${port}/trpc`);
