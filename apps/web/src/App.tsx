@@ -9,8 +9,6 @@ function App() {
 
   const greetQuery = trpc.greeting.useQuery();
 
-  console.log(greetQuery.data);
-
   return (
     <>
       <div>
@@ -31,7 +29,8 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+        Click on the Vite and React logos to learn more{" "}
+        {greetQuery.isLoading ? "Loading" : greetQuery.data}
       </p>
     </>
   );
