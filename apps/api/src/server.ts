@@ -8,7 +8,7 @@ import { createContext, createTrpcRouter, publicProcedure } from "./trpc";
 const app = express();
 
 export const appRouter = createTrpcRouter({
-  greeting: publicProcedure.query(() => "hello tRPC v10!"),
+  greeting: publicProcedure.query(() => "hello tRPC v11!"),
 });
 
 export type AppRouter = typeof appRouter;
