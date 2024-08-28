@@ -1,15 +1,17 @@
 {
   "name": "budgetto",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "dotenv -- turbo dev --no-cache  --continue"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Brixter Porras",
   "devDependencies": {
-    "turbo": "^2.1.0"
+    "dotenv-cli": "^7.4.2",
+    "turbo": "^2.1.0",
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "pnpm@9.1.1",
+  "engines": {
+    "node": ">=18"
   }
 }
