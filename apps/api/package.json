@@ -2,10 +2,19 @@
   "name": "@repo/api",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "dev": "tsx watch ./src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "format": "prettier --write \"**/*.ts\" --cache"
   },
   "keywords": [],
   "author": "",

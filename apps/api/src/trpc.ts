@@ -10,9 +10,9 @@ export const createContext = ({
   return { req, res };
 };
 
-type TrpcContext = Awaited<ReturnType<typeof createContext>> & {};
+type Context = Awaited<ReturnType<typeof createContext>> & {};
 
-export const t = initTRPC.context<TrpcContext>().create({
+export const t = initTRPC.context<Context>().create({
   transformer: superjson,
   errorFormatter: ({ shape, error }) => ({
     ...shape,

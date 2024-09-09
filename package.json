@@ -2,7 +2,8 @@
   "name": "budgetto",
   "private": true,
   "scripts": {
-    "dev": "dotenv -- turbo dev --no-cache  --continue"
+    "dev": "dotenv -- turbo dev --no-cache  --continue",
+    "build": "turbo build"
   },
   "author": "Brixter Porras",
   "devDependencies": {

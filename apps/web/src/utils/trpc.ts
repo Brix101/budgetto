@@ -1,4 +1,4 @@
-import type { AppRouter } from "@repo/api/src";
+import type { AppRouter } from "@repo/api";
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import {
   createTRPCQueryUtils,
@@ -41,7 +41,7 @@ export const queryClient = new QueryClient({
       console.error(
         `An error occurred: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     },
   }),
@@ -50,7 +50,7 @@ export const queryClient = new QueryClient({
       console.error(
         `An error occurred: ${
           error instanceof Error ? error.message : "Unknown error"
-        }`
+        }`,
       );
     },
   }),
