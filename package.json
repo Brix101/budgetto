@@ -1,0 +1,29 @@
+{
+  "name": "trpc-starter",
+  "private": true,
+  "engines": {
+    "node": ">=20.15.0",
+    "pnpm": "^9.15.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo run clean",
+    "dev": "turbo dev --no-cache  --continue",
+    "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
+    "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
+    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
+    "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "postinstall": "pnpm lint:ws",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@acme/prettier-config": "workspace:*",
+    "prettier": "catalog:",
+    "turbo": "^2.3.3",
+    "typescript": "catalog:"
+  },
+  "prettier": "@acme/prettier-config"
+}
