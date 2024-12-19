@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --output public",
     "start": "next start",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
