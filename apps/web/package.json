@@ -12,15 +12,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@acme/api": "workspace:*",
     "@tanstack/react-query": "^5.62.8",
-    "@trpc/client": "11.0.0-rc.666",
-    "@trpc/next": "11.0.0-rc.666",
-    "@trpc/react-query": "11.0.0-rc.666",
     "next": "15.1.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "superjson": "^2.2.2"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
