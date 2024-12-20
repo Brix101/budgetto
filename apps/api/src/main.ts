@@ -10,12 +10,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<ConfigSchema["PORT"]>("PORT");
 
-  // await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
-  // await app.get(MikroORM).getSchemaGenerator().updateSchema();
-
   app.setGlobalPrefix("api");
   app.useGlobalFilters(new HttpExceptionFilter());
-  // Starts listening for shutdown hooks
+
+  // Starts listening for shutdown hooks for graceful shutdown
   app.enableShutdownHooks();
 
   await app.listen(port);
