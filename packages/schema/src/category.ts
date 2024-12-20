@@ -6,7 +6,12 @@ export enum CategoryType {
 }
 
 export const createCategorySchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+  name: z.string().nonempty(),
+  description: z.string().optional(),
+  type: z.nativeEnum(CategoryType),
 });
+
+export const updateCategorySchema = createCategorySchema.partial();
+
+export type CreateCategoryDto = z.infer<typeof createCategorySchema>;
+export type UpdateCategoryDto = z.infer<typeof updateCategorySchema>;

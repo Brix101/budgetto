@@ -13,10 +13,10 @@ export class Budget extends BaseEntity {
   description!: string;
 
   @Property()
-  start_date = new Date();
+  startDate = new Date();
 
   @Property()
-  end_date = new Date();
+  endDate = new Date();
 
   @ManyToOne(() => Category, {
     cascade: [Cascade.PERSIST, Cascade.REMOVE],
