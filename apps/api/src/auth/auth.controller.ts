@@ -1,25 +1,28 @@
-import type { SignInDto } from "@budgetto/schema";
-import { signInSchema } from "@budgetto/schema";
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-  UsePipes,
-} from "@nestjs/common";
-import { ZodValidationPipe } from "src/common/zod-validation.pipe";
+import { Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
+import { User } from "src/users/entities/user.entity";
 
+import { Public } from "./auth.decorator";
 import { AuthService } from "./auth.service";
+import { LocalAuthGuard } from "./local-auth.guard";
 
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post("sign-in")
-  @UsePipes(new ZodValidationPipe(signInSchema))
-  signIn(@Body() { email, password }: SignInDto) {
-    return this.authService.signIn(email, password);
+  signIn(@Request() req: { user: Partial<User> }) {
+    return this.authService.signIn(req.user);
+  }
+
+  @Get("profile")
+  getProfile(@Request() req) {
+    return req.user;
+  }
+
+  @Post("/sign-out")
+  async signOut(@Request() req) {
+    return req.logout();
   }
 }

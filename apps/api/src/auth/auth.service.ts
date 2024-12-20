@@ -1,4 +1,6 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { User } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { PasswordUtilService } from "src/util/password-util.service";
 
@@ -7,11 +9,13 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly passwordUtilService: PasswordUtilService,
+    private jwtService: JwtService,
   ) {}
 
-  async signIn(username: string, pass: string): Promise<any> {
+  async validateUser(email: string, pass: string) {
     try {
-      const user = await this.usersService.findOneByEmail(username);
+      const user = await this.usersService.findOneByEmail(email);
+
       const hashedPassword = await user.password.load();
 
       const isVerified = await this.passwordUtilService.verify(
@@ -19,28 +23,20 @@ export class AuthService {
         pass,
       );
 
-      if (!isVerified) {
-        throw new UnauthorizedException([
-          {
-            validation: "email",
-            code: "invalid_string",
-            message: "Invalid email or password",
-            path: ["email"],
-          },
-        ]);
+      if (user && isVerified) {
+        return user;
       }
-      // TODO: Generate a JWT and return it here
-      // instead of the user object
-      return user;
+
+      return null;
     } catch {
-      throw new UnauthorizedException([
-        {
-          validation: "email",
-          code: "invalid_string",
-          message: "Invalid email or password",
-          path: ["email"],
-        },
-      ]);
+      return null;
     }
+  }
+
+  async signIn(user: Partial<User>): Promise<any> {
+    const payload = { sub: user.id, email: user.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

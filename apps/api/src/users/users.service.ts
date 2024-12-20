@@ -56,8 +56,7 @@ export class UsersService {
   async findOneByEmail(email: string) {
     try {
       return this.em.findOneOrFail(User, { email });
-    } catch (error) {
-      this.logger.error(error);
+    } catch {
       throw new BadRequestException([
         {
           validation: "email",
