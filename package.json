@@ -20,10 +20,10 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "@acme/prettier-config": "workspace:*",
+    "@budgetto/prettier-config": "workspace:*",
     "prettier": "catalog:",
     "turbo": "^2.3.3",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@budgetto/prettier-config"
 }

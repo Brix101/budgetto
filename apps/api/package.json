@@ -1,5 +1,5 @@
 {
-  "name": "@acme/api",
+  "name": "@budgetto/api",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -36,9 +36,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:^",
-    "@acme/prettier-config": "workspace:^",
-    "@acme/tsconfig": "workspace:^",
+    "@budgetto/eslint-config": "workspace:^",
+    "@budgetto/prettier-config": "workspace:^",
+    "@budgetto/tsconfig": "workspace:^",
     "@mikro-orm/cli": "^6.4.1",
     "@mikro-orm/migrations": "^6.4.1",
     "@mikro-orm/seeder": "^6.4.1",
@@ -86,5 +86,5 @@
       "./dist/mikro-orm.config.js"
     ]
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@budgetto/prettier-config"
 }

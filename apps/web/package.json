@@ -1,5 +1,5 @@
 {
-  "name": "@acme/web",
+  "name": "@budgetto/web",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -19,9 +19,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
+    "@budgetto/eslint-config": "workspace:*",
+    "@budgetto/prettier-config": "workspace:*",
+    "@budgetto/tsconfig": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@types/node": "catalog:",
     "@types/react": "^19",
@@ -33,5 +33,5 @@
     "tailwindcss": "^3.4.1",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@budgetto/prettier-config"
 }

@@ -8,7 +8,7 @@ catalogs:
   default:
     '@types/node':
       specifier: ^22.10.2
-      version: 20.17.10
+      version: 22.10.2
     eslint:
       specifier: ^9.15.0
       version: 9.17.0
@@ -26,7 +26,7 @@ importers:
 
   .:
     devDependencies:
-      '@acme/prettier-config':
+      '@budgetto/prettier-config':
         specifier: workspace:*
         version: link:packages/prettier
       prettier:
@@ -84,13 +84,13 @@ importers:
         specifier: 'catalog:'
         version: 3.24.1
     devDependencies:
-      '@acme/eslint-config':
+      '@budgetto/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint
-      '@acme/prettier-config':
+      '@budgetto/prettier-config':
         specifier: workspace:^
         version: link:../../packages/prettier
-      '@acme/tsconfig':
+      '@budgetto/tsconfig':
         specifier: workspace:^
         version: link:../../packages/typescript
       '@mikro-orm/cli':
@@ -172,13 +172,13 @@ importers:
         specifier: 'catalog:'
         version: 3.24.1
     devDependencies:
-      '@acme/eslint-config':
+      '@budgetto/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint
-      '@acme/prettier-config':
+      '@budgetto/prettier-config':
         specifier: workspace:*
         version: link:../../packages/prettier
-      '@acme/tsconfig':
+      '@budgetto/tsconfig':
         specifier: workspace:*
         version: link:../../packages/typescript
       '@eslint/eslintrc':
@@ -245,10 +245,10 @@ importers:
         specifier: ^8.15.0
         version: 8.18.1(eslint@9.17.0(jiti@1.21.7))(typescript@5.7.2)
     devDependencies:
-      '@acme/prettier-config':
+      '@budgetto/prettier-config':
         specifier: workspace:*
         version: link:../prettier
-      '@acme/tsconfig':
+      '@budgetto/tsconfig':
         specifier: workspace:*
         version: link:../typescript
       '@types/eslint__js':
@@ -276,7 +276,7 @@ importers:
         specifier: ^3.4.2
         version: 3.4.2
     devDependencies:
-      '@acme/tsconfig':
+      '@budgetto/tsconfig':
         specifier: workspace:*
         version: link:../typescript
       typescript:
@@ -284,6 +284,31 @@ importers:
         version: 5.7.2
 
   packages/typescript: {}
+
+  packages/validators:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.1
+    devDependencies:
+      '@budgetto/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint
+      '@budgetto/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier
+      '@budgetto/tsconfig':
+        specifier: workspace:*
+        version: link:../typescript
+      eslint:
+        specifier: 'catalog:'
+        version: 9.17.0(jiti@1.21.7)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.4.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.2
 
 packages:
 

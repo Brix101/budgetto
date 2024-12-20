@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   /** Enables hot reloading for local packages without a build step */
-  transpilePackages: ["@acme/api"],
+  transpilePackages: ["@budgetto/api"],
 };
 
 export default nextConfig;
