@@ -8,6 +8,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from "@nestjs/common";
 
 import { CreateUserDto, UpdateUserDto } from "@budgetto/schema";
@@ -50,7 +51,18 @@ export class UsersService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    try {
+      return this.em.findOneOrFail(User, { id });
+    } catch {
+      throw new NotFoundException([
+        {
+          validation: "id",
+          code: "invalid_string",
+          message: "User not found",
+          path: ["id"],
+        },
+      ]);
+    }
   }
 
   async findOneByEmail(email: string) {
