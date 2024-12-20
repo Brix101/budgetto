@@ -6,8 +6,9 @@ import {
   Property,
   Unique,
 } from "@mikro-orm/core";
-import { BaseEntity } from "src/common/entities/base.entity";
-import { User } from "src/user/entities/user.entity";
+
+import { BaseEntity } from "../../common/entities/base.entity";
+import { User } from "../../user/entities/user.entity";
 
 export enum CategoryType {
   INCOME = "income",

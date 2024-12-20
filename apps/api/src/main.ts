@@ -1,4 +1,3 @@
-import { MikroORM } from "@mikro-orm/core";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 
@@ -11,8 +10,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<ConfigSchema["PORT"]>("PORT");
 
-  await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
-  await app.get(MikroORM).getSchemaGenerator().updateSchema();
+  // await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
+  // await app.get(MikroORM).getSchemaGenerator().updateSchema();
 
   app.setGlobalPrefix("api");
   app.useGlobalFilters(new HttpExceptionFilter());

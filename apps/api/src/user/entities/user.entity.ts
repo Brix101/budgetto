@@ -1,6 +1,7 @@
 import type { Ref } from "@mikro-orm/core";
 import { Entity, Property, Unique } from "@mikro-orm/core";
-import { BaseEntity } from "src/common/entities/base.entity";
+
+import { BaseEntity } from "../../common/entities/base.entity";
 
 @Entity()
 @Unique({ properties: ["email"] })

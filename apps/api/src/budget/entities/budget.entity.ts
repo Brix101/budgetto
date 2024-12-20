@@ -1,7 +1,8 @@
 import { Cascade, Entity, ManyToOne, Property } from "@mikro-orm/core";
-import { Category } from "src/category/entities/category.entity";
-import { BaseEntity } from "src/common/entities/base.entity";
-import { User } from "src/user/entities/user.entity";
+
+import { Category } from "../../category/entities/category.entity";
+import { BaseEntity } from "../../common/entities/base.entity";
+import { User } from "../../user/entities/user.entity";
 
 @Entity()
 export class Budget extends BaseEntity {

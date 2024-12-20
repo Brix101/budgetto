@@ -39,6 +39,8 @@
     "@acme/prettier-config": "workspace:^",
     "@acme/tsconfig": "workspace:^",
     "@mikro-orm/cli": "^6.4.1",
+    "@mikro-orm/migrations": "^6.4.1",
+    "@mikro-orm/seeder": "^6.4.1",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

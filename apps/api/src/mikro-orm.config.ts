@@ -1,5 +1,6 @@
 import { defineConfig } from "@mikro-orm/core";
 import { PostgreSqlDriver } from "@mikro-orm/postgresql";
+import { SeedManager } from "@mikro-orm/seeder";
 import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
 import { Logger } from "@nestjs/common";
 import * as dotenv from "dotenv";
@@ -27,4 +28,5 @@ export default defineConfig({
   driver: PostgreSqlDriver,
   highlighter: new SqlHighlighter(),
   logger: logger.log.bind(logger),
+  extensions: [SeedManager],
 });
