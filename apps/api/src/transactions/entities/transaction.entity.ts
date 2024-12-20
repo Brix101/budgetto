@@ -1,8 +1,8 @@
 import { Cascade, Entity, ManyToOne, Property } from "@mikro-orm/core";
 
-import { Category } from "../../category/entities/category.entity";
+import { Category } from "../../categories/entities/category.entity";
 import { BaseEntity } from "../../common/entities/base.entity";
-import { User } from "../../user/entities/user.entity";
+import { User } from "../../users/entities/user.entity";
 
 @Entity()
 export class Transaction extends BaseEntity {

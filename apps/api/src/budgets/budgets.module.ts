@@ -1,13 +1,13 @@
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { Module } from "@nestjs/common";
 
-import { BudgetController } from "./budget.controller";
-import { BudgetService } from "./budget.service";
+import { BudgetsController } from "./budgets.controller";
+import { BudgetsService } from "./budgets.service";
 import { Budget } from "./entities/budget.entity";
 
 @Module({
   imports: [MikroOrmModule.forFeature([Budget])],
-  controllers: [BudgetController],
-  providers: [BudgetService],
+  controllers: [BudgetsController],
+  providers: [BudgetsService],
 })
-export class BudgetModule {}
+export class BudgetsModule {}

@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBudgetDto } from './dto/create-budget.dto';
-import { UpdateBudgetDto } from './dto/update-budget.dto';
+import { Injectable } from "@nestjs/common";
+
+import { CreateBudgetDto } from "./dto/create-budget.dto";
+import { UpdateBudgetDto } from "./dto/update-budget.dto";
 
 @Injectable()
-export class BudgetService {
+export class BudgetsService {
   create(createBudgetDto: CreateBudgetDto) {
-    return 'This action adds a new budget';
+    return "This action adds a new budget";
   }
 
   findAll() {

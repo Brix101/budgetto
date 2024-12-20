@@ -3,14 +3,14 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 
 import { AuthModule } from "./auth/auth.module";
-import { BudgetModule } from "./budget/budget.module";
-import { CategoryModule } from "./category/category.module";
+import { BudgetsModule } from "./budgets/budgets.module";
+import { CategoriesModule } from "./categories/categories.module";
 import configSchema from "./config/config.schema";
 import configuration from "./config/configuration";
 import databaseConfig from "./config/database.config";
 import mikroOrmConfig from "./mikro-orm.config";
-import { TransactionModule } from "./transaction/transaction.module";
-import { UserModule } from "./user/user.module";
+import { TransactionsModule } from "./transactions/transactions.module";
+import { UsersModule } from "./users/users.module";
 import { UtilModule } from "./util/util.module";
 
 @Module({
@@ -22,10 +22,10 @@ import { UtilModule } from "./util/util.module";
       isGlobal: true,
     }),
     MikroOrmModule.forRoot(mikroOrmConfig),
-    UserModule,
-    CategoryModule,
-    BudgetModule,
-    TransactionModule,
+    UsersModule,
+    CategoriesModule,
+    BudgetsModule,
+    TransactionsModule,
     AuthModule,
     UtilModule,
   ],

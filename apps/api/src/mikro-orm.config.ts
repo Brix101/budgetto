@@ -5,11 +5,11 @@ import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
 import { Logger } from "@nestjs/common";
 import * as dotenv from "dotenv";
 
-import { Budget } from "./budget/entities/budget.entity";
-import { Category } from "./category/entities/category.entity";
+import { Budget } from "./budgets/entities/budget.entity";
+import { Category } from "./categories/entities/category.entity";
 import { BaseEntity } from "./common/entities/base.entity";
-import { Transaction } from "./transaction/entities/transaction.entity";
-import { User } from "./user/entities/user.entity";
+import { Transaction } from "./transactions/entities/transaction.entity";
+import { User } from "./users/entities/user.entity";
 
 dotenv.config({
   path: [".env", ".env.development.local"],

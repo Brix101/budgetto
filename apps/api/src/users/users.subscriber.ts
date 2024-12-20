@@ -6,7 +6,7 @@ import { PasswordUtilService } from "src/util/password-util.service";
 import { User } from "./entities/user.entity";
 
 @Injectable()
-export class UserSubscriber implements EventSubscriber<User> {
+export class UsersSubscriber implements EventSubscriber<User> {
   constructor(
     private readonly em: EntityManager,
     private readonly passwordUtilsService: PasswordUtilService,
