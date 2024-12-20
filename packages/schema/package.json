@@ -2,37 +2,13 @@
   "name": "@budgetto/schema",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
-    },
-    "./auth": {
-      "types": "./dist/auth.d.ts",
-      "default": "./src/auth.ts"
-    },
-    "./budget": {
-      "types": "./dist/budget.d.ts",
-      "default": "./src/budget.ts"
-    },
-    "./category": {
-      "types": "./dist/category.d.ts",
-      "default": "./src/category.ts"
-    },
-    "./transaction": {
-      "types": "./dist/transaction.d.ts",
-      "default": "./src/transaction.ts"
-    },
-    "./user": {
-      "types": "./dist/users.d.ts",
-      "default": "./src/users.ts"
-    }
-  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
   "scripts": {
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsc",
+    "dev": "tsc --watch",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"

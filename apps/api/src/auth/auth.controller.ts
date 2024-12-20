@@ -1,4 +1,5 @@
-import { SignInDto, signInSchema } from "@budgetto/schema/auth";
+import type { SignInDto } from "@budgetto/schema";
+import { signInSchema } from "@budgetto/schema";
 import {
   Body,
   Controller,

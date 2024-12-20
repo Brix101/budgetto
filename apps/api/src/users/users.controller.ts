@@ -1,8 +1,9 @@
 import { Body, Controller, Param, Patch, Post, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 
-import type { CreateUserDto } from "./dto/create-user.dto";
-import { createUserSchema } from "./dto/create-user.dto";
+import type { CreateUserDto } from "@budgetto/schema";
+import { createUserSchema } from "@budgetto/schema";
+
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UsersService } from "./users.service";
 
