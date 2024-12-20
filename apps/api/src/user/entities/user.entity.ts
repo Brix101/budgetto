@@ -12,7 +12,7 @@ export class User extends BaseEntity {
   @Property()
   email!: string;
 
-  @Property({ lazy: true, ref: true })
+  @Property({ lazy: true, ref: true, hidden: true })
   password!: Ref<string>;
 
   @Property({ default: false, hidden: true })

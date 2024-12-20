@@ -1,12 +1,48 @@
-import { Injectable } from "@nestjs/common";
+import {
+  EntityManager,
+  MikroORM,
+  UniqueConstraintViolationException,
+} from "@mikro-orm/core";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { User } from "./entities/user.entity";
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return "This action adds a new user";
+  private logger = new Logger(UserService.name);
+
+  constructor(
+    private readonly orm: MikroORM,
+    private readonly em: EntityManager,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = this.em.create(User, createUserDto);
+      await this.em.persistAndFlush(user);
+
+      return user;
+    } catch (error) {
+      if (error instanceof UniqueConstraintViolationException) {
+        throw new BadRequestException([
+          {
+            validation: "email",
+            code: "invalid_string",
+            message: "User with this email already exists",
+            path: ["email"],
+          },
+        ]);
+      }
+
+      throw new InternalServerErrorException(error || "Something went wrong");
+    }
   }
 
   findAll() {
@@ -15,6 +51,22 @@ export class UserService {
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
+  }
+
+  async findOneByEmail(email: string) {
+    try {
+      return this.em.findOneOrFail(User, { email });
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadRequestException([
+        {
+          validation: "email",
+          code: "invalid_string",
+          message: "Invalid email or password",
+          path: ["email"],
+        },
+      ]);
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
