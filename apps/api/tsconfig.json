@@ -1,17 +1,13 @@
 {
-  // "extends": "@acme/tsconfig/internal-package.json",
+  "extends": "@acme/tsconfig/internal-package.json",
   "compilerOptions": {
-    "moduleResolution": "nodenext",
-    "module": "NodeNext",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    // "target": "ES2022",
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
+    // "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -20,18 +16,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
 
-    "esModuleInterop": true,
-    "lib": ["ES2022"],
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "checkJs": false,
+    "noEmit": false,
+    "emitDeclarationOnly": false,
 
-    "disableSourceOfProjectReferenceRedirect": true,
-    "tsBuildInfoFile": "${configDir}/.cache/tsbuildinfo.json"
-
-    // "declarationMap": false
-    // "emitDeclarationOnly": true
-    // "noEmit": false
+    "baseUrl": "./"
   }
 }
