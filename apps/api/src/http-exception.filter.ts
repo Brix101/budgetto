@@ -31,9 +31,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       errorResponse.errors = exceptionResponse.message;
     }
 
-    // ? Catch errors on ZodpipeValidation
+    // ? Catch errors on ZodValidationPipe
     if (exceptionResponse.errors) {
-      errorResponse.message = "Bad Request";
+      errorResponse.message = "Validation failed";
       errorResponse.errors = exceptionResponse.errors;
     }
 
