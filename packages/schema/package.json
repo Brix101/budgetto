@@ -1,5 +1,5 @@
 {
-  "name": "@budgetto/validators",
+  "name": "@budgetto/schema",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,6 +7,26 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
+    },
+    "./auth": {
+      "types": "./dist/auth.d.ts",
+      "default": "./src/auth.ts"
+    },
+    "./budget": {
+      "types": "./dist/budget.d.ts",
+      "default": "./src/budget.ts"
+    },
+    "./category": {
+      "types": "./dist/category.d.ts",
+      "default": "./src/category.ts"
+    },
+    "./transaction": {
+      "types": "./dist/transaction.d.ts",
+      "default": "./src/transaction.ts"
+    },
+    "./user": {
+      "types": "./dist/users.d.ts",
+      "default": "./src/users.ts"
     }
   },
   "scripts": {
