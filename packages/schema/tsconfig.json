@@ -1,5 +1,10 @@
 {
   "extends": "@budgetto/tsconfig/internal-package.json",
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "emitDeclarationOnly": false
+  },
+  "exclude": ["node_modules", "dist"]
 }
