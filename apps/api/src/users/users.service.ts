@@ -10,9 +10,8 @@ import {
   Logger,
 } from "@nestjs/common";
 
-import { CreateUserDto } from "@budgetto/schema";
+import { CreateUserDto, UpdateUserDto } from "@budgetto/schema";
 
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 
 @Injectable()

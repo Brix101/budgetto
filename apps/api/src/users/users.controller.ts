@@ -1,10 +1,9 @@
 import { Body, Controller, Param, Patch, Post, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 
-import type { CreateUserDto } from "@budgetto/schema";
-import { createUserSchema } from "@budgetto/schema";
+import type { CreateUserDto, UpdateUserDto } from "@budgetto/schema";
+import { createUserSchema, updateUserSchema } from "@budgetto/schema";
 
-import { UpdateUserDto } from "./dto/update-user.dto";
 import { UsersService } from "./users.service";
 
 @Controller("users")
@@ -28,6 +27,7 @@ export class UsersController {
   // }
 
   @Patch(":id")
+  @UsePipes(new ZodValidationPipe(updateUserSchema))
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }

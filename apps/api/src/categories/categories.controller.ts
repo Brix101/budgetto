@@ -6,17 +6,21 @@ import {
   Param,
   Patch,
   Post,
+  UsePipes,
 } from "@nestjs/common";
+import { ZodValidationPipe } from "src/common/zod-validation.pipe";
+
+import type { CreateCategoryDto, UpdateCategoryDto } from "@budgetto/schema";
+import { createCategorySchema, updateCategorySchema } from "@budgetto/schema";
 
 import { CategoriesService } from "./categories.service";
-import { CreateCategoryDto } from "./dto/create-category.dto";
-import { UpdateCategoryDto } from "./dto/update-category.dto";
 
 @Controller("categories")
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
+  @UsePipes(new ZodValidationPipe(createCategorySchema))
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
@@ -32,6 +36,7 @@ export class CategoriesController {
   }
 
   @Patch(":id")
+  @UsePipes(new ZodValidationPipe(updateCategorySchema))
   update(
     @Param("id") id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,

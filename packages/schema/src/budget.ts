@@ -11,4 +11,4 @@ export const createBudgetSchema = z.object({
 export const updateBudgetSchema = createBudgetSchema.partial();
 
 export type CreateBudgetDto = z.infer<typeof createBudgetSchema>;
-export type updateBudgetDto = z.infer<typeof updateBudgetSchema>;
+export type UpdateBudgetDto = z.infer<typeof updateBudgetSchema>;
