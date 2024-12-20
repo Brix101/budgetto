@@ -1,7 +1,9 @@
 import type { EntityManager } from "@mikro-orm/core";
 import { Seeder } from "@mikro-orm/seeder";
 
-import { Category, CategoryType } from "../categories/entities/category.entity";
+import { CategoryType } from "@budgetto/schema";
+
+import { Category } from "../categories/entities/category.entity";
 
 export class CategorySeeder extends Seeder {
   private categories = [

@@ -7,13 +7,10 @@ import {
   Unique,
 } from "@mikro-orm/core";
 
+import { CategoryType } from "@budgetto/schema";
+
 import { BaseEntity } from "../../common/entities/base.entity";
 import { User } from "../../users/entities/user.entity";
-
-export enum CategoryType {
-  INCOME = "income",
-  EXPENSE = "expense",
-}
 
 @Entity()
 @Unique({ properties: ["name", "user"] })
