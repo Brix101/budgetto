@@ -20,6 +20,9 @@ export class User extends BaseEntity {
   @Property({ default: false, hidden: true })
   isConfirmed = false;
 
+  @Property({ default: false, hidden: true })
+  isAdmin = false;
+
   public toPayload(): UserPayloadDto {
     return {
       sub: uuidv4(),

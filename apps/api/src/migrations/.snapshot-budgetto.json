@@ -1,5 +1,7 @@
 {
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "name": "public",
   "tables": [
     {
@@ -72,6 +74,16 @@
           "nullable": false,
           "default": "false",
           "mappedType": "boolean"
+        },
+        "is_admin": {
+          "name": "is_admin",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "false",
+          "mappedType": "boolean"
         }
       },
       "name": "user",
@@ -79,7 +91,9 @@
       "indexes": [
         {
           "keyName": "user_email_unique",
-          "columnNames": ["email"],
+          "columnNames": [
+            "email"
+          ],
           "composite": false,
           "constraint": true,
           "primary": false,
@@ -87,7 +101,9 @@
         },
         {
           "keyName": "user_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -156,7 +172,10 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "enumItems": ["income", "expense"],
+          "enumItems": [
+            "income",
+            "expense"
+          ],
           "mappedType": "enum"
         },
         "user_id": {
@@ -174,7 +193,10 @@
       "indexes": [
         {
           "keyName": "category_name_user_id_unique",
-          "columnNames": ["name", "user_id"],
+          "columnNames": [
+            "name",
+            "user_id"
+          ],
           "composite": true,
           "constraint": true,
           "primary": false,
@@ -182,7 +204,9 @@
         },
         {
           "keyName": "category_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -193,9 +217,13 @@
       "foreignKeys": {
         "category_user_id_foreign": {
           "constraintName": "category_user_id_foreign",
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "localTableName": "public.category",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade",
           "updateRule": "cascade"
@@ -287,7 +315,9 @@
       "indexes": [
         {
           "keyName": "transaction_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -298,18 +328,26 @@
       "foreignKeys": {
         "transaction_category_id_foreign": {
           "constraintName": "transaction_category_id_foreign",
-          "columnNames": ["category_id"],
+          "columnNames": [
+            "category_id"
+          ],
           "localTableName": "public.transaction",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.category",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "transaction_user_id_foreign": {
           "constraintName": "transaction_user_id_foreign",
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "localTableName": "public.transaction",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade",
           "updateRule": "cascade"
@@ -411,7 +449,9 @@
       "indexes": [
         {
           "keyName": "budget_pkey",
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "primary": true,
@@ -422,18 +462,26 @@
       "foreignKeys": {
         "budget_category_id_foreign": {
           "constraintName": "budget_category_id_foreign",
-          "columnNames": ["category_id"],
+          "columnNames": [
+            "category_id"
+          ],
           "localTableName": "public.budget",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.category",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "budget_user_id_foreign": {
           "constraintName": "budget_user_id_foreign",
-          "columnNames": ["user_id"],
+          "columnNames": [
+            "user_id"
+          ],
           "localTableName": "public.budget",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.user",
           "deleteRule": "cascade",
           "updateRule": "cascade"
