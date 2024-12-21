@@ -44,7 +44,7 @@ export class BudgetsController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string, @Request() req: { user: UserDto }) {
+  findOne(@Param("id") id: string, @Request() _req: { user: UserDto }) {
     return this.budgetsService.findOne(+id);
   }
 
@@ -53,13 +53,13 @@ export class BudgetsController {
   update(
     @Param("id") id: string,
     @Body() updateBudgetDto: UpdateBudgetDto,
-    @Request() req: { user: UserDto },
+    @Request() _req: { user: UserDto },
   ) {
     return this.budgetsService.update(+id, updateBudgetDto);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string, @Request() req: { user: UserDto }) {
+  remove(@Param("id") id: string, @Request() _req: { user: UserDto }) {
     return this.budgetsService.remove(+id);
   }
 }

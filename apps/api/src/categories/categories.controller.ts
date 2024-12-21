@@ -66,13 +66,13 @@ export class CategoriesController {
   update(
     @Param("id") id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
-    @Request() req: { user: UserDto },
+    @Request() _req: { user: UserDto },
   ) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string, @Request() req: { user: UserDto }) {
+  remove(@Param("id") id: string, @Request() _req: { user: UserDto }) {
     return this.categoriesService.remove(+id);
   }
 }
