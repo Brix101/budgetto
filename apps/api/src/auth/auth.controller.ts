@@ -45,8 +45,8 @@ export class AuthController {
     return req.user;
   }
 
-  @Post("/sign-out")
-  async signOut(@Request() req) {
-    return req.logout();
-  }
+  // @Post("/sign-out")
+  // async signOut(@Request() req) {
+  //   return req.logout();
+  // }
 }

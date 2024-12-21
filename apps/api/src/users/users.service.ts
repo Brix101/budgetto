@@ -36,7 +36,7 @@ export class UsersService {
         throw new BadRequestException([
           {
             validation: "email",
-            code: "invalid_string",
+            code: "invalid_email",
             message: "User with this email already exists",
             path: ["email"],
           },
@@ -59,7 +59,6 @@ export class UsersService {
       throw new NotFoundException([
         {
           validation: "id",
-          code: "invalid_string",
           message: "User not found",
           path: ["id"],
         },

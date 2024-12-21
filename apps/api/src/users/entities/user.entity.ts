@@ -1,4 +1,4 @@
-import type { Ref } from "@mikro-orm/core";
+import type { EntityDTO, Ref } from "@mikro-orm/core";
 import { Entity, Property, Unique } from "@mikro-orm/core";
 import { v4 as uuidv4 } from "uuid";
 
@@ -31,3 +31,5 @@ export class User extends BaseEntity {
     };
   }
 }
+
+export type UserDto = EntityDTO<User>;

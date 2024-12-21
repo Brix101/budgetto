@@ -27,6 +27,7 @@ export class Category extends BaseEntity {
   @ManyToOne(() => User, {
     cascade: [Cascade.PERSIST, Cascade.REMOVE],
     nullable: true,
+    hidden: true,
   })
   user?: User;
 }
