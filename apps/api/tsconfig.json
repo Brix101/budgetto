@@ -1,5 +1,5 @@
 {
-  "extends": "@budgetto/tsconfig/internal-package.json",
+  "extends": "@budgetto/tsconfig/node.json",
   "compilerOptions": {
     "declaration": true,
     "removeComments": true,
@@ -16,11 +16,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
 
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
     "checkJs": false,
-    "noEmit": false,
-    "emitDeclarationOnly": false,
 
     "baseUrl": "./"
   },
