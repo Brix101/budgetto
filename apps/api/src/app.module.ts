@@ -13,6 +13,7 @@ import mikroOrmConfig from "./mikro-orm.config";
 import { TransactionsModule } from "./transactions/transactions.module";
 import { UsersModule } from "./users/users.module";
 import { UtilModule } from "./util/util.module";
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UtilModule } from "./util/util.module";
     AuthModule,
     UtilModule,
     CacheModule,
+    CaslModule,
   ],
 })
 export class AppModule {}
