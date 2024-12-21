@@ -1,5 +1,6 @@
 import {
   EntityManager,
+  FilterQuery,
   MikroORM,
   UniqueConstraintViolationException,
 } from "@mikro-orm/core";
@@ -42,6 +43,7 @@ export class UsersService {
         ]);
       }
 
+      this.logger.error(error);
       throw new InternalServerErrorException(error || "Something went wrong");
     }
   }
@@ -50,9 +52,9 @@ export class UsersService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
+  findOne(where: FilterQuery<NoInfer<User>>) {
     try {
-      return this.em.findOneOrFail(User, { id });
+      return this.em.findOneOrFail(User, where);
     } catch {
       throw new NotFoundException([
         {
@@ -60,21 +62,6 @@ export class UsersService {
           code: "invalid_string",
           message: "User not found",
           path: ["id"],
-        },
-      ]);
-    }
-  }
-
-  async findOneByEmail(email: string) {
-    try {
-      return this.em.findOneOrFail(User, { email });
-    } catch {
-      throw new BadRequestException([
-        {
-          validation: "email",
-          code: "invalid_string",
-          message: "Invalid email or password",
-          path: ["email"],
         },
       ]);
     }

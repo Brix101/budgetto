@@ -1,7 +1,9 @@
 import type { Ref } from "@mikro-orm/core";
 import { Entity, Property, Unique } from "@mikro-orm/core";
+import { v4 as uuidv4 } from "uuid";
 
 import { BaseEntity } from "../../common/entities/base.entity";
+import { UserPayloadDto } from "../dto/user-payload.dto";
 
 @Entity()
 @Unique({ properties: ["email"] })
@@ -17,4 +19,12 @@ export class User extends BaseEntity {
 
   @Property({ default: false, hidden: true })
   isConfirmed = false;
+
+  public toPayload(): UserPayloadDto {
+    return {
+      sub: uuidv4(),
+      name: this.name,
+      email: this.email,
+    };
+  }
 }

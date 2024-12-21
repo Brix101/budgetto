@@ -1,3 +1,4 @@
+import { EntityDTO } from "@mikro-orm/core";
 import { Controller, Get, Post, Request, UseGuards } from "@nestjs/common";
 import { User } from "src/users/entities/user.entity";
 
@@ -12,12 +13,12 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post("sign-in")
-  signIn(@Request() req: { user: Partial<User> }) {
+  signIn(@Request() req: { user: User }) {
     return this.authService.signIn(req.user);
   }
 
   @Get("profile")
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: EntityDTO<User> }) {
     return req.user;
   }
 

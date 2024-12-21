@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 
 import { AuthModule } from "./auth/auth.module";
 import { BudgetsModule } from "./budgets/budgets.module";
+import { CacheModule } from "./cache/cache.module";
 import { CategoriesModule } from "./categories/categories.module";
 import configSchema from "./config/config.schema";
 import configuration from "./config/configuration";
@@ -28,6 +29,7 @@ import { UtilModule } from "./util/util.module";
     TransactionsModule,
     AuthModule,
     UtilModule,
+    CacheModule,
   ],
 })
 export class AppModule {}
