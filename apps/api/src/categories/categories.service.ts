@@ -50,9 +50,9 @@ export class CategoriesService {
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     try {
-      const category = this.em.findOneOrFail(Category, { id });
+      const category = await this.em.findOneOrFail(Category, { id });
 
       return category;
     } catch (error) {
@@ -69,7 +69,7 @@ export class CategoriesService {
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     try {
-      const category = this.findOne(id);
+      const category = await this.findOne(id);
       this.em.assign(category, updateCategoryDto);
 
       await this.em.nativeUpdate(Category, { id }, updateCategoryDto);
@@ -86,7 +86,7 @@ export class CategoriesService {
 
   async remove(id: number) {
     try {
-      const category = this.findOne(id);
+      const category = await this.findOne(id);
 
       await this.em.nativeDelete(Category, { id });
 

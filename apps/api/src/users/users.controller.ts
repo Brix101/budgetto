@@ -1,9 +1,10 @@
-import { Body, Controller, Param, Patch, UsePipes } from "@nestjs/common";
+import { Body, Controller, Patch, Request, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 
 import type { UpdateUserDto } from "@budgetto/schema";
 import { updateUserSchema } from "@budgetto/schema";
 
+import { UserDto } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
 @Controller("users")
@@ -27,10 +28,14 @@ export class UsersController {
   //   return this.usersService.findOne(+id);
   // }
 
-  @Patch(":id")
+  @Patch()
   @UsePipes(new ZodValidationPipe(updateUserSchema))
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(
+    // @Param("id") id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() req: { user: UserDto },
+  ) {
+    return this.usersService.update(req.user.id, updateUserDto);
   }
 
   // @Delete(":id")

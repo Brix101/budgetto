@@ -6,9 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UsePipes,
 } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
+import { UserDto } from "src/users/entities/user.entity";
 
 import type {
   CreateTransactionDto,
@@ -27,17 +29,20 @@ export class TransactionsController {
 
   @Post()
   @UsePipes(new ZodValidationPipe(createTransactionSchema))
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  create(
+    @Body() createTransactionDto: CreateTransactionDto,
+    @Request() req: { user: UserDto },
+  ) {
+    return this.transactionsService.create(req.user, createTransactionDto);
   }
 
   @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  findAll(@Request() req: { user: UserDto }) {
+    return this.transactionsService.findAll(req.user);
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
+  findOne(@Param("id") id: string, @Request() _req: { user: UserDto }) {
     return this.transactionsService.findOne(+id);
   }
 
@@ -46,12 +51,13 @@ export class TransactionsController {
   update(
     @Param("id") id: string,
     @Body() updateTransactionDto: UpdateTransactionDto,
+    @Request() _req: { user: UserDto },
   ) {
     return this.transactionsService.update(+id, updateTransactionDto);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
+  remove(@Param("id") id: string, @Request() _req: { user: UserDto }) {
     return this.transactionsService.remove(+id);
   }
 }

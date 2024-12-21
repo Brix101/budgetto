@@ -22,9 +22,10 @@ export class BudgetsService {
 
   async create(user: UserDto, createBudgetDto: CreateBudgetDto) {
     try {
+      const { categoryId, ...rest } = createBudgetDto;
       const budget = this.em.create(Budget, {
-        ...createBudgetDto,
-        category: createBudgetDto.categoryId,
+        ...rest,
+        category: categoryId,
         user: user.id,
       });
 
@@ -70,7 +71,7 @@ export class BudgetsService {
 
   async update(id: number, updateBudgetDto: UpdateBudgetDto) {
     try {
-      const budget = this.findOne(id);
+      const budget = await this.findOne(id);
       this.em.assign(budget, updateBudgetDto);
 
       await this.em.nativeUpdate(Budget, { id }, updateBudgetDto);
@@ -87,7 +88,7 @@ export class BudgetsService {
 
   async remove(id: number) {
     try {
-      const budget = this.findOne(id);
+      const budget = await this.findOne(id);
 
       await this.em.nativeDelete(Budget, { id });
 
