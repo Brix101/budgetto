@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { UserDto } from "src/users/entities/user.entity";
-import { UsersService } from "src/users/users.service";
 
 import { CreateCategoryDto, UpdateCategoryDto } from "@budgetto/schema";
 
@@ -19,16 +18,13 @@ export class CategoriesService {
   constructor(
     private readonly orm: MikroORM,
     private readonly em: EntityManager,
-    private readonly usersService: UsersService,
   ) {}
 
   async create(user: UserDto, createCategoryDto: CreateCategoryDto) {
     try {
-      const userEntity = await this.usersService.findOne({ id: user.id });
-
-      const category = this.em.create("Category", {
+      const category = this.em.create(Category, {
         ...createCategoryDto,
-        user: userEntity,
+        user: user.id,
       });
 
       await this.em.persistAndFlush(category);
@@ -46,7 +42,6 @@ export class CategoriesService {
       const categories = await this.em.find(Category, {
         $or: [{ user: { id: user.id } }, { user: null }],
       });
-      this.logger.log(categories);
       return categories;
     } catch (error) {
       this.logger.error(error);
