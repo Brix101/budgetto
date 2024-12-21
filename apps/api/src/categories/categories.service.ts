@@ -72,11 +72,36 @@ export class CategoriesService {
     }
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    try {
+      const category = this.findOne(id);
+      this.em.assign(category, updateCategoryDto);
+
+      await this.em.nativeUpdate(Category, { id }, updateCategoryDto);
+
+      return category;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number) {
+    try {
+      const category = this.findOne(id);
+
+      await this.em.nativeDelete(Category, { id });
+
+      return category;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      this.logger.error(error);
+      throw new InternalServerErrorException(error);
+    }
   }
 }

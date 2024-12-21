@@ -33,9 +33,9 @@ export class CaslAbilityFactory {
     }
 
     // Users
-    // can(Action.Manage, User, { id: user.id });
-    can(Action.Manage, Budget, { user: user });
-    can(Action.Manage, Category, { user: user });
+    can(Action.Manage, User, { id: user.id });
+    can(Action.Manage, Budget, { user: { id: user.id } });
+    can(Action.Manage, Category, { user: { id: user.id } });
 
     return build({
       // Read https://casl.js.org/v6/en/guide/subject-type-detection#use-classes-as-subject-types for details

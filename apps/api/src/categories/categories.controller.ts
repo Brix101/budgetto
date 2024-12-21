@@ -2,30 +2,30 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
   Post,
   Request,
-  UseGuards,
   UsePipes,
 } from "@nestjs/common";
-import { AppAbility } from "src/casl/casl-ability.factory/casl-ability.factory";
+import { CaslAbilityFactory } from "src/casl/casl-ability.factory/casl-ability.factory";
 import Action from "src/casl/casl-action.enum";
-import { CheckPolicies } from "src/casl/policies/policies.decorator";
-import { PoliciesGuard } from "src/casl/policies/policies.guard";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
-import { UserDto } from "src/users/entities/user.entity";
+import { User, UserDto } from "src/users/entities/user.entity";
 
 import type { CreateCategoryDto, UpdateCategoryDto } from "@budgetto/schema";
 import { createCategorySchema, updateCategorySchema } from "@budgetto/schema";
 
 import { CategoriesService } from "./categories.service";
-import { Category } from "./entities/category.entity";
 
 @Controller("categories")
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(
+    private readonly categoriesService: CategoriesService,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
+  ) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(createCategorySchema))
@@ -37,17 +37,28 @@ export class CategoriesController {
   }
 
   @Get()
-  @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Category))
   findAll(@Request() req: { user: UserDto }) {
     return this.categoriesService.findAll(req.user);
   }
 
   @Get(":id")
-  @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can(Action.Read, Category))
-  findOne(@Param("id") id: string) {
-    return this.categoriesService.findOne(+id);
+  async findOne(@Param("id") id: string, @Request() req: { user: User }) {
+    const category = await this.categoriesService.findOne(+id);
+
+    const ability = this.caslAbilityFactory.createForUser(req.user);
+
+    category.assign({ user: { id: category.user.id } });
+
+    console.log(category);
+    const hasAbility = ability.can(Action.Manage, category);
+
+    if (!hasAbility) {
+      throw new ForbiddenException(
+        "You do not have permission to view this category",
+      );
+    }
+
+    return category;
   }
 
   @Patch(":id")

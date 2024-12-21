@@ -27,7 +27,7 @@ export class PoliciesGuard implements CanActivate {
     const ability = this.caslAbilityFactory.createForUser(user);
 
     console.log(user);
-    console.log(ability);
+    console.log(ability.rules[1].conditions);
 
     return policyHandlers.every((handler) =>
       this.execPolicyHandler(handler, ability),
