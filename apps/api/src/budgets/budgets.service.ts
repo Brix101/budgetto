@@ -1,4 +1,3 @@
-import { EntityManager, MikroORM } from "@mikro-orm/core";
 import {
   Injectable,
   InternalServerErrorException,
@@ -9,27 +8,23 @@ import { UserDto } from "src/users/entities/user.entity";
 
 import { CreateBudgetDto, UpdateBudgetDto } from "@budgetto/schema";
 
-import { Budget } from "./entities/budget.entity";
+import { BudgetRepository } from "./budgets.repository";
 
 @Injectable()
 export class BudgetsService {
   private logger = new Logger(BudgetsService.name);
 
-  constructor(
-    private readonly orm: MikroORM,
-    private readonly em: EntityManager,
-  ) {}
+  constructor(private readonly repo: BudgetRepository) {}
 
-  async create(user: UserDto, createBudgetDto: CreateBudgetDto) {
+  async create(user: UserDto, { categoryId, ...rest }: CreateBudgetDto) {
     try {
-      const { categoryId, ...rest } = createBudgetDto;
-      const budget = this.em.create(Budget, {
+      const budget = this.repo.create({
         ...rest,
         category: categoryId,
         user: user.id,
       });
 
-      await this.em.persistAndFlush(budget);
+      await this.repo.insert(budget);
 
       return budget;
     } catch (error) {
@@ -41,9 +36,8 @@ export class BudgetsService {
 
   async findAll(user: UserDto) {
     try {
-      const budgets = await this.em.find(Budget, {
-        user: { id: user.id },
-      });
+      const budgets = await this.repo.findAll({ where: { user: user.id } });
+
       return budgets;
     } catch (error) {
       this.logger.error(error);
@@ -54,7 +48,7 @@ export class BudgetsService {
 
   async findOne(id: number) {
     try {
-      const budget = await this.em.findOneOrFail(Budget, { id });
+      const budget = await this.repo.findOneOrFail({ id });
 
       return budget;
     } catch (error) {
@@ -72,9 +66,10 @@ export class BudgetsService {
   async update(id: number, updateBudgetDto: UpdateBudgetDto) {
     try {
       const budget = await this.findOne(id);
-      this.em.assign(budget, updateBudgetDto);
 
-      await this.em.nativeUpdate(Budget, { id }, updateBudgetDto);
+      budget.assign(updateBudgetDto);
+
+      await this.repo.nativeUpdate({ id }, updateBudgetDto);
 
       return budget;
     } catch (error) {
@@ -90,7 +85,7 @@ export class BudgetsService {
     try {
       const budget = await this.findOne(id);
 
-      await this.em.nativeDelete(Budget, { id });
+      await this.repo.nativeDelete({ id });
 
       return budget;
     } catch (error) {

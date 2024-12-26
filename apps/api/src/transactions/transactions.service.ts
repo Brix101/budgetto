@@ -1,4 +1,3 @@
-import { EntityManager, MikroORM } from "@mikro-orm/core";
 import {
   Injectable,
   InternalServerErrorException,
@@ -9,27 +8,23 @@ import { UserDto } from "src/users/entities/user.entity";
 
 import { CreateTransactionDto, UpdateTransactionDto } from "@budgetto/schema";
 
-import { Transaction } from "./entities/transaction.entity";
+import { TransactionRepository } from "./transactions.repository";
 
 @Injectable()
 export class TransactionsService {
   private logger = new Logger(TransactionsService.name);
 
-  constructor(
-    private readonly orm: MikroORM,
-    private readonly em: EntityManager,
-  ) {}
+  constructor(private readonly repo: TransactionRepository) {}
 
-  async create(user: UserDto, createTransactionDto: CreateTransactionDto) {
+  async create(user: UserDto, { categoryId, ...rest }: CreateTransactionDto) {
     try {
-      const { categoryId, ...rest } = createTransactionDto;
-      const transaction = this.em.create(Transaction, {
+      const transaction = this.repo.create({
         ...rest,
         category: categoryId,
         user: user.id,
       });
 
-      await this.em.persistAndFlush(transaction);
+      await this.repo.insert(transaction);
 
       return transaction;
     } catch (error) {
@@ -41,8 +36,8 @@ export class TransactionsService {
 
   async findAll(user: UserDto) {
     try {
-      const transactions = await this.em.find(Transaction, {
-        user: { id: user.id },
+      const transactions = await this.repo.findAll({
+        where: { user: { id: user.id } },
       });
       return transactions;
     } catch (error) {
@@ -54,7 +49,7 @@ export class TransactionsService {
 
   async findOne(id: number) {
     try {
-      const transcations = await this.em.findOneOrFail(Transaction, { id });
+      const transcations = await this.repo.findOneOrFail({ id });
 
       return transcations;
     } catch (error) {
@@ -72,9 +67,9 @@ export class TransactionsService {
   async update(id: number, updateTransactionDto: UpdateTransactionDto) {
     try {
       const budget = await this.findOne(id);
-      this.em.assign(budget, updateTransactionDto);
+      budget.assign(updateTransactionDto);
 
-      await this.em.nativeUpdate(Transaction, { id }, updateTransactionDto);
+      await this.repo.nativeUpdate({ id }, updateTransactionDto);
 
       return budget;
     } catch (error) {
@@ -90,7 +85,7 @@ export class TransactionsService {
     try {
       const transaction = await this.findOne(id);
 
-      await this.em.nativeDelete(Transaction, { id });
+      await this.repo.nativeDelete({ id });
 
       return transaction;
     } catch (error) {

@@ -1,20 +1,25 @@
 import {
   Cascade,
   Entity,
+  EntityRepositoryType,
   Enum,
   ManyToOne,
   Property,
   Unique,
 } from "@mikro-orm/core";
+import { UserRepository } from "src/users/users.repository";
 
 import { CategoryType } from "@budgetto/schema";
 
 import { BaseEntity } from "../../common/entities/base.entity";
 import { User } from "../../users/entities/user.entity";
+import { CategoryRepository } from "../categories.repository";
 
-@Entity()
+@Entity({ repository: () => CategoryRepository })
 @Unique({ properties: ["name", "user"] })
 export class Category extends BaseEntity {
+  [EntityRepositoryType]?: UserRepository;
+
   @Property()
   name!: string;
 

@@ -1,11 +1,20 @@
-import { Cascade, Entity, ManyToOne, Property } from "@mikro-orm/core";
+import {
+  Cascade,
+  Entity,
+  EntityRepositoryType,
+  ManyToOne,
+  Property,
+} from "@mikro-orm/core";
 
 import { Category } from "../../categories/entities/category.entity";
 import { BaseEntity } from "../../common/entities/base.entity";
 import { User } from "../../users/entities/user.entity";
+import { BudgetRepository } from "../budgets.repository";
 
-@Entity()
+@Entity({ repository: () => BudgetRepository })
 export class Budget extends BaseEntity {
+  [EntityRepositoryType]?: BudgetRepository;
+
   @Property()
   amount!: number;
 
