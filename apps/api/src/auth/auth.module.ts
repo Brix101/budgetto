@@ -7,7 +7,6 @@ import { CacheModule } from "src/cache/cache.module";
 import { UsersModule } from "src/users/users.module";
 import { UtilModule } from "src/util/util.module";
 
-import { jwtConstants } from "./auth.constants";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
@@ -19,11 +18,7 @@ import { LocalStrategy } from "./local.strategy";
     UtilModule,
     UsersModule,
     CacheModule,
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: jwtConstants.accessExpiresIn },
-    }),
+    JwtModule,
     PassportModule,
     ConfigModule,
   ],

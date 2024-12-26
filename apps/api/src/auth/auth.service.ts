@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "src/auth/auth.constants";
 import { CacheService } from "src/cache/cache.service";
+import { JwtConfig } from "src/config/jwt.config";
 import { User, UserDto } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { PasswordUtilService } from "src/util/password-util.service";
@@ -45,12 +46,15 @@ export class AuthService {
   async signIn(user: User): Promise<SignInResponseDto> {
     const payload = user.toPayload();
 
+    const jwtConfig: JwtConfig = this.configService.get<JwtConfig>("jwt");
+
     const accessToken = await this.genAcessToken(payload.sub, user.toObject());
     const refreshToken = await this.jwtService.signAsync(
       { sub: payload.sub },
       {
         privateKey: this.configService.get<string>("jwt.refreshPrivateKey"),
-        expiresIn: "90d",
+        expiresIn: this.configService.get<number>("jwt.refreshExpiresIn"),
+        algorithm: "RS256",
       },
     );
 
@@ -65,6 +69,10 @@ export class AuthService {
     try {
       const { sub } = await this.jwtService.verifyAsync<{ sub: string }>(
         refreshToken,
+        {
+          publicKey: this.configService.get<string>("jwt.refreshPublicKey"),
+          algorithms: ["RS256"],
+        },
       );
 
       const payload = await this.cacheService.get<UserDto>(
@@ -82,7 +90,8 @@ export class AuthService {
         refreshToken,
         expiresIn: jwtConstants.accessExpiresIn,
       };
-    } catch {
+    } catch (e) {
+      console.error(e);
       throw new UnauthorizedException([
         {
           code: "invalid_token",
@@ -100,11 +109,18 @@ export class AuthService {
       jwtConstants.accessExpiresIn * 1000,
     );
 
-    const accessToken = await this.jwtService.signAsync({
-      sub,
-      email: user.email,
-      name: user.name,
-    });
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub,
+        email: user.email,
+        name: user.name,
+      },
+      {
+        privateKey: this.configService.get<string>("jwt.accessPrivateKey"),
+        expiresIn: this.configService.get<number>("jwt.accessExpiresIn"),
+        algorithm: "RS256",
+      },
+    );
 
     return accessToken;
   }
