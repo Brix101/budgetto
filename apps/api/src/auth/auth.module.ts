@@ -12,7 +12,6 @@ import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { JwtStrategy } from "./jwt.strategy";
 import { LocalStrategy } from "./local.strategy";
-import { RefreshStrategy } from "./refresh.strategy";
 
 @Module({
   imports: [
@@ -30,7 +29,6 @@ import { RefreshStrategy } from "./refresh.strategy";
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    RefreshStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
