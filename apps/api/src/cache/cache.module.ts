@@ -14,9 +14,9 @@ import { CacheService } from "./cache.service";
         const redisConfig = configService.get<RedisClientOptions>("redis");
         const secondary = new KeyvRedis(redisConfig);
 
-        return new Cacheable({ secondary, ttl: "4h" });
+        return new Cacheable({ secondary });
       },
-      inject: [ConfigService], // Ensure ConfigService is injected
+      inject: [ConfigService],
     },
     CacheService,
   ],

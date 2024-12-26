@@ -1,13 +1,17 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "src/auth/auth.constants";
 import { CacheService } from "src/cache/cache.service";
-import { User } from "src/users/entities/user.entity";
+import { User, UserDto } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { PasswordUtilService } from "src/util/password-util.service";
 
+import { RefreshDto, SignInResponseDto } from "@budgetto/schema";
+
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly passwordUtilService: PasswordUtilService,
@@ -36,17 +40,69 @@ export class AuthService {
     }
   }
 
-  async signIn(user: User): Promise<any> {
+  async signIn(user: User): Promise<SignInResponseDto> {
     const payload = user.toPayload();
 
-    await this.cacheService.set(
-      jwtConstants.accessPrefix + payload.sub,
-      user.toObject(),
-      jwtConstants.accessTokenExpires,
+    const accessToken = await this.genAcessToken(payload.sub, user.toObject());
+    const refreshToken = await this.jwtService.signAsync(
+      { sub: payload.sub },
+      {
+        expiresIn: "90d",
+      },
     );
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken,
+      refreshToken,
+      expiresIn: jwtConstants.accessExpiresIn,
     };
+  }
+
+  async refresh({ refreshToken }: RefreshDto): Promise<SignInResponseDto> {
+    try {
+      const { sub } = await this.jwtService.verifyAsync<{ sub: string }>(
+        refreshToken,
+      );
+
+      const payload = await this.cacheService.get<UserDto>(
+        jwtConstants.keyPrefix + sub,
+      );
+
+      if (!payload) {
+        throw new UnauthorizedException();
+      }
+
+      const accessToken = await this.genAcessToken(sub, payload);
+
+      return {
+        accessToken,
+        refreshToken,
+        expiresIn: jwtConstants.accessExpiresIn,
+      };
+    } catch {
+      throw new UnauthorizedException([
+        {
+          code: "invalid_token",
+          message: "Invalid refresh token",
+          path: ["refreshToken"],
+        },
+      ]);
+    }
+  }
+
+  private async genAcessToken(sub: string, payload: UserDto) {
+    const user = await this.cacheService.set(
+      jwtConstants.keyPrefix + sub,
+      payload,
+      jwtConstants.accessExpiresIn * 1000,
+    );
+
+    const accessToken = await this.jwtService.signAsync({
+      sub,
+      email: user.email,
+      name: user.name,
+    });
+
+    return accessToken;
   }
 }

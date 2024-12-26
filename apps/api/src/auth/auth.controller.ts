@@ -1,4 +1,3 @@
-import { EntityDTO } from "@mikro-orm/core";
 import {
   Body,
   Controller,
@@ -9,11 +8,11 @@ import {
   UsePipes,
 } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
-import { User } from "src/users/entities/user.entity";
+import { User, UserDto } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 
-import type { CreateUserDto } from "@budgetto/schema";
-import { createUserSchema } from "@budgetto/schema";
+import type { CreateUserDto, RefreshDto } from "@budgetto/schema";
+import { createUserSchema, refreshSchema } from "@budgetto/schema";
 
 import { Public } from "./auth.decorator";
 import { AuthService } from "./auth.service";
@@ -34,19 +33,22 @@ export class AuthController {
   }
 
   @Public()
-  @Post()
+  @Post("sign-up")
   @UsePipes(new ZodValidationPipe(createUserSchema))
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @Get("profile")
-  getProfile(@Request() req: { user: EntityDTO<User> }) {
-    return req.user;
+  @Public()
+  @Post("refresh")
+  // @UseGuards(AuthGuard(["refresh"]))
+  @UsePipes(new ZodValidationPipe(refreshSchema))
+  refresh(@Body() refreshDto: RefreshDto) {
+    return this.authService.refresh(refreshDto);
   }
 
-  // @Post("/sign-out")
-  // async signOut(@Request() req) {
-  //   return req.logout();
-  // }
+  @Get("profile")
+  getProfile(@Request() req: { user: UserDto }) {
+    return req.user;
+  }
 }

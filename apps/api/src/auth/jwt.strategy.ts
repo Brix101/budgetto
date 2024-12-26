@@ -1,11 +1,10 @@
-import { EntityDTO } from "@mikro-orm/core";
 import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { jwtConstants } from "src/auth/auth.constants";
 import { CacheService } from "src/cache/cache.service";
 import { UserPayloadDto } from "src/users/dto/user-payload.dto";
-import { User } from "src/users/entities/user.entity";
+import { UserDto } from "src/users/entities/user.entity";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,8 +17,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: UserPayloadDto) {
-    const cachedUser = await this.cacheService.get<EntityDTO<User>>(
-      jwtConstants.accessPrefix + payload.sub,
+    const cachedUser = await this.cacheService.get<UserDto>(
+      jwtConstants.keyPrefix + payload.sub,
     );
 
     if (!cachedUser) {
