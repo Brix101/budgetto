@@ -23,12 +23,23 @@ export const redisConfigSchema = z.object({
   REDIS_SSL_ENABLED: z.boolean().default(false),
 });
 
+export const jwtConfigSchema = z.object({
+  ACCESS_PUBLIC_KEY: z.string(),
+  ACCESS_PRIVATE_KEY: z.string(),
+  ACCESS_EXPIRES_IN: z.string().default("1hr"),
+  REFRESH_PUBLIC_KEY: z.string(),
+  REFRESH_PRIVATE_KEY: z.string(),
+  REFRESH_EXPIRES_IN: z.string().default("90d"),
+});
+
 const configSchema = serverConfigSchema
   .merge(dbConfigSchema)
-  .merge(redisConfigSchema);
+  .merge(redisConfigSchema)
+  .merge(jwtConfigSchema);
 
 export type DbConfig = z.infer<typeof dbConfigSchema>;
 export type RedisConfig = z.infer<typeof redisConfigSchema>;
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
+export type JwtConfig = z.infer<typeof jwtConfigSchema>;
 
 export default configSchema;

@@ -10,6 +10,8 @@ import { CategoriesModule } from "./categories/categories.module";
 import configSchema from "./config/config.schema";
 import configuration from "./config/configuration";
 import databaseConfig from "./config/database.config";
+import jwtConfig from "./config/jwt.config";
+import redisConfig from "./config/redis.config";
 import mikroOrmConfig from "./mikro-orm.config";
 import { TransactionsModule } from "./transactions/transactions.module";
 import { UsersModule } from "./users/users.module";
@@ -19,7 +21,7 @@ import { UtilModule } from "./util/util.module";
   imports: [
     ConfigModule.forRoot({
       envFilePath: [".env.development.local", ".env"],
-      load: [configuration, databaseConfig],
+      load: [configuration, databaseConfig, redisConfig, jwtConfig],
       validate: (config) => configSchema.parse(config),
       isGlobal: true,
     }),

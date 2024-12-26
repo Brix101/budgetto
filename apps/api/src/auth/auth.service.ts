@@ -1,4 +1,5 @@
 import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "src/auth/auth.constants";
 import { CacheService } from "src/cache/cache.service";
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly passwordUtilService: PasswordUtilService,
     private jwtService: JwtService,
     private readonly cacheService: CacheService,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateUser(email: string, pass: string) {
@@ -47,6 +49,7 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync(
       { sub: payload.sub },
       {
+        privateKey: this.configService.get<string>("jwt.refreshPrivateKey"),
         expiresIn: "90d",
       },
     );

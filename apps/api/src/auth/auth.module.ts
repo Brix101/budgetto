@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -24,6 +25,7 @@ import { LocalStrategy } from "./local.strategy";
       signOptions: { expiresIn: jwtConstants.accessExpiresIn },
     }),
     PassportModule,
+    ConfigModule,
   ],
   providers: [
     AuthService,
