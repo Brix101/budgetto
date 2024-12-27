@@ -20,18 +20,12 @@ export class AuthService {
     try {
       const user = await this.usersService.findOne({ email });
 
-      this.logger.log(user);
-
       const hashedPass = await user.password.load();
-
-      this.logger.log(hashedPass);
 
       const isVerified = await this.passwordUtilService.verify(
         hashedPass,
         pass,
       );
-
-      this.logger.log({ isVerified });
 
       if (user && isVerified) {
         return user;
@@ -44,15 +38,7 @@ export class AuthService {
   }
 
   async signIn(user: User): Promise<SignInResponseDto> {
-    this.logger.log(
-      "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
-    );
-    this.logger.log(user.toObject());
-
-    const tokenPair = await this.jwtUtilService.getTokenPair(user);
-
-    this.logger.log(tokenPair);
-    return tokenPair;
+    return this.jwtUtilService.getTokenPair(user);
   }
 
   async refresh({ refreshToken }: RefreshDto): Promise<SignInResponseDto> {
