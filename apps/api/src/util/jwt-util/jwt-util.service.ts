@@ -5,8 +5,8 @@ import { CacheService } from "src/cache/cache.service";
 import { JwtConfig } from "src/config/jwt.config";
 import { User, UserDto } from "src/users/entities/user.entity";
 
+import { UserAuthDto } from "../dto/auth.dto";
 import { AccessPayloadDto, RefreshPayloadDto } from "../dto/payload.dto";
-import { TokenPairDto } from "../dto/token-pair.dto";
 
 @Injectable()
 export class JwtUtilService {
@@ -19,7 +19,7 @@ export class JwtUtilService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getTokenPair(user: User): Promise<TokenPairDto> {
+  async getTokenPair(user: User): Promise<UserAuthDto> {
     const userUUID = user.generateUUID();
     const payload = user.toObject();
 
@@ -27,13 +27,14 @@ export class JwtUtilService {
     const refreshToken = await this.signRefreshToken(userUUID, payload);
 
     return {
+      user: payload,
       accessToken,
       refreshToken,
       expiresIn: this.EXPIRES_IN,
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<TokenPairDto> {
+  async refreshAccessToken(refreshToken: string): Promise<UserAuthDto> {
     try {
       const jwtConfig = this.configService.get<JwtConfig>("jwt");
 
@@ -54,6 +55,7 @@ export class JwtUtilService {
       const accessToken = await this.signAccessToken(sub, userObj);
 
       return {
+        user: userObj,
         accessToken,
         refreshToken,
         expiresIn: this.EXPIRES_IN,
