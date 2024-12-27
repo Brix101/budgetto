@@ -41,7 +41,7 @@ RUN adduser --system --uid 1001 brix
 USER brix
 
 # Automatically leverage output traces to reduce image size
-COPY --from=installer --chown=brix:nodejs /app/apps/api/dist ./apps/api/dist
+# COPY --from=installer --chown=brix:nodejs /app/apps/api/dist ./apps/api/dist
 
 # CMD [ "pnpm", "start:prod" ]
 
