@@ -41,7 +41,6 @@ export class AuthController {
 
   @Public()
   @Post("refresh")
-  // @UseGuards(AuthGuard(["refresh"]))
   @UsePipes(new ZodValidationPipe(refreshSchema))
   refresh(@Body() refreshDto: RefreshDto) {
     return this.authService.refresh(refreshDto);
