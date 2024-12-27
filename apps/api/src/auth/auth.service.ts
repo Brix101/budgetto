@@ -31,6 +31,8 @@ export class AuthService {
         pass,
       );
 
+      this.logger.log({ isVerified });
+
       if (user && isVerified) {
         return user;
       }
