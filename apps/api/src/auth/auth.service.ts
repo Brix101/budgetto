@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { User } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 import { JwtUtilService } from "src/util/jwt-util/jwt-util.service";
@@ -38,21 +38,10 @@ export class AuthService {
   }
 
   async signIn(user: User): Promise<SignInResponseDto> {
-    return this.jwtUtilService.genTokenPair(user);
+    return this.jwtUtilService.getTokenPair(user);
   }
 
   async refresh({ refreshToken }: RefreshDto): Promise<SignInResponseDto> {
-    try {
-      return this.jwtUtilService.refreshAccessToken(refreshToken);
-    } catch (e) {
-      console.error(e);
-      throw new UnauthorizedException([
-        {
-          code: "invalid_token",
-          message: "Invalid refresh token",
-          path: ["refreshToken"],
-        },
-      ]);
-    }
+    return this.jwtUtilService.refreshAccessToken(refreshToken);
   }
 }

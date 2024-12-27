@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
-import { UserPayloadDto } from "src/users/dto/user-payload.dto";
+import { AccessPayloadDto } from "src/util/dto/payload.dto";
 import { JwtUtilService } from "src/util/jwt-util/jwt-util.service";
 
 @Injectable()
@@ -18,13 +18,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: UserPayloadDto) {
-    const cachedUser = await this.jwtUtilService.getUserObject(payload.sub);
+  async validate({ sub }: AccessPayloadDto) {
+    const cachedUser = await this.jwtUtilService.getUserObject(sub);
 
     if (!cachedUser) {
       return null;
     }
 
-    return { sub: payload.sub, ...cachedUser };
+    return { sub, ...cachedUser };
   }
 }
