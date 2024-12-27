@@ -31,21 +31,21 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post("sign-in")
   @HttpCode(HttpStatus.OK)
-  signIn(@Request() req: { user: User }) {
+  async signIn(@Request() req: { user: User }) {
     return this.authService.signIn(req.user);
   }
 
   @Public()
   @Post("sign-up")
   @UsePipes(new ZodValidationPipe(createUserSchema))
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Public()
   @Post("refresh")
   @UsePipes(new ZodValidationPipe(refreshSchema))
-  refresh(@Body() refreshDto: RefreshDto) {
+  async refresh(@Body() refreshDto: RefreshDto) {
     return this.authService.refresh(refreshDto);
   }
 

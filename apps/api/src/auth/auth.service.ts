@@ -49,7 +49,10 @@ export class AuthService {
     );
     this.logger.log(user.toObject());
 
-    return this.jwtUtilService.getTokenPair(user);
+    const tokenPair = await this.jwtUtilService.getTokenPair(user);
+
+    this.logger.log(tokenPair);
+    return tokenPair;
   }
 
   async refresh({ refreshToken }: RefreshDto): Promise<SignInResponseDto> {
