@@ -20,6 +20,8 @@ export class AuthService {
     try {
       const user = await this.usersService.findOne({ email });
 
+      this.logger.log(user);
+
       const hashedPass = await user.password.load();
 
       const isVerified = await this.passwordUtilService.verify(
