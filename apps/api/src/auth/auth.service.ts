@@ -24,6 +24,8 @@ export class AuthService {
 
       const hashedPass = await user.password.load();
 
+      this.logger.log(hashedPass);
+
       const isVerified = await this.passwordUtilService.verify(
         hashedPass,
         pass,
