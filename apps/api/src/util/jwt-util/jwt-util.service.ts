@@ -23,6 +23,7 @@ export class JwtUtilService {
     const userUUID = user.generateUUID();
     const payload = user.toObject();
 
+    console.log({ userUUID, payload });
     const accessToken = await this.signAccessToken(userUUID, payload);
     const refreshToken = await this.signRefreshToken(userUUID, payload);
 
