@@ -43,8 +43,5 @@ USER brix
 # Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=brix:nodejs /app .
 
-# CMD [ "pnpm", "start:prod" ]
-
-RUN ls -la
 
 CMD node apps/api/dist/src/main.js
