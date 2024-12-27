@@ -40,11 +40,11 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 brix
 USER brix
 
-# Copy the built files from the installer stage
+# Automatically leverage output traces to reduce image size
 COPY --from=installer --chown=brix:nodejs /app/apps/api/dist ./apps/api/dist
 
 # CMD [ "pnpm", "start:prod" ]
 
-RUN ls apps/api -la
+RUN ls apps -la
 
 CMD node apps/api/dist/src/main.js
