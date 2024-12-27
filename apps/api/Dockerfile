@@ -13,11 +13,11 @@ WORKDIR /app
 # RUN pnpm global add turbo@^2
 RUN pnpm global add turbo@^2.3.3
 COPY . .
-
+ 
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
-# Assuming "api" is the name entered in the project's package.json: { name: "api" }
-RUN turbo prune api --docker
-
+# Assuming "web" is the name entered in the project's package.json: { name: "web" }
+RUN turbo prune @budgetto/api --docker
+ 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 RUN apk update
@@ -27,12 +27,22 @@ WORKDIR /app
 # First install the dependencies (as they change less often)
 COPY --from=builder /app/out/json/ .
 RUN pnpm install
-
+ 
 # Build the project
 COPY --from=builder /app/out/full/ .
-RUN yarn turbo run build
+RUN pnpm turbo run build
  
 FROM base AS runner
 WORKDIR /app
 
-CMD [ "pnpm", "start:prod" ]
+# Don't run production as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 brix
+USER brix
+
+# Copy the built files from the installer stage
+COPY --from=installer --chown=brix:nodejs /app/apps/api/dist /app/apps/api/dist
+
+# CMD [ "pnpm", "start:prod" ]
+
+CMD node /app/apps/api/dist/main.js
