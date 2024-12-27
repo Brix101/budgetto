@@ -8,7 +8,6 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 import { BaseEntity } from "../../common/entities/base.entity";
-import { UserPayloadDto } from "../dto/user-payload.dto";
 import { UserRepository } from "../users.repository";
 
 @Entity({ repository: () => UserRepository })
@@ -31,12 +30,8 @@ export class User extends BaseEntity {
   @Property({ default: false, hidden: true })
   isAdmin = false;
 
-  public toPayload(): UserPayloadDto {
-    return {
-      sub: uuidv4(),
-      name: this.name,
-      email: this.email,
-    };
+  public generateUUID(): string {
+    return uuidv4();
   }
 }
 

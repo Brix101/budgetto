@@ -1,7 +1,7 @@
 import { EntityName, EventArgs, EventSubscriber } from "@mikro-orm/core";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { Injectable } from "@nestjs/common";
-import { PasswordUtilService } from "src/util/password-util.service";
+import { PasswordUtilService } from "src/util/password-util/password-util.service";
 
 import { User } from "./entities/user.entity";
 
@@ -21,8 +21,8 @@ export class UsersSubscriber implements EventSubscriber<User> {
   async beforeCreate(args: EventArgs<User>) {
     const user = args.entity;
     const password = await user.password.load();
-    const hashedPassword = await this.passwordUtilsService.hash(password);
+    const hasdPass = await this.passwordUtilsService.hash(password);
 
-    user.password.set(hashedPassword);
+    user.password.set(hasdPass);
   }
 }
