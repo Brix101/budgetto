@@ -5,12 +5,11 @@ import { UtilModule } from "src/util/util.module";
 import { User } from "./entities/user.entity";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
-import { UsersSubscriber } from "./users.subscriber";
 
 @Module({
   imports: [MikroOrmModule.forFeature([User]), UtilModule],
   controllers: [UsersController],
-  providers: [UsersService, UsersSubscriber],
+  providers: [UsersService],
   exports: [UsersService],
 })
 export class UsersModule {}

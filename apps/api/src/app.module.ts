@@ -20,7 +20,7 @@ import { UtilModule } from "./util/util.module";
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [".env.development.local", ".env"],
+      envFilePath: [".env", ".env.development.local"],
       load: [configuration, databaseConfig, redisConfig, jwtConfig],
       validate: (config) => configSchema.parse(config),
       isGlobal: true,

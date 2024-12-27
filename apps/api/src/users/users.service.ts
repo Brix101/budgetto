@@ -9,6 +9,7 @@ import {
   Logger,
   NotFoundException,
 } from "@nestjs/common";
+import { PasswordUtilService } from "src/util/password-util/password-util.service";
 
 import { CreateUserDto, UpdateUserDto } from "@budgetto/schema";
 
@@ -19,10 +20,17 @@ import { UserRepository } from "./users.repository";
 export class UsersService {
   private logger = new Logger(UsersService.name);
 
-  constructor(private readonly repo: UserRepository) {}
+  constructor(
+    private readonly repo: UserRepository,
+    private readonly passwordUtilsService: PasswordUtilService,
+  ) {}
 
   async create(createUserDto: CreateUserDto) {
     try {
+      createUserDto.password = await this.passwordUtilsService.hash(
+        createUserDto.password,
+      );
+
       const user = this.repo.create(createUserDto);
       await this.repo.insert(user);
 

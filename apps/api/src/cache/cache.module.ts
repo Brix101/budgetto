@@ -12,6 +12,7 @@ import { CacheService } from "./cache.service";
       provide: "CACHE_INSTANCE",
       useFactory: (configService: ConfigService) => {
         const redisConfig = configService.get<RedisClientOptions>("redis");
+
         const secondary = new KeyvRedis(redisConfig);
 
         return new Cacheable({ secondary });
