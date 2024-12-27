@@ -44,7 +44,11 @@ export class AuthService {
   }
 
   async signIn(user: User): Promise<SignInResponseDto> {
+    this.logger.log(
+      "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
+    );
     this.logger.log(user.toObject());
+
     return this.jwtUtilService.getTokenPair(user);
   }
 
