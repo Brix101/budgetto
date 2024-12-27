@@ -4,19 +4,21 @@ import * as argon2 from "argon2";
 
 @Injectable()
 export class PasswordUtilService {
-  private readonly secret = "randomsalt1234567890";
-
-  constructor(private readonly _configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {}
 
   async hash(password: string): Promise<string> {
+    const secret = this.configService.get<string>("password.secret");
+
     return argon2.hash(password, {
-      secret: Buffer.from(this.secret),
+      secret: Buffer.from(secret),
     });
   }
 
   async verify(hashedPassword: string, password: string): Promise<boolean> {
+    const secret = this.configService.get<string>("password.secret");
+
     return argon2.verify(hashedPassword, password, {
-      secret: Buffer.from(this.secret),
+      secret: Buffer.from(secret),
     });
   }
 }

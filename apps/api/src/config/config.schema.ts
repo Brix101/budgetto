@@ -23,6 +23,10 @@ export const redisConfigSchema = z.object({
   REDIS_SSL_ENABLED: z.boolean().default(false),
 });
 
+export const passwordConfigSchema = z.object({
+  PASSWORD_SECRET: z.string(),
+});
+
 export const jwtConfigSchema = z.object({
   ACCESS_PUBLIC_KEY: z.string(),
   ACCESS_PRIVATE_KEY: z.string(),
@@ -35,6 +39,7 @@ export const jwtConfigSchema = z.object({
 const configSchema = serverConfigSchema
   .merge(dbConfigSchema)
   .merge(redisConfigSchema)
+  .merge(passwordConfigSchema)
   .merge(jwtConfigSchema);
 
 export type DbConfig = z.infer<typeof dbConfigSchema>;
