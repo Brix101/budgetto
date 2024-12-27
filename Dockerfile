@@ -45,6 +45,6 @@ COPY --from=installer --chown=brix:nodejs /app/apps/api/dist ./apps/api/dist
 
 # CMD [ "pnpm", "start:prod" ]
 
-RUN ls apps -la
+RUN ls apps/api -la
 
 CMD node apps/api/dist/src/main.js
