@@ -6,6 +6,6 @@
     "moduleResolution": "nodenext",
 
     /** Emit types for internal packages to speed up editor performance. */
-    "emitDeclarationOnly": false,
+    "emitDeclarationOnly": false
   }
 }

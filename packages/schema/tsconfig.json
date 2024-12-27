@@ -2,7 +2,7 @@
   "extends": "@budgetto/tsconfig/node.json",
   "include": ["src"],
   "compilerOptions": {
-        "outDir": "./dist",
+    "outDir": "./dist"
   },
   "exclude": ["node_modules", "dist"]
 }
