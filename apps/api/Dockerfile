@@ -13,6 +13,8 @@ WORKDIR /app
 # RUN pnpm global add turbo@^2
 RUN pnpm add turbo@^2.3.3 -g
 COPY . .
+
+RUN pwd
  
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
 # Assuming "web" is the name entered in the project's package.json: { name: "web" }
