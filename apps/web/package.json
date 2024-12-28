@@ -9,7 +9,8 @@
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ui:add": "pnpm dlx shadcn@latest add"
   },
   "dependencies": {
     "@budgetto/schema": "workspace:^",

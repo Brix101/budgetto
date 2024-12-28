@@ -1,11 +1,12 @@
-import { SignInForm } from "~/sign-in-form";
-
-export const runtime = "edge";
+import { SignInForm } from "~/components/sign-in-form";
+import { Card } from "~/components/ui/card";
 
 export default function Home() {
   return (
-    <div className="items-center justify-items-center min-h-screen flex w-full">
-      <SignInForm />
+    <div className=" flex items-center justify-center min-h-screen">
+      <Card className="p-10">
+        <SignInForm />
+      </Card>
     </div>
   );
 }

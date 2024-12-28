@@ -5,7 +5,8 @@ import { CacheService } from "src/cache/cache.service";
 import { JwtConfig } from "src/config/jwt.config";
 import { User, UserDto } from "src/users/entities/user.entity";
 
-import { UserAuthDto } from "../dto/auth.dto";
+import { SignInResponseDto } from "@budgetto/schema";
+
 import { AccessPayloadDto, RefreshPayloadDto } from "../dto/payload.dto";
 
 @Injectable()
@@ -19,7 +20,7 @@ export class JwtUtilService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getTokenPair(user: User): Promise<UserAuthDto> {
+  async getTokenPair(user: User): Promise<SignInResponseDto> {
     const userUUID = user.generateUUID();
     const payload = user.toObject();
 
@@ -27,14 +28,18 @@ export class JwtUtilService {
     const refreshToken = await this.signRefreshToken(userUUID, payload);
 
     return {
-      user: payload,
+      user: {
+        ...payload,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
+      },
       accessToken,
       refreshToken,
       expiresIn: this.EXPIRES_IN,
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<UserAuthDto> {
+  async refreshAccessToken(refreshToken: string): Promise<SignInResponseDto> {
     try {
       const jwtConfig = this.configService.get<JwtConfig>("jwt");
 
@@ -55,7 +60,11 @@ export class JwtUtilService {
       const accessToken = await this.signAccessToken(sub, userObj);
 
       return {
-        user: userObj,
+        user: {
+          ...userObj,
+          createdAt: userObj.createdAt.toISOString(),
+          updatedAt: userObj.updatedAt.toISOString(),
+        },
         accessToken,
         refreshToken,
         expiresIn: this.EXPIRES_IN,
