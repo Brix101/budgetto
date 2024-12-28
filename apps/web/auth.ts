@@ -6,7 +6,7 @@ import { SignInDto, SignInResponseDto } from "@budgetto/schema";
 
 // import { privateRoutes } from "@/contains/contants"; // an array like ["/", "/account"]
 
-const privateRoutes = ["/account"];
+const privateRoutes = ["/categories"];
 
 // @ts-ignore
 async function refreshAccessToken(token) {
@@ -170,6 +170,37 @@ export const { signIn, auth, handlers } = NextAuth({
         },
         error: token.error,
       };
+    },
+    authorized({ request, auth }) {
+      const { pathname } = request.nextUrl;
+
+      // get the route name from the url such as "/about"
+      const searchTerm = request.nextUrl.pathname
+        .split("/")
+        .slice(0, 2)
+        .join("/");
+
+      // if the private routes array includes the search term, we ask authorization here and forward any unauthorized users to the login page
+      if (privateRoutes.includes(searchTerm)) {
+        console.log(
+          `${!!auth ? "Can" : "Cannot"} access private route ${searchTerm}`,
+        );
+        return !!auth;
+        // if the pathname starts with one of the routes below and the user is already logged in, forward the user to the home page
+      } else if (
+        pathname.startsWith("/sign") ||
+        pathname.startsWith("/forgot-password")
+      ) {
+        const isLoggedIn = !!auth;
+
+        if (isLoggedIn) {
+          return Response.redirect(new URL("/", request.nextUrl));
+        }
+
+        return true;
+      }
+
+      return true;
     },
   },
   // this is required

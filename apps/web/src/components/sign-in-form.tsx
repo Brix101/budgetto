@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn, SignInResponse } from "next-auth/react";
 import { useForm } from "react-hook-form";
@@ -19,10 +19,9 @@ import {
 import { Input } from "~/components/ui/input";
 
 export function SignInForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
-
-  console.log(callbackUrl);
 
   const form = useForm<SignInDto>({
     resolver: zodResolver(signInSchema),
@@ -41,6 +40,14 @@ export function SignInForm() {
       redirect: false,
     }).then((res: SignInResponse | undefined) => {
       console.log(res);
+
+      if (res?.ok) {
+        if (callbackUrl) {
+          router.push(callbackUrl);
+        } else {
+          router.push("/");
+        }
+      }
     });
   }
 
