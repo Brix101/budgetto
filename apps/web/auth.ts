@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { SignInDto } from "@budgetto/schema";
+import { SignInDto, SignInResponseDto } from "@budgetto/schema";
 
 // import { privateRoutes } from "@/contains/contants"; // an array like ["/", "/account"]
 
@@ -18,7 +18,7 @@ async function refreshAccessToken(token) {
       {
         method: "POST",
         headers: await headers(),
-        body: JSON.stringify({ userID: token.userId }),
+        body: JSON.stringify({ userId: token.userId }),
       },
     );
 
@@ -32,16 +32,15 @@ async function refreshAccessToken(token) {
     console.log("The token has been refreshed successfully.");
 
     // get some data from the new access token such as exp (expiration time)
-    // const decodedAccessToken = JSON.parse(
-    //   Buffer.from(data.accessToken.split(".")[1], "base64").toString(),
-    // );
+    const decodedAccessToken = JSON.parse(
+      Buffer.from(data.accessToken.split(".")[1], "base64").toString(),
+    );
 
     return {
       ...token,
       accessToken: data.accessToken,
       refreshToken: data.refreshToken ?? token.refreshToken,
-      //   idToken: data.idToken,
-      accessTokenExpires: data.expiresIn * 1000,
+      accessTokenExpires: decodedAccessToken["exp"] * 1000,
       error: "",
     };
   } catch (error) {
@@ -97,7 +96,7 @@ export const { signIn, auth, handlers } = NextAuth({
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data);
+          throw new Error(data.message, { cause: data.errors });
         }
 
         if (res.ok && data) {
@@ -112,7 +111,10 @@ export const { signIn, auth, handlers } = NextAuth({
             secure: true,
           } as any);
 
-          return data;
+          return {
+            ...data,
+            id: data.user.id,
+          };
         }
 
         return null;
@@ -120,22 +122,51 @@ export const { signIn, auth, handlers } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt(params) {
-      console.log("jwt callback", params);
-      return params;
+    async jwt({ token, user, account }) {
+      const _user = user as unknown as SignInResponseDto;
+
+      if (account && _user) {
+        token.id = _user.user.id;
+        token.email = _user.user.email;
+        token.name = _user.user.name;
+        token.accessToken = _user.accessToken;
+        token.refreshToken = _user.refreshToken;
+        token.role = "Unknown";
+
+        const dataToken = _user.accessToken.split(".")[1] || "";
+
+        const decodedAccessToken = JSON.parse(
+          Buffer.from(dataToken, "base64").toString(),
+        );
+
+        if (decodedAccessToken) {
+          token.userId = decodedAccessToken["sub"] as string;
+          token.accessTokenExpires = decodedAccessToken["exp"] * 1000;
+        }
+      }
+
+      // if our access token has not expired yet, return all information except the refresh token
+      if (
+        (token.accessTokenExpires &&
+          Date.now() < Number(token.accessTokenExpires)) ||
+        token.error == "RefreshAccessTokenError"
+      ) {
+        const { refreshToken, ...rest } = token;
+        return rest;
+      }
+
+      return await refreshAccessToken(token);
     },
     async session({ session, token, user }) {
-      console.log("session callback", session, token, user);
-
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id as string,
+          name: token.name as string,
           email: token.email as string,
           accessToken: token.accessToken as string,
           accessTokenExpires: token.accessTokenExpires as number,
-          // role: token.role as string,
         },
         error: token.error,
       };
