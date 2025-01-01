@@ -1,26 +1,40 @@
 import { cookies, headers } from "next/headers";
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { SignInDto, SignInResponseDto } from "@budgetto/schema";
+import { SignInDto } from "@budgetto/schema";
 
-// import { privateRoutes } from "@/contains/contants"; // an array like ["/", "/account"]
+import { env } from "~/env";
 
 const privateRoutes = ["/categories"];
+
+declare module "next-auth" {
+  interface User {
+    id?: string;
+    email?: string | null;
+    accessToken: string;
+    refreshToken: string;
+    exp: number;
+    role: string;
+  }
+
+  interface Session {
+    user: User & DefaultSession["user"];
+    expires: string;
+    error: string;
+  }
+}
 
 // @ts-ignore
 async function refreshAccessToken(token) {
   // this is our refresh token method
   console.log("Now refreshing the expired token...");
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/refresh`,
-      {
-        method: "POST",
-        headers: await headers(),
-        body: JSON.stringify({ userId: token.userId }),
-      },
-    );
+    const res = await fetch(`${env.NEXT_PUBLIC_BASE_URL}/api/auth/refresh`, {
+      method: "POST",
+      headers: await headers(),
+      body: JSON.stringify({ userId: token.userId }),
+    });
 
     const { success, data } = await res.json();
 
@@ -81,17 +95,14 @@ export const { signIn, auth, handlers } = NextAuth({
         } as SignInDto;
 
         // external api for users to log in, change it with your own endpoint
-        const res = await fetch(
-          `${process.env.API_BASE_URL}/api/auth/sign-in`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-            },
-            body: JSON.stringify(payload),
+        const res = await fetch(`${env.API_BASE_URL}/api/auth/sign-in`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
-        );
+          body: JSON.stringify(payload),
+        });
 
         const data = await res.json();
 
@@ -100,7 +111,7 @@ export const { signIn, auth, handlers } = NextAuth({
         }
 
         if (res.ok && data) {
-          const prefix = process.env.NODE_ENV === "development" ? "__Dev-" : "";
+          const prefix = env.NODE_ENV === "development" ? "__Dev-" : "";
 
           // we set http only cookie here to store refresh token information as we will not append it to our session to avoid maximum size warning for the session cookie (4096 bytes)
           cookieStore.set({
@@ -123,17 +134,13 @@ export const { signIn, auth, handlers } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user, account }) {
-      const _user = user as unknown as SignInResponseDto;
-
-      if (account && _user) {
-        token.id = _user.user.id;
-        token.email = _user.user.email;
-        token.name = _user.user.name;
-        token.accessToken = _user.accessToken;
-        token.refreshToken = _user.refreshToken;
+      if (account && user) {
+        token.id = user.id;
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
         token.role = "Unknown";
 
-        const dataToken = _user.accessToken.split(".")[1] || "";
+        const dataToken = user.accessToken.split(".")[1] || "";
 
         const decodedAccessToken = JSON.parse(
           Buffer.from(dataToken, "base64").toString(),
@@ -204,10 +211,10 @@ export const { signIn, auth, handlers } = NextAuth({
     },
   },
   // this is required
-  secret: process.env.AUTH_SECRET,
+  secret: env.AUTH_SECRET,
   // our custom login page
   pages: {
     signIn: "/sign-in",
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: env.NODE_ENV === "development",
 });

@@ -40,17 +40,21 @@ export function SignInForm() {
     signIn("credentials", {
       ...values,
       redirect: false,
-    }).then((res: SignInResponse | undefined) => {
-      console.log(res);
+    })
+      .then((res: SignInResponse | undefined) => {
+        console.log(res);
 
-      if (res?.ok) {
-        if (callbackUrl) {
-          router.push(callbackUrl);
-        } else {
-          router.push("/");
+        if (res?.ok) {
+          if (callbackUrl) {
+            router.push(callbackUrl);
+          } else {
+            router.push("/");
+          }
         }
-      }
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   return (
