@@ -209,6 +209,11 @@ export const { signIn, auth, handlers } = NextAuth({
 
       return true;
     },
+    redirect({ url, baseUrl }) {
+      const callBackUrl = new URL(url).searchParams.get("callbackUrl");
+
+      return callBackUrl ?? baseUrl;
+    },
   },
   // this is required
   secret: env.AUTH_SECRET,
