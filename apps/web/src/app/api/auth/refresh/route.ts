@@ -1,9 +1,11 @@
 import { cookies } from "next/headers";
 
+import { SignInResponseDto } from "@budgetto/schema";
+
 import { env } from "~/env";
 
-export async function POST(request: Request) {
-  const _body = await request.json();
+export async function POST(_request: Request) {
+  // const _body = await request.json();
 
   const prefix = env.NODE_ENV === "development" ? "__Dev-" : "";
 
@@ -25,7 +27,7 @@ export async function POST(request: Request) {
     }),
   });
 
-  const data = await res.json();
+  const data = (await res.json()) as SignInResponseDto;
 
   return Response.json({
     success: res.ok,
