@@ -13,10 +13,6 @@ export default [
     rules: {
       ...reactPlugin.configs["jsx-runtime"].rules,
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
     },
     languageOptions: {
       ecmaVersion: 2020,
