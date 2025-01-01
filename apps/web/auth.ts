@@ -54,7 +54,7 @@ async function refreshAccessToken(token) {
       ...token,
       accessToken: data.accessToken,
       refreshToken: data.refreshToken ?? token.refreshToken,
-      accessTokenExpires: decodedAccessToken["exp"] * 1000,
+      accessTokenExpires: decodedAccessToken.exp * 1000,
       error: "",
     };
   } catch (error) {
@@ -147,8 +147,8 @@ export const { signIn, auth, handlers } = NextAuth({
         );
 
         if (decodedAccessToken) {
-          token.userId = decodedAccessToken["sub"] as string;
-          token.accessTokenExpires = decodedAccessToken["exp"] * 1000;
+          token.userId = decodedAccessToken.sub as string;
+          token.accessTokenExpires = decodedAccessToken.exp * 1000;
         }
       }
 
@@ -170,8 +170,8 @@ export const { signIn, auth, handlers } = NextAuth({
         user: {
           ...session.user,
           id: token.id as string,
-          name: token.name as string,
-          email: token.email as string,
+          name: token.name!,
+          email: token.email!,
           accessToken: token.accessToken as string,
           accessTokenExpires: token.accessTokenExpires as number,
         },
@@ -190,7 +190,7 @@ export const { signIn, auth, handlers } = NextAuth({
       // if the private routes array includes the search term, we ask authorization here and forward any unauthorized users to the login page
       if (privateRoutes.includes(searchTerm)) {
         console.log(
-          `${!!auth ? "Can" : "Cannot"} access private route ${searchTerm}`,
+          `${auth ? "Can" : "Cannot"} access private route ${searchTerm}`,
         );
         return !!auth;
         // if the pathname starts with one of the routes below and the user is already logged in, forward the user to the home page

@@ -3,10 +3,8 @@ import { cookies } from "next/headers";
 import { env } from "~/env";
 
 export async function POST(request: Request) {
-  // const body = await request.json();
+  const _body = await request.json();
 
-  console.log("Refresh token body");
-  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   const prefix = env.NODE_ENV === "development" ? "__Dev-" : "";
 
   const cookieStore = await cookies();
@@ -28,9 +26,6 @@ export async function POST(request: Request) {
   });
 
   const data = await res.json();
-
-  console.log("Refreshed token");
-  console.log(data);
 
   return Response.json({
     success: res.ok,
