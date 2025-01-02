@@ -15,11 +15,11 @@ import { UserDto } from "src/users/entities/user.entity";
 import type {
   CreateTransactionDto,
   UpdateTransactionDto,
-} from "@budgetto/schema";
+} from "@budgetto/schema/transaction";
 import {
   createTransactionSchema,
   updateTransactionSchema,
-} from "@budgetto/schema";
+} from "@budgetto/schema/transaction";
 
 import { TransactionsService } from "./transactions.service";
 

@@ -8,7 +8,10 @@ import {
 } from "@nestjs/common";
 import { UserDto } from "src/users/entities/user.entity";
 
-import { CreateCategoryDto, UpdateCategoryDto } from "@budgetto/schema";
+import {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@budgetto/schema/category";
 
 import { CategoryRepository } from "./categories.repository";
 

@@ -3,9 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "exports": {
-    ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "default": [
+        "./dist/src/*.js",
+        "./src/*.ts"
+      ]
     }
   },
   "scripts": {

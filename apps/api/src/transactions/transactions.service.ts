@@ -6,7 +6,10 @@ import {
 } from "@nestjs/common";
 import { UserDto } from "src/users/entities/user.entity";
 
-import { CreateTransactionDto, UpdateTransactionDto } from "@budgetto/schema";
+import {
+  CreateTransactionDto,
+  UpdateTransactionDto,
+} from "@budgetto/schema/transaction";
 
 import { TransactionRepository } from "./transactions.repository";
 

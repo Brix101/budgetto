@@ -4,7 +4,7 @@ import { UsersService } from "src/users/users.service";
 import { JwtUtilService } from "src/util/jwt-util/jwt-util.service";
 import { PasswordUtilService } from "src/util/password-util/password-util.service";
 
-import { RefreshDto, SignInResponseDto } from "@budgetto/schema";
+import { RefreshDto, SignInResponseDto } from "@budgetto/schema/auth";
 
 @Injectable()
 export class AuthService {

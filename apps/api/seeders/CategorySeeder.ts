@@ -1,7 +1,7 @@
 import type { EntityManager } from "@mikro-orm/core";
 import { Seeder } from "@mikro-orm/seeder";
 
-import { CategoryType } from "@budgetto/schema";
+import { CategoryType } from "@budgetto/schema/category";
 
 import { Category } from "../src/categories/entities/category.entity";
 
