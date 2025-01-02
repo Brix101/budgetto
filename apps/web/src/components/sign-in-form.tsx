@@ -40,7 +40,7 @@ export function SignInForm() {
       redirect: false,
     })
       .then((res: SignInResponse | undefined) => {
-        console.log(res?.url, res?.ok);
+        console.log(res);
         if (res?.ok) {
           if (res.url) {
             router.push(res.url);
