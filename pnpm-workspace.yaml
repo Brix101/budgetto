@@ -4,9 +4,21 @@ packages:
 
 catalog:
   "@types/node": ^22.10.2
-  typescript: ^5.7.2
-  prettier: ^3.4.2
   eslint: ^9.15.0
-  zod: ^3.24.1
+  prettier: ^3.4.2
   superjson: ^2.2.2
   tailwindcss: ^3.4.1
+  typescript: ^5.7.2
+  zod: ^3.24.1
+
+catalogs:
+  react18:
+    react: 18.3.1
+    react-dom: 18.3.1
+    "@types/react": ^18.3.11
+    "@types/react-dom": ^18.3.1
+  react19:
+    react: 19.0.0
+    react-dom: 19.0.0
+    "@types/react": ^19.0.0
+    "@types/react-dom": ^19.0.0

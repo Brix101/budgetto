@@ -2,14 +2,11 @@
 
 import type { SignInResponse } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useForm } from "react-hook-form";
 
 import type { SignInDto } from "@budgetto/schema";
 import { signInSchema } from "@budgetto/schema";
-
-import { Button } from "~/components/ui/button";
+import { Button } from "@budgetto/ui/button";
 import {
   Form,
   FormControl,
@@ -17,14 +14,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+  useForm,
+} from "@budgetto/ui/form";
+import { Input } from "@budgetto/ui/input";
 
 export function SignInForm() {
   const router = useRouter();
 
-  const form = useForm<SignInDto>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm({
+    schema: signInSchema,
     defaultValues: {
       email: "",
       password: "",
@@ -32,9 +30,6 @@ export function SignInForm() {
   });
 
   function onSubmit(values: SignInDto) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
     signIn("credentials", {
       ...values,
       redirect: false,
