@@ -5,22 +5,33 @@ import { CategoryDto } from "@budgetto/schema";
 import { Card } from "~/components/ui/card";
 import { env } from "~/env";
 
+async function getCategories(): Promise<Array<CategoryDto>> {
+  try {
+    const session = await auth();
+
+    const response = await fetch(`${env.API_BASE_URL}/api/categories`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${session?.user.accessToken}`,
+      },
+    });
+
+    const result = await response.json();
+
+    return result;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+}
+
 export default async function CategoriesPage() {
-  const session = await auth();
-
-  const res = await fetch(`${env.API_BASE_URL}/api/categories`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      Authorization: `Bearer ${session?.user.accessToken}`,
-    },
-  });
-
-  const categories = (await res.json()) as CategoryDto[];
+  const categories = await getCategories();
 
   return (
-    <div className=" flex items-center justify-center min-h-screen">
+    <div className="flex min-h-screen items-center justify-center">
       <Card className="p-10">
         <h1 className="text-2xl font-bold">Categories</h1>
         <ul>
