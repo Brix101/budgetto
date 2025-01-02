@@ -3,7 +3,7 @@ import { Seeder } from "@mikro-orm/seeder";
 
 import { CategoryType } from "@budgetto/schema";
 
-import { Category } from "../categories/entities/category.entity";
+import { Category } from "../src/categories/entities/category.entity";
 
 export class CategorySeeder extends Seeder {
   private categories = [

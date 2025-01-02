@@ -1,9 +1,9 @@
 import { Migration } from "@mikro-orm/migrations";
 
-export class Migration20241220065113 extends Migration {
+export class Migration20250102032044 extends Migration {
   override async up(): Promise<void> {
     this.addSql(
-      `create table "user" ("id" serial primary key, "created_at" timestamptz not null, "updated_at" timestamptz not null, "name" varchar(255) not null, "email" varchar(255) not null, "password" varchar(255) not null, "is_confirmed" boolean not null default false);`,
+      `create table "user" ("id" serial primary key, "created_at" timestamptz not null, "updated_at" timestamptz not null, "name" varchar(255) not null, "email" varchar(255) not null, "password" varchar(255) not null, "is_confirmed" boolean not null default false, "is_admin" boolean not null default false);`,
     );
     this.addSql(
       `alter table "user" add constraint "user_email_unique" unique ("email");`,
@@ -41,5 +41,35 @@ export class Migration20241220065113 extends Migration {
     this.addSql(
       `alter table "budget" add constraint "budget_user_id_foreign" foreign key ("user_id") references "user" ("id") on update cascade on delete cascade;`,
     );
+  }
+
+  override async down(): Promise<void> {
+    this.addSql(
+      `alter table "category" drop constraint "category_user_id_foreign";`,
+    );
+
+    this.addSql(
+      `alter table "transaction" drop constraint "transaction_user_id_foreign";`,
+    );
+
+    this.addSql(
+      `alter table "budget" drop constraint "budget_user_id_foreign";`,
+    );
+
+    this.addSql(
+      `alter table "transaction" drop constraint "transaction_category_id_foreign";`,
+    );
+
+    this.addSql(
+      `alter table "budget" drop constraint "budget_category_id_foreign";`,
+    );
+
+    this.addSql(`drop table if exists "user" cascade;`);
+
+    this.addSql(`drop table if exists "category" cascade;`);
+
+    this.addSql(`drop table if exists "transaction" cascade;`);
+
+    this.addSql(`drop table if exists "budget" cascade;`);
   }
 }
