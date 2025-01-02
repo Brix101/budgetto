@@ -4,9 +4,10 @@ import type { SignInResponse } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-import type { SignInDto } from "@budgetto/schema";
-import { signInSchema } from "@budgetto/schema";
-import { Button } from "@budgetto/ui/button";
+import type { SignInDto } from "@budgetto/schema/auth";
+import { signInSchema } from "@budgetto/schema/auth";
+
+import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,8 +16,8 @@ import {
   FormLabel,
   FormMessage,
   useForm,
-} from "@budgetto/ui/form";
-import { Input } from "@budgetto/ui/input";
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 
 export function SignInForm() {
   const router = useRouter();

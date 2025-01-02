@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers";
 import NextAuth, { DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-import { SignInDto } from "@budgetto/schema";
+import { SignInDto } from "@budgetto/schema/auth";
 
 import { env } from "~/env";
 

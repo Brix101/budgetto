@@ -11,17 +11,22 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit",
     "lint": "eslint",
-    "ui:add": "pnpm dlx shadcn@latest add"
+    "ui:add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
   },
   "dependencies": {
-    "@budgetto/schema": "workspace:^",
-    "@budgetto/ui": "workspace:^",
+    "@budgetto/schema": "workspace:*",
+    "@hookform/resolvers": "^3.9.1",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.1",
     "@t3-oss/env-nextjs": "^0.11.1",
     "@tanstack/react-query": "^5.62.8",
     "next": "15.1.1",
     "next-auth": "5.0.0-beta.25",
+    "next-themes": "^0.4.4",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
+    "react-hook-form": "^7.54.2",
+    "sonner": "^1.7.1",
     "zod": "catalog:"
   },
   "devDependencies": {
