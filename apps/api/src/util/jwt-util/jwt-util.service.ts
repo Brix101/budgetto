@@ -1,17 +1,22 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
+import { JsonWebTokenError, JwtService } from "@nestjs/jwt";
 import { CacheService } from "src/cache/cache.service";
 import { JwtConfig } from "src/config/jwt.config";
-import { User, UserDto } from "src/users/entities/user.entity";
+import { User } from "src/users/entities/user.entity";
 
-import { SignInResponseDto } from "@budgetto/schema";
+import { SignInResponseDto, UserSchemaDto } from "@budgetto/schema";
 
 import { AccessPayloadDto, RefreshPayloadDto } from "../dto/payload.dto";
 
 @Injectable()
 export class JwtUtilService {
-  private readonly EXPIRES_IN = 3600;
+  private readonly logger = new Logger(JwtUtilService.name);
   private readonly CACHE_KEY = "AUTH:";
 
   constructor(
@@ -22,24 +27,25 @@ export class JwtUtilService {
 
   async getTokenPair(user: User): Promise<SignInResponseDto> {
     const userUUID = user.generateUUID();
-    const payload = user.toObject();
+    const userObj = user.toObject();
+
+    const payload: UserSchemaDto = {
+      ...userObj,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
 
     const accessToken = await this.signAccessToken(userUUID, payload);
     const refreshToken = await this.signRefreshToken(userUUID, payload);
 
     return {
-      user: {
-        ...payload,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-      },
+      user: payload,
       accessToken,
       refreshToken,
-      expiresIn: this.EXPIRES_IN,
     };
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<SignInResponseDto> {
+  async refreshToken(refreshToken: string): Promise<SignInResponseDto> {
     try {
       const jwtConfig = this.configService.get<JwtConfig>("jwt");
 
@@ -60,31 +66,40 @@ export class JwtUtilService {
       const accessToken = await this.signAccessToken(sub, userObj);
 
       return {
-        user: {
-          ...userObj,
-          createdAt: userObj.createdAt.toISOString(),
-          updatedAt: userObj.updatedAt.toISOString(),
-        },
+        user: userObj,
         accessToken,
         refreshToken,
-        expiresIn: this.EXPIRES_IN,
       };
-    } catch {
-      throw new UnauthorizedException([
+    } catch (error) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof JsonWebTokenError
+      ) {
+        throw new UnauthorizedException([
+          {
+            code: "invalid_token",
+            message: error.message || "Invalid or expired token",
+            path: ["refreshToken"],
+          },
+        ]);
+      }
+
+      this.logger.error(error);
+      throw new InternalServerErrorException([
         {
-          code: "invalid_token",
-          message: "Invalid refresh token",
-          path: ["refreshToken"],
+          code: "internal_server_error",
+          message:
+            error instanceof Error ? error.message : "Something went wrong",
         },
       ]);
     }
   }
 
   async getUserObject(sub: string) {
-    return this.cacheService.get<UserDto>(this.CACHE_KEY + sub);
+    return this.cacheService.get<UserSchemaDto>(this.CACHE_KEY + sub);
   }
 
-  private async signAccessToken(sub: string, userObj: UserDto) {
+  private async signAccessToken(sub: string, userObj: UserSchemaDto) {
     const jwtConfig = this.configService.get<JwtConfig>("jwt");
     const payload: AccessPayloadDto = {
       sub,
@@ -99,7 +114,7 @@ export class JwtUtilService {
     });
   }
 
-  private async signRefreshToken(sub: string, userObj: UserDto) {
+  private async signRefreshToken(sub: string, userObj: UserSchemaDto) {
     const jwtConfig = this.configService.get<JwtConfig>("jwt");
 
     await this.cacheService.set(
