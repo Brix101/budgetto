@@ -11,10 +11,4 @@ export default [
   ...reactConfig,
   ...nextjsConfig,
   ...restrictEnvAccess,
-  {
-    rules: {
-      "@typescript-eslint/consistent-type-imports": "off",
-      "@typescript-eslint/no-unnecessary-condition": "off",
-    },
-  },
 ];

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { SignInResponseDto } from "@budgetto/schema";
+import type { SignInResponseDto } from "@budgetto/schema";
 
 import { env } from "~/env";
 
