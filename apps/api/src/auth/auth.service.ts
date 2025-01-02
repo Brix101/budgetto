@@ -42,6 +42,6 @@ export class AuthService {
   }
 
   async refresh({ refreshToken }: RefreshDto): Promise<SignInResponseDto> {
-    return this.jwtUtilService.refreshAccessToken(refreshToken);
+    return this.jwtUtilService.refreshToken(refreshToken);
   }
 }

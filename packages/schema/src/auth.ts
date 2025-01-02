@@ -17,7 +17,6 @@ export const signInResponseSchema = z.object({
   user: userSchema,
   accessToken: z.string(),
   refreshToken: z.string(),
-  expiresIn: z.number(),
 });
 
 export type SignInDto = z.infer<typeof signInSchema>;
