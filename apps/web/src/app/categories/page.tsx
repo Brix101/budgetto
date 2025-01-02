@@ -1,11 +1,11 @@
 import { auth } from "auth";
 
-import { CategoryDto } from "@budgetto/schema";
+import type { CategoryDto } from "@budgetto/schema";
 
 import { Card } from "~/components/ui/card";
 import { env } from "~/env";
 
-async function getCategories(): Promise<Array<CategoryDto>> {
+async function getCategories(): Promise<CategoryDto[]> {
   try {
     const session = await auth();
 
@@ -18,7 +18,7 @@ async function getCategories(): Promise<Array<CategoryDto>> {
       },
     });
 
-    const result = await response.json();
+    const result = (await response.json()) as CategoryDto[];
 
     return result;
   } catch (e) {
