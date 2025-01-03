@@ -9,7 +9,7 @@ import {
 } from "@mikro-orm/core";
 import { UserRepository } from "src/users/users.repository";
 
-import { CategoryType } from "@budgetto/schema";
+import { CategoryType } from "@budgetto/schema/category";
 
 import { BaseEntity } from "../../common/entities/base.entity";
 import { User } from "../../users/entities/user.entity";

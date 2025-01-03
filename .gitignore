@@ -9,9 +9,20 @@ node_modules
 coverage
 
 # next.js
-/.next/
-/out/
-.next
+.next/
+out/
+next-env.d.ts
+
+# nitro
+.nitro/
+.output/
+
+# expo
+.expo/
+expo-env.d.ts
+apps/expo/.gitignore
+apps/expo/ios
+apps/expo/android
 
 # production
 build
@@ -29,6 +40,9 @@ yarn-error.log*
 # local env files
 .env
 .env*.local
+
+# vercel
+.vercel
 
 # typescript
 dist/

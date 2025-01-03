@@ -1,8 +1,8 @@
 import { Body, Controller, Patch, Request, UsePipes } from "@nestjs/common";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 
-import type { UpdateUserDto } from "@budgetto/schema";
-import { updateUserSchema } from "@budgetto/schema";
+import type { UpdateUserDto } from "@budgetto/schema/user";
+import { updateUserSchema } from "@budgetto/schema/user";
 
 import { UserDto } from "./entities/user.entity";
 import { UsersService } from "./users.service";

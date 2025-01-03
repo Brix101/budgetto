@@ -15,8 +15,14 @@ import Action from "src/casl/casl-action.enum";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 import { User, UserDto } from "src/users/entities/user.entity";
 
-import type { CreateCategoryDto, UpdateCategoryDto } from "@budgetto/schema";
-import { createCategorySchema, updateCategorySchema } from "@budgetto/schema";
+import type {
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from "@budgetto/schema/category";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "@budgetto/schema/category";
 
 import { CategoriesService } from "./categories.service";
 

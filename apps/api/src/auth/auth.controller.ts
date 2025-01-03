@@ -13,8 +13,10 @@ import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 import { User, UserDto } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
 
-import type { CreateUserDto, RefreshDto } from "@budgetto/schema";
-import { createUserSchema, refreshSchema } from "@budgetto/schema";
+import type { RefreshDto } from "@budgetto/schema/auth";
+import type { CreateUserDto } from "@budgetto/schema/user";
+import { refreshSchema } from "@budgetto/schema/auth";
+import { createUserSchema } from "@budgetto/schema/user";
 
 import { Public } from "./auth.decorator";
 import { AuthService } from "./auth.service";

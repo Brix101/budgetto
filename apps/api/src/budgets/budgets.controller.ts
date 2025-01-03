@@ -17,8 +17,11 @@ import { PoliciesGuard } from "src/casl/policies/policies.guard";
 import { ZodValidationPipe } from "src/common/zod-validation.pipe";
 import { UserDto } from "src/users/entities/user.entity";
 
-import type { CreateBudgetDto, UpdateBudgetDto } from "@budgetto/schema";
-import { createBudgetSchema, updateBudgetSchema } from "@budgetto/schema";
+import type { CreateBudgetDto, UpdateBudgetDto } from "@budgetto/schema/budget";
+import {
+  createBudgetSchema,
+  updateBudgetSchema,
+} from "@budgetto/schema/budget";
 
 import { BudgetsService } from "./budgets.service";
 import { Budget } from "./entities/budget.entity";

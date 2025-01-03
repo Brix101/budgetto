@@ -1,13 +1,11 @@
 "use client";
 
-import type { SignInResponse } from "next-auth/react";
+import React from "react";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import { useForm } from "react-hook-form";
 
-import type { SignInDto } from "@budgetto/schema";
-import { signInSchema } from "@budgetto/schema";
+import type { SignInDto } from "@budgetto/schema/auth";
+import { signInSchema } from "@budgetto/schema/auth";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -17,14 +15,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  useForm,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 
 export function SignInForm() {
   const router = useRouter();
+  const [isPending, startTransitionz] = React.useTransition();
 
-  const form = useForm<SignInDto>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm({
+    schema: signInSchema,
     defaultValues: {
       email: "",
       password: "",
@@ -32,26 +32,36 @@ export function SignInForm() {
   });
 
   function onSubmit(values: SignInDto) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    signIn("credentials", {
-      ...values,
-      redirect: false,
-    })
-      .then((res: SignInResponse | undefined) => {
-        console.log(res);
-        if (res?.ok) {
-          if (res.url) {
-            router.push(res.url);
+    startTransitionz(async () => {
+      try {
+        const result = await signIn("credentials", {
+          ...values,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          form.setError(
+            "email",
+            {
+              type: "manual",
+              message: "The email or password is incorrect.",
+            },
+            {
+              shouldFocus: true,
+            },
+          );
+          form.setError("password", { message: "" });
+        } else {
+          if (result?.url) {
+            router.push(result.url);
           } else {
-            router.push("/");
+            router.push("/dashboard");
           }
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      } catch (e) {
+        console.log(e);
+      }
+    });
   }
 
   return (
@@ -89,7 +99,9 @@ export function SignInForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isPending} className="w-full">
+          {isPending ? "Signing in..." : "Sign in"}
+        </Button>
       </form>
     </Form>
   );

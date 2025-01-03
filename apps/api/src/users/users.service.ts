@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import { PasswordUtilService } from "src/util/password-util/password-util.service";
 
-import { CreateUserDto, UpdateUserDto } from "@budgetto/schema";
+import { CreateUserDto, UpdateUserDto } from "@budgetto/schema/user";
 
 import { User } from "./entities/user.entity";
 import { UserRepository } from "./users.repository";

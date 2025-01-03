@@ -1,11 +1,11 @@
 import { auth } from "auth";
 
-import type { CategoryDto } from "@budgetto/schema";
+import type { CategoryDto } from "@budgetto/schema/category";
 
 import { Card } from "~/components/ui/card";
 import { env } from "~/env";
 
-async function getCategories(): Promise<CategoryDto[]> {
+async function getCategories(): Promise<CategoryDto[] | null> {
   try {
     const session = await auth();
 
@@ -23,7 +23,7 @@ async function getCategories(): Promise<CategoryDto[]> {
     return result;
   } catch (e) {
     console.log(e);
-    return [];
+    return null;
   }
 }
 

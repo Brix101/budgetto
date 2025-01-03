@@ -1,12 +1,14 @@
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
-import NextAuth, { DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { ZodErrorMap } from "zod";
 
-import { SignInDto } from "@budgetto/schema";
+import { SignInDto } from "@budgetto/schema/auth";
 
 import { env } from "~/env";
 
-const privateRoutes = ["/categories"];
+const privateRoutes = ["/dashboard"];
 
 declare module "next-auth" {
   interface User {
@@ -16,6 +18,8 @@ declare module "next-auth" {
     refreshToken: string;
     exp: number;
     role: string;
+    message?: string;
+    errors?: ZodErrorMap;
   }
 
   interface Session {
@@ -68,7 +72,7 @@ async function refreshAccessToken(token) {
   }
 }
 
-export const { signIn, auth, handlers } = NextAuth({
+const authConfig = {
   trustHost: true,
   theme: {
     logo: "https://next-auth.js.org/img/logo/logo-sm.png",
@@ -107,7 +111,7 @@ export const { signIn, auth, handlers } = NextAuth({
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.message, { cause: data.errors });
+          return data;
         }
 
         if (res.ok && data) {
@@ -214,6 +218,15 @@ export const { signIn, auth, handlers } = NextAuth({
 
       return callBackUrl ?? baseUrl;
     },
+    signIn({ user }) {
+      if (user?.errors) {
+        throw new Error(user.message, {
+          cause: user.errors,
+        });
+      }
+
+      return true;
+    },
   },
   // this is required
   secret: env.AUTH_SECRET,
@@ -222,4 +235,14 @@ export const { signIn, auth, handlers } = NextAuth({
     signIn: "/sign-in",
   },
   debug: env.NODE_ENV === "development",
-});
+} satisfies NextAuthConfig;
+
+const { handlers, auth: defaultAuth, signIn, signOut } = NextAuth(authConfig);
+
+/**
+ * This is the main way to get session data for your RSCs.
+ * This will de-duplicate all calls to next-auth's default `auth()` function and only call it once per request
+ */
+const auth = cache(defaultAuth);
+
+export { handlers, auth, signIn, signOut };

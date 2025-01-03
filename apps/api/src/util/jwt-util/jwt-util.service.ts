@@ -10,7 +10,8 @@ import { CacheService } from "src/cache/cache.service";
 import { JwtConfig } from "src/config/jwt.config";
 import { User } from "src/users/entities/user.entity";
 
-import { SignInResponseDto, UserSchemaDto } from "@budgetto/schema";
+import { SignInResponseDto } from "@budgetto/schema/auth";
+import { UserSchemaDto } from "@budgetto/schema/user";
 
 import { AccessPayloadDto, RefreshPayloadDto } from "../dto/payload.dto";
 

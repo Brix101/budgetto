@@ -2,8 +2,11 @@ import { z } from "zod";
 
 export const createTransactionSchema = z.object({
   amount: z.coerce.number(),
-  description: z.string().optional(),
-  date: z.date().optional(),
+  description: z.string().optional().default(""),
+  date: z
+    .date()
+    .optional()
+    .default(() => new Date()),
   categoryId: z.number(),
 });
 
