@@ -1,6 +1,6 @@
 "use client";
 
-import type { SignInResponse } from "next-auth/react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
@@ -21,6 +21,7 @@ import { Input } from "~/components/ui/input";
 
 export function SignInForm() {
   const router = useRouter();
+  const [isPending, startTransitionz] = React.useTransition();
 
   const form = useForm({
     schema: signInSchema,
@@ -31,23 +32,36 @@ export function SignInForm() {
   });
 
   function onSubmit(values: SignInDto) {
-    signIn("credentials", {
-      ...values,
-      redirect: false,
-    })
-      .then((res: SignInResponse | undefined) => {
-        console.log(res);
-        if (res?.ok) {
-          if (res.url) {
-            router.push(res.url);
+    startTransitionz(async () => {
+      try {
+        const result = await signIn("credentials", {
+          ...values,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          form.setError(
+            "email",
+            {
+              type: "manual",
+              message: "The email or password is incorrect.",
+            },
+            {
+              shouldFocus: true,
+            },
+          );
+          form.setError("password", { message: "" });
+        } else {
+          if (result?.url) {
+            router.push(result.url);
           } else {
-            router.push("/");
+            router.push("/dashboard");
           }
         }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      } catch (e) {
+        console.log(e);
+      }
+    });
   }
 
   return (
@@ -85,7 +99,9 @@ export function SignInForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isPending} className="w-full">
+          {isPending ? "Signing in..." : "Sign in"}
+        </Button>
       </form>
     </Form>
   );

@@ -1,12 +1,13 @@
 import { cookies, headers } from "next/headers";
-import NextAuth, { DefaultSession } from "next-auth";
+import NextAuth, { AuthError, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { ZodErrorMap } from "zod";
 
 import { SignInDto } from "@budgetto/schema/auth";
 
 import { env } from "~/env";
 
-const privateRoutes = ["/categories"];
+const privateRoutes = ["/dashboard"];
 
 declare module "next-auth" {
   interface User {
@@ -16,6 +17,8 @@ declare module "next-auth" {
     refreshToken: string;
     exp: number;
     role: string;
+    message?: string;
+    errors?: ZodErrorMap;
   }
 
   interface Session {
@@ -107,7 +110,7 @@ export const { signIn, auth, handlers } = NextAuth({
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.message, { cause: data.errors });
+          return data;
         }
 
         if (res.ok && data) {
@@ -213,6 +216,15 @@ export const { signIn, auth, handlers } = NextAuth({
       const callBackUrl = new URL(url).searchParams.get("callbackUrl");
 
       return callBackUrl ?? baseUrl;
+    },
+    signIn({ user }) {
+      if (user?.errors) {
+        throw new Error(user.message, {
+          cause: user.errors,
+        });
+      }
+
+      return true;
     },
   },
   // this is required
