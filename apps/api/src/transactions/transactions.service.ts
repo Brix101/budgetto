@@ -39,9 +39,16 @@ export class TransactionsService {
 
   async findAll(user: UserDto) {
     try {
-      const transactions = await this.repo.findAll({
-        where: { user: { id: user.id } },
-      });
+      const transactions = await this.repo.findByCursor(
+        {
+          user: { id: user.id },
+        },
+        {
+          first: 10,
+          orderBy: { createdAt: "DESC" },
+          populate: ["category"],
+        },
+      );
       return transactions;
     } catch (error) {
       this.logger.error(error);
