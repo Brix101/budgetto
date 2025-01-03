@@ -6,7 +6,9 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { env } from "~/env";
 
-async function getCategories(): Promise<CategoryDto[] | null> {
+export const dynamic = "force-dynamic";
+
+async function getCategories(): Promise<CategoryDto[]> {
   try {
     const session = await auth();
 
@@ -24,7 +26,7 @@ async function getCategories(): Promise<CategoryDto[] | null> {
     return result;
   } catch (e) {
     console.log(e);
-    return null;
+    return [];
   }
 }
 
@@ -46,7 +48,7 @@ export default async function CategoriesPage() {
       <Card className="p-10">
         <h1 className="text-2xl font-bold">Categories</h1>
         <ul>
-          {categories?.map((category) => (
+          {categories.map((category) => (
             <li key={category.id}>{category.name} </li>
           ))}
         </ul>
