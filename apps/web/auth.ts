@@ -1,5 +1,6 @@
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
-import NextAuth, { AuthError, DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { ZodErrorMap } from "zod";
 
@@ -71,7 +72,7 @@ async function refreshAccessToken(token) {
   }
 }
 
-export const { signIn, auth, handlers } = NextAuth({
+const authConfig = {
   trustHost: true,
   theme: {
     logo: "https://next-auth.js.org/img/logo/logo-sm.png",
@@ -234,4 +235,14 @@ export const { signIn, auth, handlers } = NextAuth({
     signIn: "/sign-in",
   },
   debug: env.NODE_ENV === "development",
-});
+} satisfies NextAuthConfig;
+
+const { handlers, auth: defaultAuth, signIn, signOut } = NextAuth(authConfig);
+
+/**
+ * This is the main way to get session data for your RSCs.
+ * This will de-duplicate all calls to next-auth's default `auth()` function and only call it once per request
+ */
+const auth = cache(defaultAuth);
+
+export { handlers, auth, signIn, signOut };
