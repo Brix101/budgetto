@@ -5,6 +5,8 @@ import type { CategoryDto } from "@budgetto/schema/category";
 import { Card } from "~/components/ui/card";
 import { env } from "~/env";
 
+export const dynamic = "force-dynamic";
+
 async function getCategories(): Promise<CategoryDto[] | null> {
   try {
     const session = await auth();
