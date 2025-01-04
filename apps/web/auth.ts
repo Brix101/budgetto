@@ -243,6 +243,6 @@ const { handlers, auth: defaultAuth, signIn, signOut } = NextAuth(authConfig);
  * This is the main way to get session data for your RSCs.
  * This will de-duplicate all calls to next-auth's default `auth()` function and only call it once per request
  */
-const auth = cache(defaultAuth);
+// const auth = cache(defaultAuth);
 
-export { handlers, auth, signIn, signOut };
+export { handlers, defaultAuth as auth, signIn, signOut };
